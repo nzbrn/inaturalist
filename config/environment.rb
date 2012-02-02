@@ -74,7 +74,7 @@ Rails::Initializer.run do |config|
   # Added from the acts_as_authenticated plugin 6/3/07
   config.active_record.observers = :user_observer, :listed_taxon_sweeper
   
-  # Gems
+  # Gems, see also Gemfile
   config.gem 'will_paginate', :version => '2.3.15'
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => 'http://gems.github.com', :version => '2.0.2'
   config.gem "dbf", :version => "<= 1.2.9"
@@ -111,7 +111,7 @@ Rails::Initializer.run do |config|
   config.gem "friendly_id", :version => "~> 3.2.1"
   config.gem "koala"
   config.gem "preferences"
-  
+
   # Set default time zone to UTC
   config.time_zone = 'UTC'
 end
