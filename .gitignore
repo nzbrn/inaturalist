@@ -16,6 +16,7 @@ config/settings.yml
 config/tilestache.cfg
 log/*
 cache/
+tmp/
 db/sphinx/
 Capfile
 config/*.sphinx.conf
@@ -30,6 +31,7 @@ public/taxa
 public/attachments
 .rvmrc
 .bundle
+Gemfile.lock
 *.rails2
 *.orig
 *.swp
