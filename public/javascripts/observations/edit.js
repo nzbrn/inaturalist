@@ -2,13 +2,30 @@ $(document).ready(function() {
   $('.species_guess').simpleTaxonSelector();
   $('.observed_on_string').iNatDatepicker();
   try {
+    var map = iNaturalist.Map.createMap({
+      div: $('#map').get(0),
+      mapTypeId: google.maps.MapTypeId.HYBRID
+    })
+    if (typeof(PLACE) != 'undefined' && PLACE) {
+      map.setPlace(PLACE, {
+        kml: PLACE_GEOMETRY_KML_URL,
+        click: function(e) {
+          $.fn.latLonSelector.handleMapClick(e)
+        }
+      })
+      map.controls[google.maps.ControlPosition.TOP_RIGHT].push(new iNaturalist.OverlayControl(map))
+    }
     $('.place_guess').latLonSelector({
-      mapDiv: $('#mapcontainer').get(0),
-      map: iNaturalist.Map.createMap({div: $('#mapcontainer').get(0)})
+      mapDiv: $('#map').get(0),
+      map: map
     })
   } catch (e) {
     // maps didn't load
   }
+  
+  $('#mapcontainer').hover(function() {
+    $('#mapcontainer .description').fadeOut()
+  })
   
   // Setup taxon browser
   $('body').append(

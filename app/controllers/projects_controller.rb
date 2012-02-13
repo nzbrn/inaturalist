@@ -52,8 +52,7 @@ class ProjectsController < ApplicationController
         @project_assets = @project.project_assets.all(:limit => 100)
         @logo_image = @project_assets.detect{|pa| pa.asset_file_name =~ /logo\.(png|jpg|jpeg|gif)/}    
         @kml_assets = @project_assets.select{|pa| pa.asset_content_type == "application/vnd.google-earth.kml+xml"}
-        @place = @project.project_observation_rules.first(:conditions => {:operator => "observed_in_place?"}).try(:operand)
-        if @place
+        if @place = @project.rule_place
           @place_geometry = PlaceGeometry.without_geom.first(:conditions => {:place_id => @place})
         end
       end
@@ -351,17 +350,20 @@ class ProjectsController < ApplicationController
   def add
     unless @observation = Observation.find_by_id(params[:observation_id])
       flash[:error] = "That observation doesn't exist."
-      redirect_to :back and return
+      redirect_back_or_default(@project)
+      return
     end
     if @project_observation = ProjectObservation.first(:conditions => { :project_id => @project.id, :observation_id => @observation.id })
       flash[:error] = "The observation was already added to that project."
-      redirect_to :back and return
+      redirect_back_or_default(@project)
+      return
     end
     @project_observation = ProjectObservation.create(:project => @project, :observation => @observation)
     unless @project_observation.valid?
       flash[:error] = "There were problems adding your observation to this project: " + 
         @project_observation.errors.full_messages.to_sentence
-      redirect_to :back and return
+      redirect_back_or_default(@project)
+      return
     end
     
     if @project_invitation = ProjectInvitation.first(:conditions => {:project_id => @project.id, :observation_id => @observation.id})
@@ -369,23 +371,26 @@ class ProjectsController < ApplicationController
     end
     
     flash[:notice] = "Observation added to the project \"#{@project.title}\""
-    redirect_to :back
+    redirect_back_or_default(@project)
   end
   
   def remove
     unless @project_observation = @project.project_observations.find_by_observation_id(params[:observation_id])
       flash[:error] = "That observation hasn't been added this project."
-      redirect_to :back and return
+      redirect_back_or_default(@project)
+      return
     end
     
     unless @project_observation.observation.user_id == current_user.id || current_user.project_users.first(:conditions => {:project_id => @project_observation.project.id, :role => 'curator'})
       flash[:error] = "You can't remove other people's observations."
-      redirect_to :back and return
+      redirect_back_or_default(@project)
+      return
     end
     
     @project_observation.destroy
     flash[:notice] = "Observation removed from the project \"#{@project.title}\""
-    redirect_to :back
+    redirect_back_or_default(@project)
+    return
   end
   
   def add_batch
@@ -448,7 +453,8 @@ class ProjectsController < ApplicationController
     end
     
     flash[:notice] = "Observations removed from the project \"#{@project.title}\""
-    redirect_to :back
+    redirect_back_or_default(@project)
+    return
   end
   
   def search

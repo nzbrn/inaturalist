@@ -306,6 +306,9 @@ class ObservationsController < ApplicationController
       end
       if @project
         @project_curators = @project.project_users.all(:conditions => {:role => "curator"})
+        if @place = @project.rule_place
+          @place_geometry = PlaceGeometry.without_geom.first(:conditions => {:place_id => @place})
+        end
       end
     end
     options[:time_zone] = current_user.time_zone
@@ -326,6 +329,7 @@ class ObservationsController < ApplicationController
     # this should happen AFTER photo syncing so params can override attrs 
     # from the photo
     [:latitude, :longitude, :place_guess, :location_is_exact, :map_scale,
+        :positional_accuracy, :positioning_device, :positioning_method,
         :observed_on_string].each do |obs_attr|
       @observation.send("#{obs_attr}=", params[obs_attr]) unless params[obs_attr].blank?
     end
@@ -476,7 +480,10 @@ class ObservationsController < ApplicationController
               :place_guess => o.place_guess, 
               :observed_on_string => o.observed_on_string,
               :location_is_exact => o.location_is_exact,
-              :map_scale => o.map_scale
+              :map_scale => o.map_scale,
+              :positional_accuracy => o.positional_accuracy,
+              :positioning_method => o.positional_accuracy,
+              :positioning_device => o.positional_accuracy
           elsif @observations.size == 1
             redirect_to observation_path(@observations.first)
           else
@@ -673,14 +680,14 @@ class ObservationsController < ApplicationController
         @observations << Observation.new(
           :user => current_user,
           :species_guess => taxon_name_str,
-          :taxon => Taxon.find(
-            :first, 
-            :include => :taxon_names, 
-            :conditions => ["taxon_names.name = ?", taxon_name_str.strip]),
+          :taxon => Taxon.single_taxon_for_name(taxon_name_str.strip),
           :place_guess => params[:batch][:place_guess],
           :longitude => longitude,
           :latitude => latitude,
           :map_scale => params[:batch][:map_scale],
+          :positional_accuracy => params[:batch][:positional_accuracy],
+          :positioning_method => params[:batch][:positioning_method],
+          :positioning_device => params[:batch][:positioning_device],
           :location_is_exact => params[:batch][:location_is_exact],
           :observed_on_string => params[:batch][:observed_on_string],
           :time_zone => current_user.time_zone)

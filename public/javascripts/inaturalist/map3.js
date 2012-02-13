@@ -111,7 +111,13 @@ google.maps.Map.prototype.addObservation = function(observation, options) {
   marker.setMap(this);
   observation.marker = marker;
   
-  if (options.showAccuracy && observation.positional_accuracy && observation.positional_accuracy > 0) {
+  if (options.showAccuracy && 
+      (observation.coordinates_obscured || (observation.positional_accuracy && observation.positional_accuracy > 0))) {
+    var accuracy = parseInt(observation.positional_accuracy) || 0
+    if (observation.coordinates_obscured) {
+      accuracy += 10000
+    }
+    if (accuracy == 0) return
     var color = observation.iconic_taxon ? iNaturalist.Map.ICONIC_TAXON_COLORS[observation.iconic_taxon.name] : '#333333'
     var circle = new google.maps.Circle({
       strokeColor: color,
@@ -121,7 +127,17 @@ google.maps.Map.prototype.addObservation = function(observation, options) {
       fillOpacity: 0.35,
       map: this,
       center: marker.getPosition(),
-      radius: observation.positional_accuracy
+      radius: accuracy
+    })
+    observation._circle = circle
+    google.maps.event.addListener(this, 'zoom_changed', function() {
+      var mapBounds = this.getBounds(),
+          circleBounds = circle.getBounds()
+      if (circleBounds.contains(mapBounds.getNorthEast()) && circleBounds.contains(mapBounds.getSouthWest())) {
+        circle.setVisible(false)
+      } else {
+        circle.setVisible(true)
+      }
     })
   }
   
@@ -208,6 +224,27 @@ google.maps.Map.prototype.addPlace = function(place, options) {
   
   // return the place for futher use
   return place;
+}
+
+// Zooms to place boundaries, adds kml if available
+google.maps.Map.prototype.setPlace = function(place, options) {
+  if (place.swlat) {
+    var bounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(place.swlat, place.swlng),
+      new google.maps.LatLng(place.nelat, place.nelng)
+    )
+    this.fitBounds(bounds)
+  } else {
+    this.setCenter(new google.maps.LatLng(place.latitude, place.longitude));
+  }
+  
+  if (options.kml && options.kml.length > 0) {
+    var kml = new google.maps.KmlLayer(options.kml, {suppressInfoWindows: true, preserveViewport: true})
+    this.addOverlay(place.name + " boundary", kml)
+    if (options.click) {
+      google.maps.event.addListener(kml, 'click', options.click)
+    }
+  }
 }
 // 
 // google.maps.Map.prototype.addPlaces = function(places, options) {
@@ -617,21 +654,40 @@ iNaturalist.Map.builtPlacesMapType = function(map, options) {
   return PlacesMapType
 }
 
+// Haversine distance calc, adapted from http://www.movable-type.co.uk/scripts/latlong.html
+iNaturalist.Map.distanceInMeters = function(lat1, lon1, lat2, lon2) {
+  var earthRadius = 6370997, // m 
+      degreesPerRadian = 57.2958,
+      dLat = (lat2-lat1) / degreesPerRadian,
+      dLon = (lon2-lon1) / degreesPerRadian,
+      lat1 = lat1 / degreesPerRadian,
+      lat2 = lat2 / degreesPerRadian
+
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = earthRadius * c;
+  
+  return d
+}
+
 iNaturalist.FullScreenControl = function(map) {
-  var controlDiv = document.createElement('DIV')
+  var controlDiv = document.createElement('DIV'),
+      enter = '<span class="ui-icon ui-icon-extlink">Full screen</span>',
+      exit = '<span class="ui-icon ui-icon-arrow-1-sw inlineblock"></span> Exit full screen'
   controlDiv.style.padding = '5px';
-  var controlUI = $('<div>Full screen</div>').addClass('gmapv3control')
+  var controlUI = $('<div></div>').html(enter).addClass('gmapv3control')
   controlDiv.appendChild(controlUI.get(0))
   
   controlUI.toggle(function() {
     var oldCenter = map.getCenter()
-    $(this).html('Exit full screen').css('font-weight', 'bold')
+    $(this).html(exit).css('font-weight', 'bold')
     $(map.getDiv()).addClass('fullscreen')
     google.maps.event.trigger(map, 'resize')
     map.setCenter(oldCenter)
   }, function() {
     var oldCenter = map.getCenter()
-    $(this).html('Full screen').css('font-weight', 'normal')
+    $(this).html(enter).css('font-weight', 'normal')
     $(map.getDiv()).removeClass('fullscreen')
     google.maps.event.trigger(map, 'resize')
     map.setCenter(oldCenter)

@@ -173,7 +173,6 @@ class Observation < ActiveRecord::Base
               :set_iconic_taxon,
               :keep_old_taxon_id,
               :set_latlon_from_place_guess,
-              :set_positional_accuracy,
               :reset_private_coordinates_if_coordinates_changed,
               :obscure_coordinates_for_geoprivacy,
               :obscure_coordinates_for_threatened_taxa,
@@ -1128,15 +1127,12 @@ class Observation < ActiveRecord::Base
     true
   end
   
+  def single_taxon_for_name(name)
+    Taxon.single_taxon_for_name(name)
+  end
+  
   def single_taxon_id_for_name(name)
-    return if Taxon::PROBLEM_NAMES.include?(name.downcase)
-    taxon_names = TaxonName.all(:conditions => ["lower(name) = ?", name.strip.gsub(/[\s_]+/, ' ').downcase], :limit => 5, :include => :taxon)
-    return if taxon_names.blank?
-    return taxon_names.first.taxon_id if taxon_names.size == 1
-    sorted = Taxon.sort_by_ancestry(taxon_names.map(&:taxon).compact)
-    return if sorted.blank?
-    return unless sorted.first.ancestor_of?(sorted.last)
-    sorted.first.id
+    Taxon.single_taxon_for_name(name).try(:id)
   end
   
   def set_latlon_from_place_guess
@@ -1166,14 +1162,6 @@ class Observation < ActiveRecord::Base
       self.geom = nil
     elsif longitude_changed? || latitude_changed?
       self.geom = Point.from_x_y(longitude, latitude)
-    end
-    true
-  end
-  
-  # Not *entirely* sure this is the best strategy...
-  def set_positional_accuracy
-    if (latitude_changed? || longitude_changed?) && !positional_accuracy_changed?
-      self.positional_accuracy = nil
     end
     true
   end
