@@ -995,6 +995,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.string   "suspension_reason"
     t.datetime "icon_updated_at"
     t.string   "gender"
+    t.integer  "year_of_birth"
   end
 
   add_index "users", ["identifications_count"], :name => "index_users_on_identifications_count"
