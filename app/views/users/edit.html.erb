@@ -48,6 +48,7 @@
     </div>
     <div class="column span-9">
       <%= f.text_area(:description, :label => "Tell everyone a little about yourself") %>
+      <%= f.select(:gender,User::USER_GENDER, {:prompt => 'Select gender'}) %>
     </div>
     <div id="preferencescol" class="last column span-9">
       <div class="stacked">

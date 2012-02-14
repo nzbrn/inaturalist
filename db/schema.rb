@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120123190202) do
+ActiveRecord::Schema.define(:version => 20120213223810) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -358,12 +358,12 @@ ActiveRecord::Schema.define(:version => 20120123190202) do
     t.integer  "private_positional_accuracy"
     t.string   "geoprivacy"
     t.string   "quality_grade",                                                                   :default => "casual"
-    t.point    "geom",                             :limit => nil
     t.string   "user_agent"
     t.string   "positioning_method"
     t.string   "positioning_device"
     t.boolean  "out_of_range"
     t.string   "license"
+    t.point    "geom",                             :limit => nil
   end
 
   add_index "observations", ["geom"], :name => "index_observations_on_geom", :spatial => true
@@ -765,8 +765,8 @@ ActiveRecord::Schema.define(:version => 20120123190202) do
     t.integer       "range_file_size"
     t.text          "description"
     t.integer       "source_id"
-    t.multi_polygon "geom",               :limit => nil
     t.integer       "source_identifier"
+    t.multi_polygon "geom",               :limit => nil
   end
 
   add_index "taxon_ranges", ["geom"], :name => "index_taxon_ranges_on_geom", :spatial => true
@@ -823,6 +823,7 @@ ActiveRecord::Schema.define(:version => 20120123190202) do
     t.text     "old_preferences"
     t.string   "icon_url"
     t.string   "last_ip"
+    t.string   "gender"
   end
 
   add_index "users", ["identifications_count"], :name => "index_users_on_identifications_count"
