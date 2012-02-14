@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
   preference :photo_license, :string
   
   NOTIFICATION_PREFERENCES = %w(comment_email_notification identification_email_notification project_invitation_email_notification)
-  
+  USER_GENDER = %w(Male Female)
   belongs_to :life_list, :dependent => :destroy
   has_many  :provider_authorizations, :dependent => :destroy
   has_one  :flickr_identity, :dependent => :destroy
@@ -122,11 +122,11 @@ class User < ActiveRecord::Base
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message, :allow_blank => true
   validates_length_of       :email,    :within => 6..100, :allow_blank => true #r@a.wk
   validates_uniqueness_of   :email,    :allow_blank => true
-
+  validates_inclusion_of :gender, :in => USER_GENDER, :message => "%{value} is not a valid gender", :allow_blank => true
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender
   
   named_scope :order, Proc.new { |sort_by, sort_dir|
     sort_dir ||= 'DESC'
