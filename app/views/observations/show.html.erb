@@ -84,9 +84,9 @@
         :include => {:user => {:only => :login}, :taxon => {}, :iconic_taxon => {}}) %>;
       if ((observation.latitude && observation.longitude) || (observation.private_latitude && observation.private_longitude)) {
         window.map = iNaturalist.Map.createMap({
-          lat: 40.714, 
-          lng: -98.262, 
-          zoom: <%= @observation.map_scale || 3 %>, 
+          lat: <%= INAT_CONFIG['general']['map']['lat'] -%>,
+          lng: <%= INAT_CONFIG['general']['map']['lng'] -%>,
+          zoom: <%= @observation.map_scale || INAT_CONFIG['general']['map']['zoom'] -%>
           controls: 'small'
         });
         map.addObservation(observation, {clickable: false, showAccuracy: true});

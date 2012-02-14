@@ -35,7 +35,7 @@
      $('div.observed_on h4.label').text('Observed');
      $('div.created_at').show();
 
-     var map = iNaturalist.Map.createMap({lat: 40.714, lng: -98.262, zoom: 3});
+     var map = iNaturalist.Map.createMap({lat: <%= INAT_CONFIG['general']['map']['lat'] -%>, lng: <%= INAT_CONFIG['general']['map']['lng'] -%>, zoom: <%= INAT_CONFIG['general']['map']['zoom'] -%>});
      map.overviewMapControl = true;
 
      // Load in some observations
@@ -91,8 +91,9 @@
           icon_div.empty().append(icon_img);
         }
       });
-      
-      map.fitBounds(bounds)
+      if (observations.length > 0) { 
+        map.fitBounds(bounds);
+      }
     });
   </script>
 <% end %>

@@ -8,6 +8,10 @@
 base: &base
     general:
         SITE_NAME: yoursite.org
+        map:
+            lat: 40.714
+            lng: -98.262
+            zoom: 3
     rest_auth:
         # See vendor/plugins/restful_authentication/notes/Tradeoffs.txt for more info
         REST_AUTH_SITE_KEY: 09af09af09af09af09af09af09af09af09af09af
@@ -54,24 +58,16 @@ base: &base
       secret: 09af09af09af09af09af09af09af09af09af09af
     cloudmade:
       key: 09af09af09af09af09af09af09af09af09af09af
+    flickr:
+        #http://www.flickr.com/services/api/keys/apply/
+        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
+        FLICKR_SHARED_SECRET: 09af09af09af09af
 
 development:
     <<: *base
-    flickr:
-        #http://www.flickr.com/services/api/keys/apply/
-        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
-        FLICKR_SHARED_SECRET: 09af09af09af09af
 
 test:
     <<: *base
-    flickr:
-        #http://www.flickr.com/services/api/keys/apply/
-        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
-        FLICKR_SHARED_SECRET: 09af09af09af09af
 
 production:
     <<: *base
-    flickr:
-        #http://www.flickr.com/services/api/keys/apply/
-        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
-        FLICKR_SHARED_SECRET: 09af09af09af09af

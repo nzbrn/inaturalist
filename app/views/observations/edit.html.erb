@@ -26,6 +26,7 @@
                              "taxon_browser",
                              "observations/edit" %>
   <script type="text/javascript" charset="utf-8">
+    var DEFAULT_MAP = {lat: <%= INAT_CONFIG['general']['map']['lat'] -%>, lng: <%= INAT_CONFIG['general']['map']['lng'] -%>, zoom: <%= INAT_CONFIG['general']['map']['zoom'] -%>};
     var DEFAULT_PHOTO_IDENTITY_URL = <%= @default_photo_identity_url.to_json %>
     var PHOTO_IDENTITY_URLS = [<%= @photo_identity_urls.join(',') %>]
   </script>
