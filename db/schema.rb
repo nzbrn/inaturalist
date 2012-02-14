@@ -302,6 +302,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.string   "observations_month_counts"
     t.integer  "taxon_range_id"
     t.integer  "source_id"
+    t.boolean  "comprehensive",                           :default => false
     t.boolean  "manually_added",                          :default => false
   end
 
@@ -310,6 +311,8 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
   add_index "listed_taxa", ["last_observation_id", "list_id"], :name => "index_listed_taxa_on_last_observation_id_and_list_id"
   add_index "listed_taxa", ["list_id", "taxon_ancestor_ids", "taxon_id"], :name => "index_listed_taxa_on_list_id_and_taxon_ancestor_ids_and_taxon_i"
   add_index "listed_taxa", ["list_id", "taxon_id"], :name => "index_listed_taxa_on_list_id_and_taxon_id"
+  add_index "listed_taxa", ["list_id"], :name => "index_listed_taxa_on_list_id_and_lft"
+  add_index "listed_taxa", ["place_id", "created_at"], :name => "index_listed_taxa_on_place_id_and_created_at"
   add_index "listed_taxa", ["place_id", "observations_count"], :name => "index_listed_taxa_on_place_id_and_observations_count"
   add_index "listed_taxa", ["place_id", "taxon_id"], :name => "index_listed_taxa_on_place_id_and_taxon_id"
   add_index "listed_taxa", ["source_id"], :name => "index_listed_taxa_on_source_id"
@@ -685,6 +688,18 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.datetime "updated_at"
   end
 
+  create_table "slugs", :force => true do |t|
+    t.string   "name"
+    t.integer  "sluggable_id"
+    t.integer  "sequence",                     :default => 1, :null => false
+    t.string   "sluggable_type", :limit => 40
+    t.string   "scope"
+    t.datetime "created_at"
+  end
+
+  add_index "slugs", ["name", "sluggable_type", "sequence", "scope"], :name => "index_slugs_on_n_s_s_and_s", :unique => true
+  add_index "slugs", ["sluggable_id"], :name => "index_slugs_on_sluggable_id"
+
   create_table "sources", :force => true do |t|
     t.string   "in_text"
     t.string   "citation",   :limit => 512
@@ -979,6 +994,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.datetime "suspended_at"
     t.string   "suspension_reason"
     t.datetime "icon_updated_at"
+    t.string   "gender"
   end
 
   add_index "users", ["identifications_count"], :name => "index_users_on_identifications_count"

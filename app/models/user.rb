@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
   
   # If the user has this role, has_role? will always return true
   JEDI_MASTER_ROLE = 'admin'
+
+  USER_GENDER = %w(Male Female)
   
   devise :database_authenticatable, :registerable, :suspendable,
          :recoverable, :rememberable, :confirmable, :validatable, 
@@ -32,7 +34,6 @@ class User < ActiveRecord::Base
   preference :observations_view, :string
   
   NOTIFICATION_PREFERENCES = %w(comment_email_notification identification_email_notification project_invitation_email_notification project_journal_post_email_notification)
-  
   belongs_to :life_list, :dependent => :destroy
   has_many  :provider_authorizations, :dependent => :destroy
   has_one  :flickr_identity, :dependent => :destroy
@@ -108,11 +109,13 @@ class User < ActiveRecord::Base
   validates_uniqueness_of   :login
   validates_format_of       :login,    :with => login_regex, :message => bad_login_message
 
+  validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100, :allow_blank => true
 
   validates_format_of       :email,    :with => email_regex, :message => bad_email_message, :allow_blank => true
   validates_length_of       :email,    :within => 6..100, :allow_blank => true #r@a.wk
   validates_uniqueness_of   :email,    :allow_blank => true
+  validates_inclusion_of :gender, :in => USER_GENDER, :message => "%{value} is not a valid gender", :allow_blank => true
 
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
