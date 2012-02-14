@@ -31,7 +31,7 @@
         <%= o.text_field(:observed_on_string, 
                          :class => 'observed_on_string text') %>
         <%= o.error_message_on(:observed_on) %>
-        <%= o.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:class => 'time_zone'} %>
+        <%= o.time_zone_select :time_zone, PRIORITY_ZONES, {}, {:class => 'time_zone'} %>
         <div class="small description">
           e.g. "<%= Date.today.to_s(:long) %>" or "yesterday"
         </div>

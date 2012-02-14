@@ -8,6 +8,16 @@
 base: &base
     general:
         SITE_NAME: yoursite.org
+        priority_zones:
+            - US
+            - Arizona
+            - Indiana
+            - Hawaii
+            - Alaska
+        map:
+            lat: 40.714
+            lng: -98.262
+            zoom: 3
     rest_auth:
         # See vendor/plugins/restful_authentication/notes/Tradeoffs.txt for more info
         REST_AUTH_SITE_KEY: 09af09af09af09af09af09af09af09af09af09af
