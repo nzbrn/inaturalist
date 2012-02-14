@@ -8,6 +8,12 @@
 base: &base
     general:
         SITE_NAME: yoursite.org
+        priority_zones:
+            - US
+            - Arizona
+            - Indiana
+            - Hawaii
+            - Alaska
         map:
             lat: 40.714
             lng: -98.262
