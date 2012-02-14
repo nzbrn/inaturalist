@@ -53,4 +53,6 @@ group :development, :test do
   gem "mocha",       "0.9.4", :path => 'vendor/gems/mocha-0.9.4'
   gem "faker",       "1.0.1"
   gem "ruby-debug",  "0.10.4"
+  gem "pry"
+  gem "pry-doc"
 end
