@@ -86,6 +86,7 @@ class User < ActiveRecord::Base
   before_validation :strip_name
   before_save :whitelist_licenses
   after_save :update_observation_licenses
+  before_validation :update_name
   after_save :update_photo_licenses
   after_create :create_default_life_list
   after_destroy :create_deleted_user
@@ -130,7 +131,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name
   
   scope :order_by, Proc.new { |sort_by, sort_dir|
     sort_dir ||= 'DESC'
@@ -359,10 +360,14 @@ class User < ActiveRecord::Base
     autogen_login = User.suggest_login(email.split('@').first) if autogen_login.blank? && !email.blank?
     autogen_login = User.suggest_login('naturalist') if autogen_login.blank?
     autogen_pw = SecureRandom.hex(6) # autogenerate a random password (or else validation fails)
+    fn = auth_info["info"]["first_name"] ||  auth_info["user_info"]["name"].split[0]
+    ln = auth_info["info"]["last_name"] ||  auth_info["user_info"]["name"].split[1]
     u = User.new(
       :login => autogen_login,
       :email => email,
       :name => auth_info["info"]["name"],
+      :first_name => fn,
+      :last_name => ln,
       :password => autogen_pw,
       :password_confirmation => autogen_pw,
       :icon_url => auth_info["info"]["image"]
@@ -377,6 +382,11 @@ class User < ActiveRecord::Base
     u.add_provider_auth(auth_info)
     u
   end
+  
+  def update_name
+    self.name =  [first_name, last_name].join(' ').strip
+  end
+  protected
 
   # given a requested login, will try to find existing users with that login
   # and suggest handle2, handle3, handle4, etc if the login's taken
