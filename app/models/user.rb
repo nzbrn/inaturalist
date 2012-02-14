@@ -123,10 +123,18 @@ class User < ActiveRecord::Base
   validates_length_of       :email,    :within => 6..100, :allow_blank => true #r@a.wk
   validates_uniqueness_of   :email,    :allow_blank => true
   validates_inclusion_of :gender, :in => USER_GENDER, :message => "%{value} is not a valid gender", :allow_blank => true
+  validates_each :year_of_birth, :allow_blank => true do |record, attr, value|
+    record.errors.add attr, 'must be between 1900 and this year' unless is_valid_year?(value)  
+  end
+  def self.is_valid_year? (date)
+    (1900..Time.now.year).include?(date)
+  end
+
+
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth
   
   named_scope :order, Proc.new { |sort_by, sort_dir|
     sort_dir ||= 'DESC'
