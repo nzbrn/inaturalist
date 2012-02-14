@@ -13,7 +13,8 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 require 'yaml'
 INAT_CONFIG = YAML.load(File.open("#{RAILS_ROOT}/config/config.yml"))[RAILS_ENV]
-
+# Set the priority time zones for the time zone select lists
+PRIORITY_ZONES = ActiveSupport::TimeZone.all.find_all { |z| z.name =~ %r{#{INAT_CONFIG['general']['priority_zones'].join('|')}} }
 # flickr api keys - these need to be set before Flickraw gets included
 FLICKR_API_KEY = INAT_CONFIG['flickr']['FLICKR_API_KEY']
 FLICKR_SHARED_SECRET = INAT_CONFIG['flickr']['FLICKR_SHARED_SECRET']
