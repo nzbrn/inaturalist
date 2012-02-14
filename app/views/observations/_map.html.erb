@@ -15,6 +15,9 @@
     $(document).ready(function() {
       // Setup the Map
       var map = iNaturalist.Map.createMap({
+        lat: <%= INAT_CONFIG['general']['map']['lat'] -%>,
+        lng: <%= INAT_CONFIG['general']['map']['lng'] -%>,
+        zoom: <%= INAT_CONFIG['general']['map']['zoom'] -%>,
         observationsTileServer: '<%= OBSERVATIONS_TILE_SERVER %>',
         overviewMapControl: true
       });
@@ -47,9 +50,11 @@
             new google.maps.LatLng(<%= @swlat %>, <%= @swlng %>),
             new google.maps.LatLng(<%= @nelat %>, <%= @nelng %>)
           );
-          map.fitBounds(bounds)
+          map.fitBounds(bounds);
         <%- else -%>
-          map.zoomToObservations();
+          if (observations.length > 0) {
+            map.zoomToObservations();
+          }
         <%- end -%>
       } else {
         map.setZoom(2);

@@ -54,6 +54,10 @@ base: &base
       secret: 09af09af09af09af09af09af09af09af09af09af
     cloudmade:
       key: 09af09af09af09af09af09af09af09af09af09af
+    flickr:
+        #http://www.flickr.com/services/api/keys/apply/
+        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
+        FLICKR_SHARED_SECRET: 09af09af09af09af
     bing:
       # http://www.bingmapsportal.com/
       key: 09af09af09af09af09af09af09af09af09af09af
@@ -66,21 +70,9 @@ base: &base
 
 development:
     <<: *base
-    flickr:
-        #http://www.flickr.com/services/api/keys/apply/
-        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
-        FLICKR_SHARED_SECRET: 09af09af09af09af
 
 test:
     <<: *base
-    flickr:
-        #http://www.flickr.com/services/api/keys/apply/
-        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
-        FLICKR_SHARED_SECRET: 09af09af09af09af
 
 production:
     <<: *base
-    flickr:
-        #http://www.flickr.com/services/api/keys/apply/
-        FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
-        FLICKR_SHARED_SECRET: 09af09af09af09af

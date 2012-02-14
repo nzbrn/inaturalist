@@ -3,6 +3,9 @@ $(document).ready(function() {
   $('.observed_on_string').iNatDatepicker();
   try {
     var map = iNaturalist.Map.createMap({
+      lat: DEFAULT_MAP['lat'],
+      lng: DEFAULT_MAP['lng'],
+      zoom: DEFAULT_MAP['zoom'],
       div: $('#map').get(0),
       mapTypeId: google.maps.MapTypeId.HYBRID,
       bounds: BOUNDS

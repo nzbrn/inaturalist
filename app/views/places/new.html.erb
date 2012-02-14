@@ -55,7 +55,7 @@
     $(document).ready(function() {
       $('#tabs').tabs();
       
-      var importMap = iNaturalist.Map.createMap({div: 'importMap'});
+      var importMap = iNaturalist.Map.createMap({div: 'importMap', lat: <%= INAT_CONFIG['general']['map']['lat'] -%>, lng: <%= INAT_CONFIG['general']['map']['lng'] -%>, zoom: <%= INAT_CONFIG['general']['map']['zoom'] -%>});
       window.importMap = importMap;
       $('#place_parent_id').chooser({
         collectionUrl: 'http://'+window.location.host + '/places/autocomplete.json',
