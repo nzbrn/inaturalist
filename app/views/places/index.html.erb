@@ -32,9 +32,9 @@
         places = <%= @places.to_json %>
     $(document).ready(function() {
       window.map = iNaturalist.Map.createMap({
-        lat: 0, 
-        lng: 0, 
-        zoom: 2,
+        lat: <%= INAT_CONFIG['general']['map']['lat'] -%>,
+        lng: <%= INAT_CONFIG['general']['map']['lng'] -%>,
+        zoom: <%= INAT_CONFIG['general']['map']['zoom'] -%>,
         minZoom: 2
       })
       for (var i=0; i < places.length; i++) {

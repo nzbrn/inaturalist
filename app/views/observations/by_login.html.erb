@@ -69,7 +69,7 @@ Observations by <%= h @login %>
     // define a function to be run after the window is fully loaded
     function initialize() {
       // create a Google Map instance
-      var map = window.map = iNaturalist.Map.createMap({lat: 40.714, lng: -98.262, zoom: 3});
+      var map = window.map = iNaturalist.Map.createMap({lat: <%= INAT_CONFIG['general']['map']['lat'] -%>, lng: <%= INAT_CONFIG['general']['map']['lng'] -%>, zoom: <%= INAT_CONFIG['general']['map']['zoom'] -%>});
     
       // Create a basic icon and a 'new' icon
       // Note the convient color syntax
@@ -99,7 +99,9 @@ Observations by <%= h @login %>
       });
       
       // zoom the map to the extent of the observations
-      map.fitBounds(bounds)
+      if (observations.size > 0) {
+        map.fitBounds(bounds);
+      }
       
       // create infowindows and behaviors
       $.each(observations, function(observation) {
