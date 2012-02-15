@@ -446,6 +446,14 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.datetime "updated_at"
   end
 
+  create_table "phone_numbers", :force => true do |t|
+    t.string   "label"
+    t.string   "number"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "photos", :force => true do |t|
     t.integer  "user_id"
     t.string   "native_photo_id"

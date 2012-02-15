@@ -68,6 +68,10 @@ class User < ActiveRecord::Base
   has_many :quality_metrics, :dependent => :destroy
   has_many :sources, :dependent => :nullify
   has_many :places, :dependent => :nullify
+  has_many :phone_numbers
+  accepts_nested_attributes_for :phone_numbers,
+    :allow_destroy => true,
+    :reject_if => proc { |attributes| attributes['label'].blank? or attributes['number'].blank? }
   
   has_attached_file :icon, 
     :styles => { :medium => "300x300>", :thumb => "48x48#", :mini => "16x16#" },
@@ -131,7 +135,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes
   
   scope :order_by, Proc.new { |sort_by, sort_dir|
     sort_dir ||= 'DESC'

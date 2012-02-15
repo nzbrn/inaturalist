@@ -257,6 +257,7 @@ class UsersController < ApplicationController
   end
   
   def edit
+    @user.phone_numbers.build
     respond_to do |format|
       format.html
       format.json { render :json => @user.to_json(:except => [
