@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120214214138) do
+ActiveRecord::Schema.define(:version => 20120215023943) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -386,6 +386,14 @@ ActiveRecord::Schema.define(:version => 20120214214138) do
     t.integer  "user_id"
     t.string   "reset_code"
     t.datetime "expiration_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "phone_numbers", :force => true do |t|
+    t.string   "label"
+    t.string   "number"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
