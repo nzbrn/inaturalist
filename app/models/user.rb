@@ -258,6 +258,9 @@ class User < ActiveRecord::Base
   def is_curator?
     has_role?(:curator)
   end
+  def is_pro?
+    has_role?(:pro)
+  end
   
   def is_admin?
     has_role?(:admin)
