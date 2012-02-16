@@ -24,6 +24,11 @@ class User < ActiveRecord::Base
   preference :identification_email_notification, :boolean, :default => true
   preference :no_email, :boolean, :default => false
   preference :project_invitation_email_notification, :boolean, :default => true
+  preference :user_preferred_language, :string, :default => "English"
+  preference :user_preferred_species_names, :string, :default => "Scientific"
+  preference :user_preferred_email_visible, :boolean, :default => false
+  preference :user_preferred_address_visible, :boolean, :default => false
+  preference :user_preferred_telephone_visible, :boolean, :default => false
   preference :lists_by_login_sort, :string, :default => "id"
   preference :lists_by_login_order, :string, :default => "asc"
   preference :per_page, :integer, :default => 30
