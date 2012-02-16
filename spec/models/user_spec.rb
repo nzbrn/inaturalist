@@ -167,6 +167,19 @@ describe User do
     u.update_attributes(:gender => 'hermaphridite')
     u.errors.on(:gender).should_not be_nil
   end
+  it "allows legitimate gender" do
+    u = create_user(:name => 'test user')
+    u.update_attributes(:gender => 'Male')
+    u.errors.on(:gender).should be_nil
+  end
+  it "should toggle deceased status" do
+    u = create_user(:name => 'test user')
+    u.deceased.should == false
+    u.toggle_deceased
+    u.deceased.should == true
+    u.toggle_deceased
+    u.deceased.should == false
+  end
   it "disallows illegitimate birth years" do
     u = create_user(:name => 'test user')
     u.update_attributes(:year_of_birth => 1800)
