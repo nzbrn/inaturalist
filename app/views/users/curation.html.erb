@@ -25,6 +25,12 @@
         <% else %>
           <li><%= link_to "Make curator", add_role_path(@user, :role => "curator"), :method => :post %></li>
         <% end %>
+        <% if @user.is_pro? %>
+          <li><%= link_to "Remove pro status", remove_role_path(@user, :role => "pro"), :method => :delete %></li>
+        <% else %>
+          <li><%= link_to "Make pro", add_role_path(@user, :role => "pro"), :method => :post %></li>
+        <% end %>
+
         <% unless @user.active? -%>
           <li>
             <%= link_to "Activate user", {:controller => "users", :action => "activate", :activation_code => @user.activation_code}, 
