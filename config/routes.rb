@@ -59,6 +59,7 @@ ActionController::Routing::Routes.draw do |map|
   map.with_options :controller => "users", :requirements => { :id => %r(\d+) } do |u|
     u.suspend_user '/users/:id/suspend', :action => 'suspend'
     u.unsuspend_user '/users/:id/unsuspend', :action => 'unsuspend'
+    u.toggle_deceased '/users/:id/toggle_deceased', :action => 'toggle_deceased', :method => :post
     u.add_role 'users/:id/add_role', :action => 'add_role', :method => :post
     u.remove_role 'users/:id/remove_role', :action => 'remove_role', :method => :delete
   end
