@@ -62,6 +62,9 @@
         <li>
           <strong><%= link_to "Manage / delete content", admin_user_content_path(@display_user.id) %></strong>
         </li>
+        <li>
+          <%= link_to "Mark user as #{@user.deceased? ? "alive" : "deceased"}", toggle_deceased_path(@user), :method => :post %>
+        </li>
       </ul>
     </div>
     <%- extra = capture do -%>

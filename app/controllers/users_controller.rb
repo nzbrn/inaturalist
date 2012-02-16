@@ -337,6 +337,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def toggle_deceased
+    if @user = User.find_by_id(params[:id].to_i)
+      @user.toggle_deceased
+      flash[:notice] = "Successfully updated #{@user.login} to be #{@user.deceased? ? "deceased" : "alive" }"
+      redirect_to curate_users_path and return
+    end
+    flash[:error] = "Couldn't find a user matching #{params[:id]}"
+    redirect_to root_path
+  end
 protected
 
   def add_friend

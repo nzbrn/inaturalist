@@ -390,6 +390,11 @@ class User < ActiveRecord::Base
   def update_name
     self.name =  [first_name, last_name].join(' ').strip
   end
+
+  def toggle_deceased
+    self.deceased = deceased? ? false : true
+    self.save
+  end
   protected
 
   # given a requested login, will try to find existing users with that login

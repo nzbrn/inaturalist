@@ -59,6 +59,8 @@ Inaturalist::Application.routes.draw do
   resources :people, :controller => :users
   match '/users/:id/suspend' => 'users#suspend', :as => :suspend_user, :constraints => { :id => /\d+/ }
   match '/users/:id/unsuspend' => 'users#unsuspend', :as => :unsuspend_user, :constraints => { :id => /\d+/ }
+
+    match'/users/:id/toggle_deceased' => 'users#toggle_deceased', :as => 'toggle_deceased', :method => :post, :constraints => { :id => /\d+/ }
   match 'users/:id/add_role' => 'users#add_role', :as => :add_role, :constraints => { :id => /\d+/ }, :method => :post
   match 'users/:id/remove_role' => 'users#remove_role', :as => :remove_role, :constraints => { :id => /\d+/ }, :method => :delete
   match 'photos/local_photo_fields' => 'photos#local_photo_fields', :as => :local_photo_fields
