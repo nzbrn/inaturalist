@@ -72,6 +72,20 @@
     <% end %>
   </div>
 
+
+  <% if logged_in? && @user.preferences["user_preferred_email_visible"]  %>
+    <%= separator %>
+    Email: <%= formatted_user_text(@user.email) %>
+  <% end %>
+  <% if logged_in? && @user.preferences["user_preferred_address_visible"] && !@user.address.blank? %>
+    <%= separator %>
+    Address: <%= formatted_user_text(@user.address) %>
+  <% end %>
+  <% if logged_in? && @user.preferences["user_preferred_telephone_visible"] && !@user.phone_numbers.empty? %>
+    <%= separator %>
+    <b>Contact Numbers</b><br clear="all"/>
+    <%= render @user.phone_numbers %>
+  <% end %>
   <%= separator %>
   
   <div class="stacked clear">
