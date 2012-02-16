@@ -38,6 +38,9 @@
         <li>
           <%= link_to "Log in as #{@user.login}", :controller => "admin", :action => "login_as", :id => @user.id %>
         </li>
+        <li>
+          <%= link_to "Mark user as #{@user.deceased? ? "alive" : "deceased"}", toggle_deceased_path(@user), :method => :post %>
+        </li>
       </ul>
     </div>
     <%= render :partial => 'glance' %>

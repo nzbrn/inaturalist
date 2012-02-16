@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge, 
     :show, :edit, :update, :relationships, :add_role, :remove_role]
   before_filter :ensure_user_is_current_user_or_admin, :only => [:edit, :update, :destroy]
-  before_filter :admin_required, :only => [:suspend, :unsuspend, :curation]
+  before_filter :admin_required, :only => [:suspend, :unsuspend, :curation, :toggle_deceased]
   before_filter :return_here, :only => [:index, :show, :relationships, :dashboard, :curation]
   
   MOBILIZED = [:show, :dashboard, :new]
@@ -326,6 +326,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def toggle_deceased
+    if @user = User.find_by_id(params[:id].to_i)
+      @user.toggle_deceased
+      flash[:notice] = "Successfully updated #{@user.login} to be #{@user.deceased? ? "deceased" : "alive" }"
+      redirect_to curate_users_path and return
+    end
+    flash[:error] = "Couldn't find a user matching #{params[:id]}"
+    redirect_to root_path
+  end
 protected
 
   def add_friend
