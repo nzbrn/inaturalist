@@ -418,6 +418,7 @@ ActiveRecord::Schema.define(:version => 20120217033712) do
     t.string   "file_file_name"
     t.integer  "file_file_size"
     t.boolean  "file_processing"
+    t.boolean  "mobile",            :default => false
   end
 
   add_index "photos", ["native_photo_id"], :name => "index_flickr_photos_on_flickr_native_photo_id"

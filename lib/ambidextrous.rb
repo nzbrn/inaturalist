@@ -1,7 +1,9 @@
 module Ambidextrous
   IPHONE_APP_USER_AGENT_PATTERN = /Titanium/i
+  IPHONE_APP_USER_AGENT_PATTERN_2 = /^iNaturalist\/\d+.+iOS/i
+  IPHONE_APP_USER_AGENT_PATTERNS = [IPHONE_APP_USER_AGENT_PATTERN, IPHONE_APP_USER_AGENT_PATTERN_2]
   ANDROID_APP_USER_AGENT_PATTERN = /^iNaturalist\/\d+.+Android/i
-  MOBILE_APP_USER_AGENT_PATTERNS = [IPHONE_APP_USER_AGENT_PATTERN, ANDROID_APP_USER_AGENT_PATTERN]
+  MOBILE_APP_USER_AGENT_PATTERNS = [IPHONE_APP_USER_AGENT_PATTERNS, ANDROID_APP_USER_AGENT_PATTERN].flatten
   
   protected
   def auth_url_for(provider, options = {})
@@ -24,10 +26,19 @@ module Ambidextrous
   end
   
   def is_android_app?
-    request.user_agent =~ ANDROID_APP_USER_AGENT_PATTERN
+    !(request.user_agent =~ ANDROID_APP_USER_AGENT_PATTERN).nil?
   end
   
   def is_iphone_app?
-    request.user_agent =~ IPHONE_APP_USER_AGENT_PATTERN
+    !(request.user_agent =~ IPHONE_APP_USER_AGENT_PATTERN).nil? ||
+      !(request.user_agent =~ IPHONE_APP_USER_AGENT_PATTERN_2).nil?
+  end
+  
+  def is_iphone_app_2?
+    !(request.user_agent =~ IPHONE_APP_USER_AGENT_PATTERN_2).nil?
+  end
+  
+  def is_mobile_app?
+    is_android_app? || is_iphone_app?
   end
 end
