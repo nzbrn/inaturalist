@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120220030251) do
+ActiveRecord::Schema.define(:version => 20120220034347) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -513,6 +513,11 @@ ActiveRecord::Schema.define(:version => 20120220030251) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "observation_method"
+    t.string   "host_name"
+    t.string   "habitat"
+    t.string   "substrate"
+    t.string   "substrate_qualifier"
+    t.string   "substrate_description"
   end
 
   create_table "project_assets", :force => true do |t|
