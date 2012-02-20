@@ -574,6 +574,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.boolean  "ecologically_significant", :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "observation_method"
   end
 
   create_table "project_assets", :force => true do |t|
