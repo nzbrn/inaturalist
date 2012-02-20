@@ -119,6 +119,10 @@ module ApplicationHelper
     logged_in? && current_user.is_admin?
   end
   
+  def is_pro?
+    logged_in? && current_user.is_pro?
+  end
+  
   def is_curator?
     logged_in? && current_user.is_curator?
   end

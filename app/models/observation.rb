@@ -83,7 +83,7 @@ class Observation < ActiveRecord::Base
   has_many :quality_metrics, :dependent => :destroy
   has_many :observation_field_values, :dependent => :destroy, :order => "id asc"
   has_many :observation_fields, :through => :observation_field_values
-  
+  has_one  :pro_fieldset 
   define_index do
     indexes taxon.taxon_names.name, :as => :names
     indexes tags.name, :as => :tags
@@ -144,6 +144,10 @@ class Observation < ActiveRecord::Base
   accepts_nested_attributes_for :observation_field_values, 
     :allow_destroy => true, 
     :reject_if => lambda { |attrs| attrs[:value].blank? }
+  accepts_nested_attributes_for :pro_fieldset,
+    :allow_destroy => true,
+    :reject_if  => :all_blank
+
   
   ##
   # Validations
