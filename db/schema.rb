@@ -575,6 +575,11 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "observation_method"
+    t.string   "host_name"
+    t.string   "habitat"
+    t.string   "substrate"
+    t.string   "substrate_qualifier"
+    t.string   "substrate_description"
   end
 
   create_table "project_assets", :force => true do |t|

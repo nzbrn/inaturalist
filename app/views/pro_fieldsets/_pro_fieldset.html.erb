@@ -37,4 +37,34 @@
     <span class="pro_field_value"><%=pro_fieldset.observation_method %></span>
     </div>
   <% end %>
+  <% if !pro_fieldset.host_name.blank? %>
+    <div>
+    <label>Host Name</label>
+    <span class="pro_field_value"><%=pro_fieldset.host_name %></span>
+    </div>
+  <% end %>
+  <% if !pro_fieldset.habitat.blank? %>
+    <div>
+    <label>Habitat</label>
+    <span class="pro_field_value"><%=pro_fieldset.habitat %></span>
+    </div>
+  <% end %>
+  <% if !pro_fieldset.substrate.blank? %>
+    <div>
+    <label>Substrate</label>
+    <span class="pro_field_value"><%=pro_fieldset.substrate %></span>
+    </div>
+  <% end %>
+  <% if !pro_fieldset.substrate_qualifier.blank? %>
+    <div>
+    <label>Substrate Qualifier</label>
+    <span class="pro_field_value"><%=pro_fieldset.substrate_qualifier %></span>
+    </div>
+  <% end %>
+  <% if !pro_fieldset.substrate_description.blank? %>
+    <div>
+    <label>Substrate Description</label>
+    <span class="pro_field_value"><%=pro_fieldset.substrate_description %></span>
+    </div>
+  <% end %>
 </div>
