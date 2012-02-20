@@ -31,4 +31,10 @@
     <span class="pro_field_value"><%=pro_fieldset.ecologically_significant %></span>
     </div>
   <% end %>
+  <% if !pro_fieldset.observation_method.blank? %>
+    <div>
+    <label>Observation Method</label>
+    <span class="pro_field_value"><%=pro_fieldset.observation_method %></span>
+    </div>
+  <% end %>
 </div>

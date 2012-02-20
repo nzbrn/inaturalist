@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120217033712) do
+ActiveRecord::Schema.define(:version => 20120220030251) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -512,6 +512,7 @@ ActiveRecord::Schema.define(:version => 20120217033712) do
     t.boolean  "ecologically_significant", :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "observation_method"
   end
 
   create_table "project_assets", :force => true do |t|
