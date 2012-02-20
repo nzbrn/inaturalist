@@ -565,6 +565,17 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
 
   add_index "preferences", ["owner_id", "owner_type", "name", "group_id", "group_type"], :name => "index_preferences_on_owner_and_name_and_preference", :unique => true
 
+  create_table "pro_fieldsets", :force => true do |t|
+    t.integer  "observation_id"
+    t.boolean  "second_hand",              :default => false
+    t.boolean  "uncertain",                :default => false
+    t.boolean  "escaped",                  :default => false
+    t.boolean  "planted",                  :default => false
+    t.boolean  "ecologically_significant", :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "project_assets", :force => true do |t|
     t.integer  "project_id"
     t.datetime "created_at"

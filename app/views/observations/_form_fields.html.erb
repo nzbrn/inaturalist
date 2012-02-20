@@ -174,6 +174,35 @@
         </div>
       </div>
     </div>
+    <% if is_admin? || is_pro? %>
+      <div id="profields" class ="column span-24">
+        <fieldset>
+          <legend>Pro Fields</legend>
+          <% o.fields_for :pro_fieldset do |ff| %>
+            <div>
+              <%= ff.label :second_hand %>
+              <%= ff.check_box :second_hand %>
+            </div>
+            <div>
+              <%= ff.label :uncertain %>
+              <%= ff.check_box :uncertain %>
+            </div>
+            <div>
+              <%= ff.label :escaped %>
+              <%= ff.check_box :escaped %>
+            </div>
+            <div>
+              <%= ff.label :planted %>
+              <%= ff.check_box :planted %>
+            </div>
+            <div>
+              <%= ff.label :ecologically_significant %>
+              <%= ff.check_box :ecologically_significant %>
+            </div>
+          <% end %>
+        </fieldset>
+      </div>
+    <% end %>
 
 
     <% if @project && !@project.project_observation_fields.blank? -%>
