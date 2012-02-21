@@ -13,6 +13,24 @@
   ul.address_list li span{
     float: left;
   }
+  #expertise .category-wrapper {
+    margin-bottom: 15px;
+  }
+  #expertise label.category {
+    width: 140px; display: inline-block; margin-right: 35px;
+  }
+  #expertise .expertise-level {
+    display: inline-block; text-align: center; margin-right: 35px;
+  }
+  #expertise .expertise-level input {
+    margin: 0px auto; display: block;
+  }
+  #expertise .expertise-level label {
+    font-size: 90%; color: #aaa; font-weight: normal;
+  }
+  #expertise .expertise-level.active label {
+    color: #000;
+  }
 </style>
 <!--[if lt IE 7]>
   <%= stylesheet_link_tag 'blueprint/ie' %>
@@ -32,6 +50,21 @@
   <!--[if lt IE 8]>
   <script src="http://ie7-js.googlecode.com/svn/trunk/lib/IE8.js" type="text/javascript"></script>
   <![endif]-->
+  <!-- highlight expertise radio buttons -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var highlightExpertiseRadios = function() {
+        $('.expertise-level').removeClass('active');
+        $('.expertise-level').each(function() {
+          if ($(this).find(':radio:checked').length > 0) {
+            $(this).addClass('active');
+          }
+        });
+      }
+      $('.expertise-level').change(highlightExpertiseRadios);
+      highlightExpertiseRadios();
+    });
+  </script>
 <!-- autocomplete javascript -->
   <script src="//maps.googleapis.com/maps/api/js?sensor=false&&region=NZ&libraries=places" type="text/javascript"></script>
   <script type="text/javascript">
@@ -97,6 +130,25 @@
     <div class="last column span-18">
       <%= f.text_area(:description, :label => "Tell everyone a little about yourself") %>
       <%= f.text_area(:address) %>
+    </div>
+    <div class="column span-16">
+      <fieldset id="expertise">
+        <legend>Expertise</legend>
+        <div class="description">Please indicate your identification abilities for the following categories.</div>
+        <% User::EXPERTISE_CATEGORIES.each do |cat| %>
+          <div class="category-wrapper">
+            <%= label_tag "user[expertise][#{cat}]", cat.humanize, :class => 'category' %>
+            <% User::EXPERTISE_LEVELS.each do |level| %>
+              <% content_tag :div, :class => "expertise-level" do %>
+                <%= radio_button_tag "user[expertise][#{cat}]", level, (current_user.expertise_for(cat) == level) %>
+                <%= label_tag "user[expertise][#{cat}][#{level}]", level.humanize %>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </fieldset>
+    </div>
+    <div class="column span-9">
       <%= f.select(:gender,User::USER_GENDER, {:prompt => 'Select gender'}) %>
       <%= f.select(:year_of_birth,(1900..Time.now.year).to_a.map{|i| [i,i]}, {:prompt => 'Select birth year'}) %>
     </div>

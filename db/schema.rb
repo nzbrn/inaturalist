@@ -1025,6 +1025,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.string   "last_name"
     t.text     "address"
     t.boolean  "deceased",                                 :default => false
+    t.text     "expertise"
   end
 
   add_index "users", ["identifications_count"], :name => "index_users_on_identifications_count"
