@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120220034347) do
+ActiveRecord::Schema.define(:version => 20120220035337) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -855,6 +855,7 @@ ActiveRecord::Schema.define(:version => 20120220034347) do
     t.string   "last_name"
     t.text     "address"
     t.boolean  "deceased",                                 :default => false
+    t.text     "expertise"
   end
 
   add_index "users", ["identifications_count"], :name => "index_users_on_identifications_count"
