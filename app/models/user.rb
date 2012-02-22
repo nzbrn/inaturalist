@@ -37,6 +37,9 @@ class User < ActiveRecord::Base
   preference :photo_license, :string
   NOTIFICATION_PREFERENCES = %w(comment_email_notification identification_email_notification project_invitation_email_notification)
   USER_GENDER = %w(Male Female)
+  HOME_REGIONS = ["Auckland","Bay of Plenty","Canterbury", "Gisbourne", "Hawkes Bay","Manawatu-Wanganui","Marlborough",
+    "Nelson City", "Northland", "Otago", "Southland", "Taranaki", "Tasman", "Waikato", "Wellington", "Westland", "Neslon-Marlborough", "No data"]
+    
   belongs_to :life_list, :dependent => :destroy
   has_many  :provider_authorizations, :dependent => :destroy
   has_one  :flickr_identity, :dependent => :destroy
@@ -143,7 +146,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise, :home_region
 
   serialize :expertise, Hash
 
