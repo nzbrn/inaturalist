@@ -149,6 +149,9 @@
       </fieldset>
     </div>
     <div class="column span-9">
+      <%= f.select(:home_region,User::HOME_REGIONS, {:prompt => 'Select home region'}) %>
+    </div>
+    <div class="column span-9">
       <%= f.select(:gender,User::USER_GENDER, {:prompt => 'Select gender'}) %>
       <%= f.select(:year_of_birth,(1900..Time.now.year).to_a.map{|i| [i,i]}, {:prompt => 'Select birth year'}) %>
     </div>
