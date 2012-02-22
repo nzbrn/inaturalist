@@ -67,4 +67,16 @@
     <span class="pro_field_value"><%=pro_fieldset.substrate_description %></span>
     </div>
   <% end %>
+  <% if !pro_fieldset.density.blank? %>
+    <div>
+    <label>Density per 100 msq</label>
+    <span class="pro_field_value"><%=pro_fieldset.density %></span>
+    </div>
+  <% end %>
+  <% if !pro_fieldset.cover.blank? %>
+    <div>
+    <label>% cover</label>
+    <span class="pro_field_value"><%=pro_fieldset.cover %></span>
+    </div>
+  <% end %>
 </div>
