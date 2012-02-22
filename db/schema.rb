@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120222012123) do
+ActiveRecord::Schema.define(:version => 20120222014359) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -518,6 +518,8 @@ ActiveRecord::Schema.define(:version => 20120222012123) do
     t.string   "substrate"
     t.string   "substrate_qualifier"
     t.string   "substrate_description"
+    t.float    "density"
+    t.float    "cover"
   end
 
   create_table "project_assets", :force => true do |t|
