@@ -17,7 +17,6 @@ gem "delayed_paperclip",        "0.6.5",                                        
 gem "fastercsv",                "1.5.4"
 gem "flickraw",                 "0.8.3",                                                     :path => 'vendor/gems/flickraw-0.8.3'
 gem "friendly_id",              "3.2.1.1"
-gem "hoptoad_notifier",         "2.3.3",                                                     :path => 'vendor/gems/hoptoad_notifier-2.3.3'
 gem "hpricot",                  "0.8.4"
 gem "htmlentities",             "4.0.0",                                                     :path => 'vendor/gems/htmlentities-4.0.0'
 gem "i18n",                     "0.5.0"

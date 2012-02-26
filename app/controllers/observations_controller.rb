@@ -1583,7 +1583,6 @@ class ObservationsController < ApplicationController
     rescue Timeout::Error => e
       flash.now[:error] = "Sorry, Flickr isn't responding at the moment."
       Rails.logger.error "[ERROR #{Time.now}] Timeout: #{e}"
-      HoptoadNotifier.notify(e, :request => request, :session => session)
       return
     end
     if fp && @flickr_photo && @flickr_photo.valid?
@@ -1628,7 +1627,6 @@ class ObservationsController < ApplicationController
     rescue Timeout::Error => e
       flash.now[:error] = "Sorry, Picasa isn't responding at the moment."
       Rails.logger.error "[ERROR #{Time.now}] Timeout: #{e}"
-      HoptoadNotifier.notify(e, :request => request, :session => session)
       return
     end
     unless api_response

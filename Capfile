@@ -17,7 +17,6 @@ namespace :deploy do
     create_attachments
     create_cache
     copy_sphinx
-    copy_geoip_config
   end
 
   after "deploy:update_code" do
@@ -26,7 +25,6 @@ namespace :deploy do
     symlink_gmap_api_key
     symlink_smtp_config
     symlink_sphinx_config
-    symlink_geoip_config
     symlink_s3_config
     symlink_newrelic_config # temp
     symlink_attachments
@@ -74,11 +72,6 @@ namespace :deploy do
   desc "Create a symlink to a copy of sphinx.yml that is outside the repos."
   task :symlink_sphinx_config, :hosts => "#{domain}" do
     run "ln -s #{inat_config_shared_path}/sphinx.yml #{latest_release}/config/sphinx.yml"
-  end
-  
-  desc "Create a symlink to a copy of geoip.yml that is outside the repos."
-  task :symlink_geoip_config, :hosts => "#{domain}" do
-    run "ln -s #{inat_config_shared_path}/geoip.yml #{latest_release}/config/geoip.yml"
   end
   
   desc "Create a symlink to a copy of s3.yml that is outside the repos."
@@ -232,11 +225,6 @@ namespace :deploy do
   task :copy_sphinx, :hosts => "#{domain}" do
     run "test -d #{shared_path}/system/db || mkdir #{shared_path}/system/db"
     run "test -d #{shared_path}/system/db/sphinx || mkdir #{shared_path}/system/db/sphinx"
-  end
-
-  desc "Copy geoip.yml.example to shared directory as geoip.yml if not exists"
-  task :copy_geoip_config, :hosts => "#{domain}" do
-    run "test -e #{inat_config_shared_path}/geoip.yml || cp #{latest_release}/config/geoip.yml.example #{inat_config_shared_path}/geoip.yml"
   end
 end
 
