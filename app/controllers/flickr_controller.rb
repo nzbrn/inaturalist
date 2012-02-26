@@ -161,7 +161,6 @@ class FlickrController < ApplicationController
       end
     rescue FlickRaw::FailedResponse => e
       Rails.logger.error "[Error #{Time.now}] Flickr connection failed (#{e}): #{e.message}"
-      Airbrake.notify(e, :request => request, :session => session)
       flash[:notice] = <<-EOT
         Ack! Something went wrong connecting to Flickr. You might try unlinking 
         and re-linking your account. You can contact us at 

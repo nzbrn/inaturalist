@@ -42,9 +42,6 @@ base: &base
         #then need to sign up for Yahoo Developers Network app interface:
         #https://developer.apps.yahoo.com/wsregapp/
         YDN_APP_ID: 09azAZ09azAZ09azAZ09azAZ09azAZ09azAZ09az09azAZ09azAZ09azAZ09
-    hoptoad:
-        # http://www.hoptoadapp.com/
-        api_key: 09af09af09af09af09af09af09af09af09af09af
     tile_servers:
         # EXPERIMENTAL: These endpoints should return map tiles when hit with 
         # requests like /{Z}/{X}/{Y}.png.  

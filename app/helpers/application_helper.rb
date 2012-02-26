@@ -415,7 +415,6 @@ module ApplicationHelper
     wrapper + untruncated
   rescue RuntimeError => e
     raise e unless e.message =~ /error parsing fragment/
-    Airbrake.notify(e, :request => request, :session => session)
     text.html_safe
   end
   
