@@ -40,7 +40,7 @@ class ProjectsController < ApplicationController
     respond_to do |format|
       format.html do
         @observed_taxa_count = @project.observed_taxa_count
-        @top_observers = @project.project_users.all(:order => "taxa_count desc, observations_count desc", :limit => 3, :conditions => "taxa_count > 0")
+        @top_observers = @project.project_users.all(:order => "taxa_count desc, observations_count desc", :limit => 10, :conditions => "taxa_count > 0")
         @project_users = @project.project_users.paginate(:page => 1, :per_page => 5, :include => :user, :order => "id DESC")
         @project_observations = @project.project_observations.paginate(:page => 1, 
           :include => {
@@ -54,6 +54,11 @@ class ProjectsController < ApplicationController
         @kml_assets = @project_assets.select{|pa| pa.asset_content_type == "application/vnd.google-earth.kml+xml"}
         if @place = @project.rule_place
           @place_geometry = PlaceGeometry.without_geom.first(:conditions => {:place_id => @place})
+        end
+        
+        if params[:iframe]
+          @headless = @footless = true
+          render :action => "show_iframe"
         end
       end
       format.json do
