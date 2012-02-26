@@ -463,7 +463,6 @@ class TaxaController < ApplicationController
       end[0..(limit-1)]
     rescue Timeout::Error => e
       Rails.logger.error "[ERROR #{Time.now}] Timeout: #{e}"
-      # HoptoadNotifier.notify(e, :request => request, :session => session)
       @photos = @taxon.photos
     end
     if params[:partial]

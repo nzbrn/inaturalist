@@ -384,7 +384,6 @@ module ApplicationHelper
     wrapper + untruncated
   rescue RuntimeError => e
     raise e unless e.message =~ /error parsing fragment/
-    HoptoadNotifier.notify(e, :request => request, :session => session)
     text
   end
   
