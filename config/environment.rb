@@ -90,7 +90,6 @@ Rails::Initializer.run do |config|
   config.gem "ambethia-smtp-tls", :lib => "smtp-tls", :source => "http://gems.github.com/"
   config.gem "flickraw"
   config.gem 'rest-client', :lib => 'rest_client'
-  config.gem 'hoptoad_notifier'
   config.gem "carlosparamio-geoplanet", :lib => 'geoplanet', :source => "http://gems.github.com/"
   config.gem 'daemon-spawn', :lib => 'daemon_spawn'
   config.gem 'nokogiri'
