@@ -101,11 +101,11 @@ exec {"inaturalist_setup":
   require => Exec["bundle"],
 }
 
-exec {"db_setup":
-  command => "/var/lib/gems/1.8/bin/bundle exec rake db:setup",
-  cwd     => '/vagrant',
-  require => [Postgresql::Db["inaturalist_development"], Exec["bundle"]],
-}
+#exec {"db_setup":
+#  command => "/var/lib/gems/1.8/bin/bundle exec rake db:setup",
+#  cwd     => '/vagrant',
+#  require => [Postgresql::Db["inaturalist_development"], Exec["bundle"]],
+#}
 
 exec {'gem_path': 
   command => '/bin/echo \'PATH="/var/lib/gems/1.8/bin/:$PATH"\' >> /home/vagrant/.bashrc',
