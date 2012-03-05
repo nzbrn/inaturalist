@@ -1,5 +1,6 @@
 backup/
 config/config.yml
+config/geoip.yml
 config/database.yml
 config/gmaps_api_key.yml
 config/s3.yml
