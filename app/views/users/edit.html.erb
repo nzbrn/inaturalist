@@ -140,9 +140,6 @@
       </fieldset>
     </div>
     <div class="column span-9">
-      <%= f.select(:home_region,User::HOME_REGIONS, {:prompt => 'Select home region'}) %>
-    </div>
-    <div class="column span-9">
       <%= f.select(:gender,User::USER_GENDER, {:prompt => 'Select gender'}) %>
       <%= f.select(:year_of_birth,(1900..Time.now.year).to_a.map{|i| [i,i]}, {:prompt => 'Select birth year'}) %>
     </div>
@@ -173,21 +170,6 @@
             :label => attr_name.humanize.capitalize.gsub(/ email notification/, '').pluralize, 
             :label_after => true %>
         <% end %>
-          <%= f.select :prefers_user_preferred_language,["English","Not English"], 
-            :label => 'Select your site language', 
-            :label_after => true %>
-          <%= f.select :prefers_user_preferred_species_names,["Scientific","Common"], 
-            :label => 'Do you prefer scientific or common names?', 
-            :label_after => true %>
-          <%= f.check_box "prefers_user_preferred_email_visible", 
-            :label => 'Allow your email to be visible to account holders',
-            :label_after => true %>
-          <%= f.check_box "prefers_user_preferred_address_visible", 
-            :label => 'Allow your address to be visible to account holders',
-            :label_after => true %>
-          <%= f.check_box "prefers_user_preferred_telephone_visible", 
-            :label => 'Allow your telephone number(s) to be visible to account holders',
-            :label_after => true %>
       </div>
       
     </div>
