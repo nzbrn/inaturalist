@@ -19,16 +19,11 @@ class User < ActiveRecord::Base
   attr_accessor   :make_observation_licenses_same
   attr_accessor   :make_photo_licenses_same
   MASS_ASSIGNABLE_ATTRIBUTES = [:make_observation_licenses_same, :make_photo_licenses_same]
-  
+  USER_GENDER = %w(Male Female)  
   # new way
   preference :comment_email_notification, :boolean, :default => true
   preference :identification_email_notification, :boolean, :default => true
   preference :project_invitation_email_notification, :boolean, :default => true
-  preference :user_preferred_language, :string, :default => "English"
-  preference :user_preferred_species_names, :string, :default => "Scientific"
-  preference :user_preferred_email_visible, :boolean, :default => false
-  preference :user_preferred_address_visible, :boolean, :default => false
-  preference :user_preferred_telephone_visible, :boolean, :default => false
   preference :lists_by_login_sort, :string, :default => "id"
   preference :lists_by_login_order, :string, :default => "asc"
   preference :per_page, :integer, :default => 30
@@ -36,9 +31,6 @@ class User < ActiveRecord::Base
   preference :observation_license, :string
   preference :photo_license, :string
   NOTIFICATION_PREFERENCES = %w(comment_email_notification identification_email_notification project_invitation_email_notification)
-  USER_GENDER = %w(Male Female)
-  HOME_REGIONS = ["Auckland","Bay of Plenty","Canterbury", "Gisbourne", "Hawkes Bay","Manawatu-Wanganui","Marlborough",
-    "Nelson City", "Northland", "Otago", "Southland", "Taranaki", "Tasman", "Waikato", "Wellington", "Westland", "Neslon-Marlborough", "No data"]
     
   belongs_to :life_list, :dependent => :destroy
   has_many  :provider_authorizations, :dependent => :destroy
@@ -146,7 +138,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise, :home_region
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise
 
   serialize :expertise, Hash
 
