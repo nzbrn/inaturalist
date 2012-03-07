@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120307031141) do
+ActiveRecord::Schema.define(:version => 20120307034116) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -366,6 +366,7 @@ ActiveRecord::Schema.define(:version => 20120307031141) do
     t.point    "geom",                             :limit => nil
     t.integer  "number_individuals"
     t.string   "sex"
+    t.boolean  "sought_not_found",                                                                :default => false
   end
 
   add_index "observations", ["geom"], :name => "index_observations_on_geom", :spatial => true
