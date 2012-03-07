@@ -51,6 +51,7 @@ class Observation < ActiveRecord::Base
   LAT_LON_SEPARATOR_REGEX = /[\,\s]\s*/
   LAT_LON_REGEX = /#{COORDINATE_REGEX}#{LAT_LON_SEPARATOR_REGEX}#{COORDINATE_REGEX}/
   OBSERVATION_SEX = ["Male", "Female" ,"In Pair", "Mixed"]  
+  CULTIVATED_OPTIONS = %w[Yes No Maybe]  
   
   PRIVATE = "private"
   OBSCURED = "obscured"
@@ -186,6 +187,7 @@ class Observation < ActiveRecord::Base
            :must_not_be_a_range
   
   validates_inclusion_of :sex, :in => OBSERVATION_SEX, :message => "%{value} is not a valid sex", :allow_blank => true
+  validates_inclusion_of :cultivated, :in => CULTIVATED_OPTIONS, :message => "%{value} is not a valid cultivated option", :allow_blank => true
   validates_numericality_of :latitude,
     :allow_blank => true, 
     :less_than_or_equal_to => 90, 

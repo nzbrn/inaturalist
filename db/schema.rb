@@ -423,6 +423,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.integer  "number_individuals"
     t.string   "sex"
     t.boolean  "sought_not_found",                                                                :default => false
+    t.string   "cultivated"
   end
 
   add_index "observations", ["geom"], :name => "index_observations_on_geom", :spatial => true
