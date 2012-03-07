@@ -421,6 +421,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.boolean  "out_of_range"
     t.string   "license"
     t.integer  "number_individuals"
+    t.string   "sex"
   end
 
   add_index "observations", ["geom"], :name => "index_observations_on_geom", :spatial => true
