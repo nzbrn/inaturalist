@@ -311,6 +311,12 @@
       </div>
     </div><!-- end where -->
   </div><!-- end where-and-photos -->
+  <% unless @observation.cultivated.blank? %>
+    <div class="description">
+      <label>Cultivated:</label>
+        <%= @observation.cultivated %>
+    </div>
+  <% end %>
   <% unless @observation.sex.blank? %>
     <div class="description">
       <label>Sex:</label>
