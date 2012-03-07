@@ -246,6 +246,13 @@
     </div><!-- end where -->
   </div><!-- end where-and-photos -->
   
+  <% unless @observation.number_individuals.blank? %>
+    <div class="description">
+      <label>Number of individuals:</label>
+        <%= @observation.number_individuals %>
+    </div>
+  <% end %>
+  
   <% unless @observation.description.blank? %>
     <div id="observation-description">
       <h3>Description</h3>
@@ -316,12 +323,12 @@
     
     <%= separator %>
   </div>
-
+<!--
   <% if (is_admin? || is_pro? ) && @observation.pro_fieldset%>
     <%= render @observation.pro_fieldset %> 
     <%= separator %>
   <% end %>
-
+-->
   <div id="comments_and_identifications" class="column span-16">
     <h3>Comments &amp; Identifications</h3>
     <%= render :partial => 'shared/activity_item', :collection => @comments_and_identifications %>

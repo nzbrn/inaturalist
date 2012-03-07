@@ -38,6 +38,10 @@
       </div>
       
       <div class="field">
+        <%= o.label(:number_individuals, 'Number of individuals') %>
+        <%= o.text_field(:number_individuals) %>
+      </div>
+      <div class="field">
         <%= o.label(:description, 'Description') %>
         <%= o.text_area(:description, :class => "text") %>
       </div>
@@ -174,6 +178,7 @@
         </div>
       </div>
     </div>
+    <!--
     <% if is_admin? || is_pro? %>
       <div id="profields" class ="column span-24">
         <fieldset>
@@ -227,7 +232,7 @@
         </fieldset>
       </div>
     <% end %>
-
+    -->
 
     <% if @project && !@project.project_observation_fields.blank? -%>
       <fieldset id="projectobservationfields" class="stacked">
