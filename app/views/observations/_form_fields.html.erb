@@ -38,6 +38,10 @@
         <%= o.label(:sex, 'Sex') %>
         <%= o.select(:sex,Observation::OBSERVATION_SEX, {:prompt => 'Select sex'}) %>
       </div>
+      <div class="field"> 
+        <%= o.label(:cultivated, 'Cultivated') %>
+        <%= o.select(:cultivated,Observation::CULTIVATED_OPTIONS, {:prompt => 'Select ...'}) %>
+      </div>
       <div class="field">
         <%= o.label(:number_individuals, 'Number of individuals') %>
         <%= o.text_field(:number_individuals) %>
