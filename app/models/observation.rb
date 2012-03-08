@@ -51,8 +51,30 @@ class Observation < ActiveRecord::Base
   LAT_LON_SEPARATOR_REGEX = /[\,\s]\s*/
   LAT_LON_REGEX = /#{COORDINATE_REGEX}#{LAT_LON_SEPARATOR_REGEX}#{COORDINATE_REGEX}/
   OBSERVATION_SEX = ["Male", "Female" ,"In Pair", "Mixed"]  
-  CULTIVATED_OPTIONS = %w[Yes No Maybe]  
-  
+  CULTIVATED_OPTIONS = %w[Yes No Maybe]
+  NZBRN_ICONIC = {
+    "Animalia" => nil,
+    "Actinopterygii" => nil,
+    "Aves" => "Birds",
+    "Reptilia" => nil,
+    "Amphibia" => nil,
+    "Mammalia" => "Mammals",
+    "Arachnida" => "Spiders",
+    "Plantae" => "Plants",
+    "Fungi" => "Fungi",
+    "Protozoa" => nil,
+    "Mollusca" => nil,
+    "Insecta" => "Insects"
+  }
+  STAGE_OPTIONS = {
+   'Plants' => [['Seedling','plant_seedling'],['Juvenile','plant_juvenile'], ['Adult','plant_adult']],
+   'Fungi' => [['Disease symptoms','fungi_disease'],['Immature fruiting body','fungi_immature'], ['Mature fruiting body','fungi_mature'],['Remains of fruiting body','fungi_remains']],
+   'Insects' => [['Egg','insects_egg'],['Larva/Nymph','insects_larva'], ['Pupa','insects_pupa'],['Adult','insects_adult']],
+   'Birds' => [['Egg','birds_egg'],['Chick','birds_chick'], ['Juvenile','birds_juvenile'],['Adult','birds_adult']],
+   'Mammals' => [['Juvenile','mammals_juvenile'],['Adult','mammals_adult']],
+   'All' => [['Egg','all_egg'],['Juvenile','all_juvenile'], ['Adult','all_adult']]
+  }
+ 
   PRIVATE = "private"
   OBSCURED = "obscured"
   GEOPRIVACIES = [OBSCURED, PRIVATE]
