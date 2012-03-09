@@ -425,6 +425,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.boolean  "sought_not_found",                                                                :default => false
     t.string   "cultivated"
     t.string   "stage"
+    t.string   "user_expertise"
   end
 
   add_index "observations", ["geom"], :name => "index_observations_on_geom", :spatial => true

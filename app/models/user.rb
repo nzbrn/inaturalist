@@ -4,9 +4,6 @@ class User < ActiveRecord::Base
   JEDI_MASTER_ROLE = 'admin'
 
   USER_GENDER = %w(Male Female)
-
-  HOME_REGIONS = ["Auckland","Bay of Plenty","Canterbury", "Gisbourne", "Hawkes Bay","Manawatu-Wanganui","Marlborough",
-    "Nelson City", "Northland", "Otago", "Southland", "Taranaki", "Tasman", "Waikato", "Wellington", "Westland", "Neslon-Marlborough", "No data"]
   
   devise :database_authenticatable, :registerable, :suspendable,
          :recoverable, :rememberable, :confirmable, :validatable, 
@@ -143,13 +140,23 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise, :home_region
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise
 
   serialize :expertise, Hash
 
   EXPERTISE_LEVELS = %w(learner know_common_species know_most_species expert)
-  EXPERTISE_CATEGORIES = %w(bird freshwater_invertebrate fish fungi lizard_or_frog mammal marine_invertebrate plant terrestrial_invertebrate)
+  EXPERTISE_CATEGORIES = %w(plants fungi birds mammals spiders insects lizards_and_frogs)
   
+  NZBRN_EXPERTISE_ICONIC = {
+    "Aves" => "birds",
+    "Reptilia" => "lizards_and_frogs",
+    "Amphibia" => "lizards_and_frogs",
+    "Mammalia" => "mammals",
+    "Arachnida" => "spiders",
+    "Plantae" => "plants",
+    "Fungi" => "fungi",
+    "Insecta" => "insects"
+  }
   scope :order_by, Proc.new { |sort_by, sort_dir|
     sort_dir ||= 'DESC'
     order("? ?", sort_by, sort_dir)

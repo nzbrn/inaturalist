@@ -243,6 +243,7 @@ class Observation < ActiveRecord::Base
               :set_license,
               :trim_user_agent,
               :update_identifications
+              :save_users_expertise
   
   before_update :set_quality_grade
                  
@@ -814,6 +815,13 @@ class Observation < ActiveRecord::Base
     true
   end
   
+  #save the users expertise if the user has an experience level for the 
+  #particular taxa level.
+  def save_users_expertise
+    return unless taxon
+    self.user_expertise = user.expertise_for(User::NZBRN_EXPERTISE_ICONIC[taxon.iconic_taxon_name]) 
+  end
+
   # Because it has to be slightly different, in that the taxon of a destroyed
   # obs shouldn't be removed by default from life lists (maybe you've seen it
   # in the past, but you don't have any other obs), but those listed_taxa of
