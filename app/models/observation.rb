@@ -179,7 +179,8 @@ class Observation < ActiveRecord::Base
   validates_presence_of :user_id
   
   validate :must_be_in_the_past,
-           :must_not_be_a_range
+           :must_not_be_a_range,
+           :stage_must_be_valid_for_taxon
   
   validates_inclusion_of :sex, :in => OBSERVATION_SEX, :message => "%{value} is not a valid sex", :allow_blank => true
   validates_inclusion_of :cultivated, :in => CULTIVATED_OPTIONS, :message => "%{value} is not a valid cultivated option", :allow_blank => true
@@ -1147,6 +1148,22 @@ class Observation < ActiveRecord::Base
       errors.add(:observed_on, "must be a single day, not a range")
     end
   end
+
+  #used to ensure if the stage is set that it is valid
+  def stage_must_be_valid_for_taxon
+    return if stage.blank?
+    @test_taxon = single_taxon_id_for_name(species_guess.strip) unless species_guess.blank?
+    @test_taxon = taxon_id || @test_taxon
+    if(@test_taxon)
+      @iconic = Taxon.find_by_id(@test_taxon).iconic_taxon_name
+      options = Observation::STAGE_OPTIONS[Observation::NZBRN_ICONIC[@iconic]]
+      if options # then there are specific options for this taxa
+        options.each { |v| return if v.include?(stage)}
+        errors.add(:stage, "Stage must be valid for your species")
+      end
+    end
+  end
+
   
   def set_taxon_from_taxon_name
     return true if @taxon_name.blank?
