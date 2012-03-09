@@ -104,11 +104,13 @@ module ObservationsHelper
     }
     reverse_stage[stage]
   end
+
+  #function to filter the stages.  Shouldn't be used until the javascript event is hooked up
   def filtered_stages(observation)
-    if !observation.iconic_taxon_name.nil?
-      options = Observation::STAGE_OPTIONS.reject { |k,v| ![Observation::NZBRN_ICONIC[observation.iconic_taxon_name]].include? k}
-      return options if options.count > 0
-    end
+    #if !observation.iconic_taxon_name.nil?
+    #  options = Observation::STAGE_OPTIONS.reject { |k,v| ![Observation::NZBRN_ICONIC[observation.iconic_taxon_name]].include? k}
+    #  return options if options.count > 0
+    #end
     Observation::STAGE_OPTIONS
   end
 end
