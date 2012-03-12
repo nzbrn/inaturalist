@@ -329,6 +329,12 @@
         <%= @observation.sex %>
     </div>
   <% end %>
+  <% unless @observation.user_expertise.blank? %>
+    <div class="description">
+      <label>Users Expertise:</label>
+        <%= @observation.user_expertise.humanize %>
+    </div>
+  <% end %>
   <% if @observation.sought_not_found %> 
     <div class="description">
     Species was sought for but not found
