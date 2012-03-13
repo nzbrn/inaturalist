@@ -257,7 +257,9 @@ class UsersController < ApplicationController
   end
   
   def edit
-    @user.phone_numbers.build
+    up_to_three = (3-@user.phone_numbers.count) < 1 ? 1 : 3-@user.phone_numbers.count
+    up_to_three.times {@user.phone_numbers.build}
+
     respond_to do |format|
       format.html
       format.json { render :json => @user.to_json(:except => [
