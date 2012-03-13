@@ -271,7 +271,8 @@ class UsersController < ApplicationController
   end
   
   def edit
-    current_user.phone_numbers.build
+    up_to_three = (3-current_user.phone_numbers.count) < 1 ? 1 : 3-current_user.phone_numbers.count
+    up_to_three.times {current_user.phone_numbers.build}
   end
 
   # this is the page that's shown after a new user is created via 3rd party provider_authorization
