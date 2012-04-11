@@ -68,4 +68,5 @@ group :test, :development do
   gem "database_cleaner"
   gem "machinist"
   gem "rspec-rails"
+  gem "sqlite3"
 end

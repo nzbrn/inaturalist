@@ -1032,7 +1032,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.text     "address"
     t.boolean  "deceased",                                 :default => false
     t.text     "expertise"
-    t.string   "home_region"
+    t.text     "legacy"
   end
 
   add_index "users", ["identifications_count"], :name => "index_users_on_identifications_count"
