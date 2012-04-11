@@ -144,8 +144,18 @@ class User < ActiveRecord::Base
   serialize :legacy
 
   EXPERTISE_LEVELS = %w(learner know_common_species know_most_species expert)
-  EXPERTISE_CATEGORIES = %w(bird freshwater_invertebrate fish fungi lizard_or_frog mammal marine_invertebrate plant terrestrial_invertebrate)
+  EXPERTISE_CATEGORIES = %w(plants fungi birds mammals spiders insects lizards_and_frogs)
   
+  NZBRN_EXPERTISE_ICONIC = {
+    "Aves" => "birds",
+    "Reptilia" => "lizards_and_frogs",
+    "Amphibia" => "lizards_and_frogs",
+    "Mammalia" => "mammals",
+    "Arachnida" => "spiders",
+    "Plantae" => "plants",
+    "Fungi" => "fungi",
+    "Insecta" => "insects"
+  }
   named_scope :order, Proc.new { |sort_by, sort_dir|
     sort_dir ||= 'DESC'
     {:order => ("%s %s" % [sort_by, sort_dir])}

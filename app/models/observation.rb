@@ -213,7 +213,8 @@ class Observation < ActiveRecord::Base
               :obscure_coordinates_for_geoprivacy,
               :obscure_coordinates_for_threatened_taxa,
               :set_geom_from_latlon,
-              :set_license
+              :set_license,
+              :save_users_expertise
   
   before_update :set_quality_grade
                  
@@ -761,7 +762,13 @@ class Observation < ActiveRecord::Base
       :dj_priority => 1)
     true
   end
-  
+   
+  #save the users expertise if the user has an experience level for the 
+  #particular taxa level.
+  def save_users_expertise
+    return unless taxon
+    self.user_expertise = user.expertise_for(User::NZBRN_EXPERTISE_ICONIC[taxon.iconic_taxon_name]) 
+  end
   # Because it has to be slightly different, in that the taxon of a destroyed
   # obs shouldn't be removed by default from life lists (maybe you've seen it
   # in the past, but you don't have any other obs), but those listed_taxa of
