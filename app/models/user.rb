@@ -138,9 +138,10 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :icon, :description, :time_zone, :icon_url, :gender, :year_of_birth, :first_name, :last_name, :address, :phone_numbers_attributes, :expertise, :legacy
 
   serialize :expertise, Hash
+  serialize :legacy
 
   EXPERTISE_LEVELS = %w(learner know_common_species know_most_species expert)
   EXPERTISE_CATEGORIES = %w(bird freshwater_invertebrate fish fungi lizard_or_frog mammal marine_invertebrate plant terrestrial_invertebrate)
