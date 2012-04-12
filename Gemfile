@@ -54,5 +54,4 @@ group :development, :test do
   gem "ruby-debug",  "0.10.4"
   gem "pry"
   gem "pry-doc"
-  gem "sqlite3"
 end
