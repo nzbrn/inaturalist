@@ -46,12 +46,10 @@ gem "tzinfo",                   "0.3.30"
 gem "will_paginate",            "2.3.15"
 gem "xml-simple",               "1.0.12", :require => "xmlsimple",                           :path => 'vendor/gems/xml-simple-1.0.12'
 
-group :development, :test do
-  gem "foreman"
-  gem "machinist",   "1.0.6"
-  gem "mocha",       "0.9.4", :path => 'vendor/gems/mocha-0.9.4'
-  gem "faker",       "1.0.1"
-  gem "ruby-debug",  "0.10.4"
-  gem "pry"
-  gem "pry-doc"
-end
+gem "foreman"
+gem "machinist",   "1.0.6"
+gem "mocha",       "0.9.4", :path => 'vendor/gems/mocha-0.9.4'
+gem "faker",       "1.0.1"
+gem "ruby-debug",  "0.10.4"
+gem "pry"
+gem "pry-doc"
