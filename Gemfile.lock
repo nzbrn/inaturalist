@@ -1,0 +1,272 @@
+PATH
+  remote: vendor/gems/ambethia-smtp-tls-1.0
+  specs:
+    ambethia-smtp-tls (1.0)
+
+PATH
+  remote: vendor/gems/ancestry-1.2.3
+  specs:
+    ancestry (1.2.3)
+      activerecord (>= 2.2.2)
+
+PATH
+  remote: vendor/gems/aws-s3-0.6.2
+  specs:
+    aws-s3 (0.6.2)
+
+PATH
+  remote: vendor/gems/carlosparamio-geoplanet-0.2.2
+  specs:
+    carlosparamio-geoplanet (0.2.2)
+
+PATH
+  remote: vendor/gems/delayed_paperclip-0.6.5
+  specs:
+    delayed_paperclip (0.6.5)
+      paperclip (>= 2.3.0)
+
+PATH
+  remote: vendor/gems/flickraw-0.8.3
+  specs:
+    flickraw (0.8.3)
+
+PATH
+  remote: vendor/gems/htmlentities-4.0.0
+  specs:
+    htmlentities (4.0.0)
+
+PATH
+  remote: vendor/gems/mocha-0.9.4
+  specs:
+    mocha (0.9.4)
+
+PATH
+  remote: vendor/gems/mojombo-chronic-0.3.0
+  specs:
+    mojombo-chronic (0.3.0)
+
+PATH
+  remote: vendor/gems/paperclip-2.3.8
+  specs:
+    paperclip (2.3.8)
+
+PATH
+  remote: vendor/gems/rubyist-aasm-2.0.2
+  specs:
+    rubyist-aasm (2.0.2)
+
+PATH
+  remote: vendor/gems/xml-simple-1.0.12
+  specs:
+    xml-simple (1.0.12)
+
+GEM
+  remote: http://rubygems.org/
+  remote: http://gems.github.com/
+  specs:
+    GeoRuby (1.3.4)
+    actionmailer (2.3.12)
+      actionpack (= 2.3.12)
+    actionpack (2.3.12)
+      activesupport (= 2.3.12)
+      rack (~> 1.1.0)
+    activerecord (2.3.12)
+      activesupport (= 2.3.12)
+    activeresource (2.3.12)
+      activesupport (= 2.3.12)
+    activesupport (2.3.12)
+    addressable (2.2.4)
+    after_commit (1.0.10)
+      activerecord (>= 1.15.6, < 3.0.0)
+    babosa (0.3.5)
+    bluecloth (2.1.0)
+    builder (2.1.2)
+    coderay (1.0.5)
+    columnize (0.3.4)
+    daemon-spawn (0.4.2)
+    daemons (1.1.4)
+    dbf (1.2.9)
+      activesupport (>= 2.3.5)
+      fastercsv (>= 1.4.0)
+    delayed_job (2.0.3)
+      daemons
+    faker (1.0.1)
+      i18n (~> 0.4)
+    faraday (0.6.1)
+      addressable (~> 2.2.4)
+      multipart-post (~> 1.1.0)
+      rack (>= 1.1.0, < 2)
+    fastercsv (1.5.4)
+    foreman (0.39.0)
+      term-ansicolor (~> 1.0.7)
+      thor (>= 0.13.6)
+    friendly_id (3.2.1.1)
+      babosa (~> 0.3.0)
+    hpricot (0.8.4)
+    i18n (0.5.0)
+    json (1.6.1)
+    koala (1.1.0)
+      multi_json (~> 1.0)
+      multipart-post (~> 1.0)
+    linecache (0.46)
+      rbx-require-relative (> 0.0.4)
+    machinist (1.0.6)
+    method_source (0.7.0)
+    mime-types (1.17.1)
+    multi_json (1.0.3)
+    multi_xml (0.2.2)
+    multipart-post (1.1.3)
+    net-ldap (0.2.2)
+    nofxx-georuby (1.9.2)
+    nokogiri (1.4.7)
+    oa-basic (0.2.6)
+      oa-core (= 0.2.6)
+      rest-client (~> 1.6.0)
+    oa-core (0.2.6)
+    oa-enterprise (0.2.6)
+      addressable (= 2.2.4)
+      net-ldap (~> 0.2.2)
+      nokogiri (~> 1.4.2)
+      oa-core (= 0.2.6)
+      pyu-ruby-sasl (~> 0.0.3.1)
+      rubyntlm (~> 0.1.1)
+    oa-more (0.2.6)
+      multi_json (~> 1.0.0)
+      oa-core (= 0.2.6)
+      rest-client (~> 1.6.0)
+    oa-oauth (0.2.6)
+      faraday (~> 0.6.1)
+      multi_json (~> 1.0.0)
+      multi_xml (~> 0.2.2)
+      oa-core (= 0.2.6)
+      oauth (~> 0.4.0)
+      oauth2 (~> 0.4.1)
+    oa-openid (0.2.6)
+      oa-core (= 0.2.6)
+      rack-openid (~> 1.3.1)
+      ruby-openid-apps-discovery (~> 1.2.0)
+    oauth (0.4.5)
+    oauth2 (0.4.1)
+      faraday (~> 0.6.1)
+      multi_json (>= 0.0.5)
+    objectify-xml (0.2.3)
+      activesupport
+      nokogiri
+    omniauth (0.2.6)
+      oa-basic (= 0.2.6)
+      oa-core (= 0.2.6)
+      oa-enterprise (= 0.2.6)
+      oa-more (= 0.2.6)
+      oa-oauth (= 0.2.6)
+      oa-openid (= 0.2.6)
+    pg (0.11.0)
+    preferences (0.4.2)
+    pry (0.9.8.2)
+      coderay (~> 1.0.5)
+      method_source (~> 0.7)
+      slop (>= 2.4.4, < 3)
+    pry-doc (0.4.0)
+      pry (>= 0.9.0)
+      yard (~> 0.7.4)
+    pyu-ruby-sasl (0.0.3.3)
+    rack (1.1.2)
+    rack-openid (1.3.1)
+      rack (>= 1.1.0)
+      ruby-openid (>= 2.1.8)
+    rails (2.3.12)
+      actionmailer (= 2.3.12)
+      actionpack (= 2.3.12)
+      activerecord (= 2.3.12)
+      activeresource (= 2.3.12)
+      activesupport (= 2.3.12)
+      rake (>= 0.8.3)
+    rake (0.9.2.2)
+    rbx-require-relative (0.0.5)
+    rdoc (3.12)
+      json (~> 1.4)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
+    riddle (1.4.0)
+    ruby-debug (0.10.4)
+      columnize (>= 0.1)
+      ruby-debug-base (~> 0.10.4.0)
+    ruby-debug-base (0.10.4)
+      linecache (>= 0.3)
+    ruby-openid (2.1.8)
+    ruby-openid-apps-discovery (1.2.0)
+      ruby-openid (>= 2.1.7)
+    rubyntlm (0.1.1)
+    slop (2.4.4)
+    spatial_adapter (1.3.1)
+      GeoRuby (>= 1.3.0)
+      activerecord (>= 2.2.2, < 3.1.0)
+    sqlite3 (1.3.5)
+    term-ansicolor (1.0.7)
+    thinking-sphinx (1.4.6)
+      activerecord (>= 1.15.6, < 3.0.0)
+      after_commit (>= 1.0.7)
+      riddle (>= 1.3.3)
+    thor (0.14.6)
+    ts-delayed-delta (1.1.1)
+      delayed_job (>= 1.8.4)
+      thinking-sphinx (>= 1.3.6)
+    tzinfo (0.3.30)
+    will_paginate (2.3.15)
+    yard (0.7.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  ambethia-smtp-tls (= 1.0)!
+  ancestry (= 1.2.3)!
+  aws-s3 (= 0.6.2)!
+  babosa (= 0.3.5)
+  bluecloth (= 2.1.0)
+  builder (= 2.1.2)
+  carlosparamio-geoplanet (= 0.2.2)!
+  columnize (= 0.3.4)
+  daemon-spawn (= 0.4.2)
+  daemons (= 1.1.4)
+  dbf (= 1.2.9)
+  delayed_job (= 2.0.3)
+  delayed_paperclip (= 0.6.5)!
+  faker (= 1.0.1)
+  fastercsv (= 1.5.4)
+  flickraw (= 0.8.3)!
+  foreman
+  friendly_id (= 3.2.1.1)
+  hpricot (= 0.8.4)
+  htmlentities (= 4.0.0)!
+  i18n (= 0.5.0)
+  json (= 1.6.1)
+  koala (= 1.1.0)
+  machinist (= 1.0.6)
+  mime-types (= 1.17.1)
+  mocha (= 0.9.4)!
+  mojombo-chronic (= 0.3.0)!
+  multi_json (= 1.0.3)
+  multipart-post (= 1.1.3)
+  nofxx-georuby (= 1.9.2)
+  nokogiri (= 1.4.7)
+  objectify-xml (= 0.2.3)
+  omniauth (= 0.2.6)
+  paperclip (= 2.3.8)!
+  pg (= 0.11.0)
+  preferences (= 0.4.2)
+  pry
+  pry-doc
+  rack (= 1.1.2)
+  rails (= 2.3.12)
+  rdoc
+  rest-client (= 1.6.7)
+  riddle (= 1.4.0)
+  ruby-debug (= 0.10.4)
+  rubyist-aasm (= 2.0.2)!
+  spatial_adapter (= 1.3.1)
+  sqlite3
+  thinking-sphinx (= 1.4.6)
+  ts-delayed-delta (= 1.1.1)
+  tzinfo (= 0.3.30)
+  will_paginate (= 2.3.15)
+  xml-simple (= 1.0.12)!
