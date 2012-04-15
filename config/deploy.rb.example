@@ -59,7 +59,7 @@ after "deploy:update_code" do
   symlink_s3_config
   symlink_newrelic_config # temp
   symlink_attachments
-  symlink_cache
+  #symlink_cache
   # symlink_observation_tiles
   #symlink_sphinx
   #sphinx_configure
@@ -113,7 +113,7 @@ desc "Symlink to the common attachments dir"
 task :symlink_attachments, :hosts => "#{domain}" do
   run "ln -s #{shared_path}/system/attachments #{latest_release}/public/attachments"
 end
-
+=begin
 desc "Symlink to the common cache dir"
 task :symlink_cache, :hosts => "#{domain}" do
   run "ln -s #{shared_path}/system/cache #{latest_release}/cache"
@@ -122,7 +122,7 @@ task :symlink_cache, :hosts => "#{domain}" do
   run "ln -s #{shared_path}/system/page_cache/places #{latest_release}/public/places"
   run "ln -s #{shared_path}/system/page_cache/lists #{latest_release}/public/lists"
 end
-
+=end
 desc "Symlink the path to tilelite"
 task :symlink_observation_tiles, :hosts => "#{domain}" do
   run "ln -s #{inat_config_shared_path}/tilelite/public #{shared_path}/system/page_cache/observations/tiles"
