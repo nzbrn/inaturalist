@@ -61,8 +61,8 @@ after "deploy:update_code" do
   symlink_attachments
   #symlink_cache
   # symlink_observation_tiles
-  #symlink_sphinx
-  #sphinx_configure
+  symlink_sphinx
+  sphinx_configure
 end
 desc "Create a symlink to a copy of config.yml that is outside the repos."
 task :symlink_config, :hosts => "#{domain}" do
@@ -152,6 +152,42 @@ namespace :delayed_job do
   end
 end
 
-after "deploy:start", "delayed_job:start" 
+after "deploy:start", "delayed_job:restart" 
 after "deploy:stop", "delayed_job:stop" 
 after "deploy:restart", "delayed_job:restart"
+after "deploy:start" do
+  sphinx_restart
+end
+after "deploy:restart" do
+  sphinx_restart
+end
+## SPHINX TASKS ##########################################################
+desc "Symlink path to Sphinx indexes"
+task :symlink_sphinx, :hosts => "#{domain}" do
+  run "ln -s #{shared_path}/system/db/sphinx #{latest_release}/db/sphinx"
+end
+
+task :sphinx_start do
+  run "cd #{latest_release} && rake thinking_sphinx:start RAILS_ENV=production"
+end
+
+desc "Executes rake thinking_sphinx:stop, which stops the searchd daemon"
+task :sphinx_stop do
+  run "cd #{latest_release} && rake thinking_sphinx:stop RAILS_ENV=production"
+end
+
+desc "Restarts the searchd daemon"
+task :sphinx_restart do
+  sphinx_stop
+  sphinx_start
+end
+
+desc "Executes rake thinking_sphinx:index, which generates the indexes"
+task :sphinx_index do
+  run "cd #{latest_release} && rake thinking_sphinx:index RAILS_ENV=production"
+end
+
+desc "Executes rake thinking_sphinx:configure, which builds the Sphinx conf file without re-indexing"
+task :sphinx_configure do
+  run "cd #{latest_release} && rake thinking_sphinx:configure RAILS_ENV=production"
+end
