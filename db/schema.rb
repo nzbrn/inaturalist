@@ -426,6 +426,7 @@ ActiveRecord::Schema.define(:version => 20121128022641) do
     t.string   "cultivated"
     t.string   "stage"
     t.string   "user_expertise"
+    t.text     "legacy"
   end
 
   add_index "observations", ["geom"], :name => "index_observations_on_geom", :spatial => true
