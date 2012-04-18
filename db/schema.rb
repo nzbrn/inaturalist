@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120410004318) do
+ActiveRecord::Schema.define(:version => 20120411221842) do
 
   create_table "activity_streams", :force => true do |t|
     t.integer  "user_id"
@@ -363,13 +363,14 @@ ActiveRecord::Schema.define(:version => 20120410004318) do
     t.string   "positioning_device"
     t.boolean  "out_of_range"
     t.string   "license"
-    t.point    "geom",                             :limit => nil
     t.integer  "number_individuals"
     t.string   "sex"
     t.boolean  "sought_not_found",                                                                :default => false
     t.string   "cultivated"
     t.string   "stage"
     t.string   "user_expertise"
+    t.point    "geom",                             :limit => nil
+    t.text     "legacy"
   end
 
   add_index "observations", ["geom"], :name => "index_observations_on_geom", :spatial => true
