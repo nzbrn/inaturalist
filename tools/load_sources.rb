@@ -36,3 +36,14 @@ unless inat = Source.find_by_title('iNaturalist')
   )
   inat.save
 end
+
+unless nzor = Source.find_by_title('NZOR')
+  puts "Creating source for NZOR..."
+  nzor = Source.new(
+    :in_text => 'NZOR',
+    :citation => 'NZOR. <http://www.nzor.org.nz/>.',
+    :url => 'http://www.nzor.org.nz',
+    :title => 'NZOR'
+  )
+  nzor.save
+end
