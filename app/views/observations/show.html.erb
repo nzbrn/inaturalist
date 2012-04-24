@@ -202,8 +202,10 @@
   </div>
   
   <h2>
-    <%- if @observation.taxon -%>
+    <%- if @observation.taxon and @observation.species_guess.present? -%>
       <%= link_to @observation.species_guess, @observation.taxon -%>
+    <%- elsif @observation.taxon and @observation.species_guess.blank? -%>
+      <%= link_to @observation.taxon.name, @observation.taxon -%>
     <%- elsif @observation.species_guess and @observation.species_guess != '' -%>
       <%= h @observation.species_guess -%>
     <%- else -%>
