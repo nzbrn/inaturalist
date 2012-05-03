@@ -23,4 +23,4 @@ config.action_mailer.delivery_method = :sendmail
 config.logger = Logger.new("#{RAILS_ROOT}/log/#{ENV['RAILS_ENV']}.log", 10, 10485760)
 
 # Only log events at the info level
-config.logger.level = Logger::Severity::INFO
+config.logger.level = Logger::Severity::DEBUG
