@@ -35,7 +35,6 @@ module PlacesHelper
       :zoom => 15,
       :size => '200x200',
       :sensor => 'false',
-      :key => Ym4r::GmPlugin::ApiKey.get
     }.merge(options)
     url_for(url_for_options)
   end
