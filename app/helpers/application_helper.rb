@@ -534,7 +534,6 @@ module ApplicationHelper
       :size => '200x200',
       :sensor => 'false',
       :markers => "color:0x#{iconic_taxon_color(o.iconic_taxon_id)}|#{o.latitude},#{o.longitude}",
-      :key => Ym4r::GmPlugin::ApiKey.get
     }.merge(options)
     url_for(url_for_options)
   end
