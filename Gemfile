@@ -5,7 +5,6 @@ gem 'rake', '0.8.7' # ubuntu seems to freak with the most recent version
 
 gem 'aasm'
 gem 'addressable', :require => 'addressable/uri'
-gem 'airbrake'
 gem 'bborn-acts_as_taggable_on_steroids', :git => 'git://github.com/samoli/acts_as_taggable_on_steroids.git', :require => 'acts_as_taggable'
 gem 'ancestry'
 gem 'aws-sdk'
@@ -63,6 +62,7 @@ gem 'will_paginate'
 gem 'whenever', :require => false
 gem 'ym4r_gm', :git => 'git://github.com/modyo/ym4r_gm.git'
 gem 'xmp'
+gem "exception_notification",   "~> 2.3.3.0"
 
 group :test, :development do
   gem "database_cleaner"

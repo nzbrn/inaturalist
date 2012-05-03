@@ -83,3 +83,13 @@ Ym4r::GmPlugin::ApiKey.key = YAML.load_file("#{::Rails.root}/config/gmaps_api_ke
 # force encoding
 Encoding.default_internal = Encoding::UTF_8
 Encoding.default_external = Encoding::UTF_8
+
+# Set the priority time zones for the time zone select lists
+PRIORITY_ZONES = ActiveSupport::TimeZone.all.find_all { |z| z.name =~ %r{#{INAT_CONFIG['general']['priority_zones'].join('|')}} }
+
+# Exception notifications
+if INAT_CONFIG['exception_notifications']
+  ExceptionNotification::Notifier.exception_recipients = INAT_CONFIG['exception_recipients']
+  ExceptionNotification::Notifier.sender_address = %("#{SITE_NAME} Application Error" <#{INAT_CONFIG['noreply_email']}>)
+  ExceptionNotification::Notifier.email_prefix = "[#{SITE_NAME} Error] "
+end
