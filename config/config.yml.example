@@ -68,6 +68,11 @@ base: &base
         #http://www.flickr.com/services/api/keys/apply/
         FLICKR_API_KEY: 09af09af09af09af09af09af09af09af
         FLICKR_SHARED_SECRET: 09af09af09af09af
+    exception_notifications: true
+    exception_recipients:
+      - dev1@example.com
+      - dev2@example.com
+      - dev3@example.com
 
 development:
     <<: *base

@@ -45,6 +45,7 @@ gem "ts-delayed-delta",         "1.1.1",  :require => "thinking_sphinx/deltas/de
 gem "tzinfo",                   "0.3.30"
 gem "will_paginate",            "2.3.15"
 gem "xml-simple",               "1.0.12", :require => "xmlsimple",                           :path => 'vendor/gems/xml-simple-1.0.12'
+gem "exception_notification",   "~> 2.3.3.0"
 
 gem "foreman"
 gem "machinist",   "1.0.6"
