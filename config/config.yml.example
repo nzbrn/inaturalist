@@ -52,6 +52,7 @@ base: &base
     google_webmaster:
       verification: abiglongkey
     s3_bucket: 'yourbucketname'
+    s3_host: 'static.yoursite.org'
     memcached: 'localhost'
     facebook:
       app_id: 00000000000
