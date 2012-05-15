@@ -24,7 +24,7 @@ class LocalPhoto < Photo
     },
     :storage => :s3,
     :s3_credentials => "#{Rails.root}/config/s3.yml",
-    :s3_host_alias => INAT_CONFIG['s3_bucket'],
+    :s3_host_alias => INAT_CONFIG['s3_host'],
     :bucket => INAT_CONFIG['s3_bucket'],
     :path => "photos/:id/:style.:extension",
     :url => ":s3_alias_url",
