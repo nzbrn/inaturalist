@@ -3,7 +3,7 @@ default_run_options[:pty] = true
 set :application, "inaturalist"
 set :domain,      "inat.nzbrn.org.nz"
 default_run_options[:pty] = true
-set :repository,  "git@github.com:nzbrn/inaturalist.git"
+set :repository,  "git://github.com/nzbrn/inaturalist.git"
 set :scm, "git"
 set :user, "egressive"
 set :branch, "master"
