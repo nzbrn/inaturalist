@@ -50,7 +50,6 @@ class LifeList < List
         # Create new ListedTaxa for the taxa that aren't already in the list
         collection = (taxa_ids - existing.map{|e| e.taxon_id}).map do |taxon_id|
           listed_taxon = ListedTaxon.new(:list => self, :taxon_id => taxon_id)
-          listed_taxon.skip_update = true
           listed_taxon
         end
       end
@@ -61,13 +60,40 @@ class LifeList < List
 
     collection.each do |lt|
       lt.skip_update_cache_columns = options[:skip_update_cache_columns]
-      lt.skip_update = options[:skip_update]
       lt.save
       if !lt.valid? || (lt.first_observation_id.blank? && lt.last_observation_id.blank? && !lt.manually_added?)
         lt.destroy
       end
     end
     true
+  end
+  
+  def self.create_new_listed_taxa_for_refresh(taxon, listed_taxa, target_list_ids)
+    new_list_ids = target_list_ids - listed_taxa.map{|lt| lt.taxon_id == taxon.id ? lt.list_id : nil}
+    new_taxa = [taxon, taxon.species].compact
+    new_list_ids.each do |list_id|
+      new_taxa.each do |new_taxon|
+        lt = ListedTaxon.new(:list_id => list_id, :taxon_id => new_taxon.id)
+        unless lt.save
+          Rails.logger.info "[INFO #{Time.now}] Failed to create #{lt}: #{lt.errors.full_messages.to_sentence}"
+        end
+      end
+    end
+  end
+  
+  def self.refresh_listed_taxon(lt)
+    unless lt.save
+      lt.destroy
+      return
+    end
+    if lt.first_observation_id.blank? && lt.last_observation_id.blank? && !lt.manually_added?
+      lt.destroy
+    end
+  end
+  
+  def self.refresh_with_observation_lists(observation, options = {})
+    user = observation.try(:user) || User.find_by_id(options[:user_id])
+    user ? user.life_list_ids : []
   end
   
   # Add all the taxa the list's owner has observed.  Cache the job ID so we 
@@ -82,6 +108,10 @@ class LifeList < List
     "add_taxa_from_observations_job_#{id}"
   end
   
+  def rule_taxon
+    rules.detect{|r| r.operator == 'in_taxon?'}.try(:operand)
+  end
+  
   def self.add_taxa_from_observations(list, options = {})
     conditions = if options[:taxa]
       ["taxon_id IN (?)", options[:taxa]]
@@ -93,11 +123,8 @@ class LifeList < List
     # further up the call stack, causing bugs.
     list.owner.observations.all(
         :select => 'DISTINCT ON(observations.taxon_id) observations.id, observations.taxon_id', 
-        # :group => 'observations.taxon_id', 
         :conditions => conditions).each do |observation|
-      list.add_taxon(observation.taxon_id, 
-        :last_observation_id => observation.id,
-        :skip_update => true)
+      list.add_taxon(observation.taxon_id, :last_observation_id => observation.id)
     end
   end
   
@@ -138,8 +165,13 @@ class LifeList < List
   
   private
   def set_defaults
-    self.title ||= "%s's Life List" % owner_name
-    self.description ||= "Every species seen by #{owner_name}"
+    if title.blank?
+      self.title = "%s's Life List" % owner_name
+      self.title += " of #{rule_taxon.default_name.name}" if rule_taxon
+    end
+    if description.blank? && rule_taxon.blank?
+      self.description = "Every species seen by #{owner_name}"
+    end
     true
   end
 end

@@ -13,8 +13,7 @@
 <%- end -%>
 <%- content_for(:extrajs) do -%>
   <%= javascript_include_tag 'jquery/plugins/jquery.autocomplete.min.js',
-                             'jquery/plugins/inat/place_autocomplete.js',
-                             'jquery/plugins/inat/taxon_selectors.js' %>
+                             'jquery/plugins/inat/place_autocomplete.js' %>
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
 
@@ -169,8 +168,15 @@
     <%= link_to_function "add a new rule", "$(this).before('#{escape_javascript new_rule_field}'); rulify(); $(this).hide()" %>
   </fieldset>
   
+  <%= f.text_field :tracking_codes, :description => 
+    "Comma-separated list of tracking codes. Add these if you want to " + 
+    "append a tracking code when sending people to the new observation form, " + 
+    "e.g. #{root_url}observations/new?project_id=#{@project.id}&tracking_code=yourcode123. " + 
+    "You can use this to track participation from different sources. " + 
+    "You can access these codes when downloading your project's observations as CSV." %>
+  
   <% if current_user.is_admin? && !@project.new_record? -%>
-    <fieldset id="project_assets">
+    <fieldset id="project_assets" class="admin">
       <legend>Project Assets</legend>
       
       <ul>
@@ -189,7 +195,7 @@
       <%= link_to "Add asset", new_project_asset_path(:project_id => @project.id), :class => "readmore" %>
     </fieldset>
     
-    <fieldset id="custom_project_fields">
+    <fieldset id="custom_project_fields" class="admin">
       <legend>Custom Project Fields</legend>
       
       <% if @project.custom_project -%>
@@ -198,12 +204,22 @@
         <%= link_to "Add custom project fields", new_custom_project_path(:project_id => @project.id), :class => "readmore" %>
       <% end -%>
     </fieldset>
+    
+    <fieldset class="admin">
+      <legend>Extra Properties</legend>
+      
+      <%= f.check_box :featured_at, 
+        :label => "Feature this project?", 
+        :label_after => true %>
+        
+      <%= f.text_field :source_url, :description => "URL / identifier of a project derived from some external resource" %>
+    </fieldset>
   <% end -%>
 
   <div class="buttons">
     <%= f.submit project.new_record? ? "Create" : "Save", :class => "default button", "data-loading-click" => "Saving..." %>
     <%= link_to "Cancel", projects_path, :class => "button" %>
-    <% unless project.new_record? -%>
+    <% if @project_user && @project_user.is_admin? && !project.new_record? -%>
       <%= link_to "Delete this project", project, :method => :delete, 
         :confirm => "Are you sure you want to delete this project?",
         :class => "minor delete button" %>

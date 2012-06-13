@@ -56,24 +56,22 @@ module TaxaHelper
     end
     image_params = params.merge(:alt => default_taxon_name(taxon))
     unless taxon.photos.blank?
-      image_params[:alt] += " - Photo #{taxon.photos.first.attribution}"
+      image_params[:alt] += " - Photo #{taxon.default_photo.attribution}"
     end
     image_params[:title] = image_params[:alt]
     
     [:id, :class, :style, :alt, :title, :width, :height].each do |attr_name|
       image_params[attr_name] = params.delete(attr_name) if params[attr_name]
     end
+    image_params[:class] ||= ""
+    image_params[:class] += " #{params[:size]} photo" if params[:size]
     image_tag(taxon_image_url(taxon, params), image_params)
   end
   
   def taxon_image_url(taxon, params = {})
     return iconic_taxon_image_url(taxon, params) if taxon.blank? || taxon.photos.blank?
     size = params[:size] ? "#{params[:size]}_url" : 'square_url'
-    photo = if taxon.taxon_photos.loaded?
-      taxon.taxon_photos.sort_by{|tp| tp.id}.first.photo
-    else
-      taxon.taxon_photos.first(:include => [:photo], :order => "taxon_photos.id ASC").photo
-    end
+    photo = taxon.default_photo
     if photo.respond_to?(size)
       photo.send(size)
     else
@@ -115,12 +113,14 @@ module TaxaHelper
   def iconic_taxon_image_url(taxon, params = {})
     params[:size] = nil unless params[:size].is_a? Fixnum
     params[:size] ||= 32
-    iconic_taxon = if taxon
+    iconic_taxon = Taxon::ICONIC_TAXA_BY_ID[taxon]
+    iconic_taxon ||= if taxon
+      taxon = Taxon.find_by_id(taxon) unless taxon.is_a?(Taxon)
       taxon.is_iconic? ? taxon : Taxon::ICONIC_TAXA_BY_ID[taxon.iconic_taxon_id]
     else
       nil
     end
-    path = Rails.env.production? ? "http://inaturalist.org" : "http://localhost:3000"
+    path = APP_CONFIG[:site_url]
     path += '/images/iconic_taxa/'
     if iconic_taxon
       path += iconic_taxon.name.downcase

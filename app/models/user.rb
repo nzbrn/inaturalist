@@ -19,10 +19,11 @@ class User < ActiveRecord::Base
   attr_accessor   :make_observation_licenses_same
   attr_accessor   :make_photo_licenses_same
   MASS_ASSIGNABLE_ATTRIBUTES = [:make_observation_licenses_same, :make_photo_licenses_same]
-  USER_GENDER = %w(Male Female)  
-  # new way
+  USER_GENDER = %w(Male Female)
+
   preference :comment_email_notification, :boolean, :default => true
   preference :identification_email_notification, :boolean, :default => true
+  preference :no_email, :boolean, :default => false
   preference :project_invitation_email_notification, :boolean, :default => true
   preference :lists_by_login_sort, :string, :default => "id"
   preference :lists_by_login_order, :string, :default => "asc"
@@ -30,8 +31,9 @@ class User < ActiveRecord::Base
   preference :gbif_sharing, :boolean, :default => true
   preference :observation_license, :string
   preference :photo_license, :string
+  
   NOTIFICATION_PREFERENCES = %w(comment_email_notification identification_email_notification project_invitation_email_notification)
-    
+  
   belongs_to :life_list, :dependent => :destroy
   has_many  :provider_authorizations, :dependent => :destroy
   has_one  :flickr_identity, :dependent => :destroy
@@ -43,9 +45,6 @@ class User < ActiveRecord::Base
   has_many :friends, :through => :friendships
   has_many :stalkerships, :class_name => 'Friendship', :foreign_key => 'friend_id', :dependent => :destroy
   has_many :followers, :through => :stalkerships,  :source => 'user'
-  
-  has_many :activity_stream_updates, :class_name => 'ActivityStream', :dependent => :destroy
-  has_many :activity_streams, :foreign_key => 'subscriber_id'
   
   has_many :lists, :dependent => :destroy
   has_many :life_lists
@@ -92,12 +91,16 @@ class User < ActiveRecord::Base
   
   has_attached_file :icon, 
     :styles => { :medium => "300x300>", :thumb => "48x48#", :mini => "16x16#" },
-    :path => ":rails_root/public/attachments/:class/:attachment/:id/:style/:basename.:extension",
-    :url => "/attachments/:class/:attachment/:id/:style/:basename.:extension",
+    :path => ":rails_root/public/attachments/:class/:attachment/:id-:style.:icon_type_extension",
+    :url => "/attachments/:class/:attachment/:id-:style.:icon_type_extension",
     :default_url => "/attachment_defaults/:class/:attachment/defaults/:style.png"
 
   # Roles
   has_and_belongs_to_many :roles
+  
+  has_subscribers
+  has_many :subscriptions
+  has_many :updates, :foreign_key => :subscriber_id
 
   before_validation :download_remote_icon, :if => :icon_url_provided?
   before_save :whitelist_licenses
@@ -112,7 +115,10 @@ class User < ActiveRecord::Base
     :message => "must be JPG, PNG, or GIF"
 
   validates_presence_of     :login
-  validates_length_of       :login,    :within => 3..40
+  
+  MIN_LOGIN_SIZE = 3
+  MAX_LOGIN_SIZE = 40
+  validates_length_of       :login,    :within => MIN_LOGIN_SIZE..MAX_LOGIN_SIZE
   validates_uniqueness_of   :login
   validates_format_of       :login,    :with => Authentication.login_regex, :message => Authentication.bad_login_message
 
@@ -334,15 +340,12 @@ class User < ActiveRecord::Base
   end
   
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
-  #
-  # uff.  this is really an authorization, not authentication routine.  
-  # We really need a Dispatch Chain here or something.
-  # This will also let us return a human error message.
-  #
   def self.authenticate(login, password)
     return nil if login.blank? || password.blank?
     u = find_in_state :first, :active, :conditions => ["lower(login) = ?", login.downcase]
-    u = find_in_state :first, :active, :conditions => {:email => login} if u.nil?
+    u ||= find_in_state :first, :active, :conditions => {:email => login}
+    u ||= find_in_state :first, :pending, :conditions => ["lower(login) = ?", login.downcase]
+    u ||= find_in_state :first, :pending, :conditions => {:email => login}
     u && u.authenticated?(password) ? u : nil
   end
 
@@ -383,8 +386,9 @@ class User < ActiveRecord::Base
         u.activate!
       rescue ActiveRecord::StatementInvalid => e
         raise e unless e.message =~ /unique constraint/
-        u.login = User.suggest_login(u.login)
-        Rails.logger.info "[INFO #{Time.now}] unique violation, suggested login: #{u.login}"
+        suggestion = User.suggest_login(u.login)
+        Rails.logger.info "[INFO #{Time.now}] unique violation on #{u.login}, suggested login: #{suggestion}"
+        u.login = suggestion
         u.register! unless u.pending?
         u.activate!
       end
@@ -416,12 +420,18 @@ class User < ActiveRecord::Base
       ('a'..'z').member?(l) || ('0'..'9').member?(l)
     end.join('')
     suggested_login = requested_login
+    
+    if suggested_login.size > MAX_LOGIN_SIZE
+      suggested_login = suggested_login[0..MAX_LOGIN_SIZE/2]
+    end
+    
     appendix = 1
-    while User.find_by_login(suggested_login)
+    while suggested_login.to_s.size < MIN_LOGIN_SIZE || User.find_by_login(suggested_login)
       appendix += 1 
       suggested_login = "#{requested_login}#{appendix}"
-    end  
-    suggested_login
+    end
+    
+    (MIN_LOGIN_SIZE..MAX_LOGIN_SIZE).include?(suggested_login.size) ? suggested_login : nil
   end  
   
   def make_activation_code

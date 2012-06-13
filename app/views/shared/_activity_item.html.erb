@@ -1,0 +1,43 @@
+<%- 
+  item = object || item
+  taxon = update_cached(item, :taxon) if item.respond_to?(:taxon)
+  observation = update_cached(item, :observation) if item.respond_to?(:observation)
+  user = update_cached(item, :user) if item.respond_to?(:user)
+-%>
+<div id="<%= id_for(item) %>" class="<%= item.class.name.humanize.underscore %> item clear stacked">
+  <div class="item_user column">
+    <%= link_to(
+      image_tag(item.user.icon.url(:thumb), :class => 'usericon'),
+      person_path(item.user)) %>
+  </div>
+  <div class="item_content last column">
+    <%- if item.is_a? Identification %>
+      <%= render :partial => "identifications/identification", :locals => { 
+        :identification => item,
+        :taxon => taxon,
+        :observation => observation,
+        :user => user
+      } %>
+    <%- end -%>
+    
+    <% unless item.body.blank? -%>
+      <div class="readable body"><%= formatted_user_text(item.body) %></div>
+    <% end -%>
+    
+    <div class="meta">
+      Posted by <%= link_to(truncate(you_or_login(item.user), :length => 20), person_path(item.user)) %>
+      <span class="when">
+        <abbr class="date timeago" title="<%= item.created_at.iso8601 %>"><%= time_ago_in_words(item.created_at) %> ago</abbr>
+      </span>
+      <%- if is_me?(item.user) -%>
+        <span class="comment_actions">
+          (<%= link_to "Edit", item.is_a?(Identification) ? edit_identification_path(item) : edit_comment_path(item) %> |
+          <%= link_to "Delete", item, 
+                      :confirm => "Are you sure you want to delete this?", 
+                      :method => :delete, 
+                      :id => "delete_comment_#{item.id}_button" %>)
+        </span>
+      <%- end -%>
+    </div>
+  </div>
+</div>

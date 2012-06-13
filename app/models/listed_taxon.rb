@@ -3,10 +3,9 @@
 # last observed taxon (saving some db time), this model's validation makes
 # sure a taxon passes all of a list's ListRules.
 #
-class ListedTaxon < ActiveRecord::Base
-  acts_as_activity_streamable :batch_window => 30.minutes, 
-    :batch_partial => "lists/listed_taxa_activity_stream_batch",
-    :user_scope => :by_user
+class ListedTaxon < ActiveRecord::Base  
+  has_subscribers
+  
   belongs_to :list
   belongs_to :taxon, :counter_cache => true
   belongs_to :first_observation,
@@ -130,6 +129,10 @@ class ListedTaxon < ActiveRecord::Base
     "list_id: #{self.list_id}>"
   end
   
+  def to_plain_s
+    "#{taxon.default_name.name} on #{list.title}"
+  end
+  
   def validate
     # don't bother if validates_presence_of(:taxon) has already failed
     if errors.on(:taxon).blank?
@@ -138,8 +141,7 @@ class ListedTaxon < ActiveRecord::Base
       end
     end
     
-    # if last_observation && !(taxon == last_observation.taxon || last_observation.taxon.in_taxon?(taxon))
-    if last_observation && !(taxon_id == last_observation.taxon_id || taxon_ancestor_ids.split('/').include?(last_observation.taxon_id))
+    if last_observation && !(taxon_id == last_observation.taxon_id || taxon.ancestor_of?(last_observation.taxon) || last_observation.taxon.ancestor_of?(taxon))
       errors.add(:taxon_id, "must be the same as the last observed taxon, #{last_observation.taxon.try(:to_plain_s)}")
     end
     
@@ -352,16 +354,17 @@ class ListedTaxon < ActiveRecord::Base
     OCCURRENCE_STATUS_LEVELS[occurrence_status_level]
   end
   
-  def editable_by?(user)
-    list.editable_by?(user)
+  def editable_by?(target_user)
+    list.editable_by?(target_user)
   end
   
-  def removable_by?(user)
-    return false unless user
-    return true if user.admin?
-    return true if list.is_a?(ProjectList) && list.project.curated_by?(user)
+  def removable_by?(target_user)
+    return false unless target_user
+    return true if user == target_user
+    return true if list.is_a?(CheckList) && target_user.admin?
+    return true if list.is_a?(ProjectList) && list.project.curated_by?(target_user)
     return true if citation_object.blank?
-    citation_object == user
+    citation_object == target_user
   end
   
   def citation_object

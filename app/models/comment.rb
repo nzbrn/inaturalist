@@ -1,13 +1,15 @@
 class Comment < ActiveRecord::Base
-  acts_as_activity_streamable
   belongs_to :parent, :polymorphic => true
   belongs_to :user
   
   validates_length_of :body, :within => 1..5000, :message => "can't be blank"
   
-  after_create :deliver_notification
+  # after_create :deliver_notification
   after_create :update_parent_counter_cache
   after_destroy :update_parent_counter_cache
+  
+  notifies_subscribers_of :parent, :notification => "activity", :include_owner => true
+  auto_subscribes :user, :to => :parent
   
   named_scope :by, lambda {|user| 
     {:conditions => ["comments.user_id = ?", user]}}

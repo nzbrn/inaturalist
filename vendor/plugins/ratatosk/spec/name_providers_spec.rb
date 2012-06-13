@@ -4,7 +4,6 @@ require File.dirname(__FILE__) + '/spec_helper'
 ######## Shared Example Groups ##############################################
 
 describe "a name provider", :shared => true do
-  fixtures :taxa, :taxon_names
   
   it "should have a #find method" do
     @np.should respond_to(:find)
@@ -79,7 +78,6 @@ describe "a name provider", :shared => true do
 end
 
 describe "a Taxon adapter", :shared => true do
-  fixtures :sources
   
   it "should have a name" do
     @adapter.name.should == 'Homo sapiens'
@@ -133,7 +131,6 @@ describe "a Taxon adapter", :shared => true do
 end
 
 describe "a TaxonName adapter", :shared => true do
-  fixtures :sources
   
   it "should return a name" do
     @adapter.name.should == 'Western Bluebird'
@@ -226,6 +223,7 @@ describe Ratatosk::NameProviders::ColNameProvider do
 end
 
 describe Ratatosk::NameProviders::ColTaxonNameAdapter do
+  fixtures :sources
   it_should_behave_like "a TaxonName adapter"
   
   before(:all) do
@@ -262,6 +260,7 @@ describe Ratatosk::NameProviders::ColTaxonNameAdapter do
 end
 
 describe Ratatosk::NameProviders::ColTaxonAdapter do
+  fixtures :sources
   it_should_behave_like "a Taxon adapter"
   
   before(:all) do    
@@ -313,6 +312,7 @@ describe Ratatosk::NameProviders::UBioNameProvider do
 end
 
 describe Ratatosk::NameProviders::UBioTaxonNameAdapter do
+  fixtures :sources
   it_should_behave_like "a TaxonName adapter"
   
   before(:each) do
@@ -332,6 +332,7 @@ describe Ratatosk::NameProviders::UBioTaxonNameAdapter do
 end
 
 describe Ratatosk::NameProviders::UBioTaxonAdapter do
+  fixtures :sources
   it_should_behave_like "a Taxon adapter"
   
   before(:all) do

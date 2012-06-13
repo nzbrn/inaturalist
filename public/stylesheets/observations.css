@@ -8,6 +8,7 @@
 .observation .description.attribute{color:#333;}
 .observation div.description p{font-style:italic;}
 .observation .description.attribute img,
+.observation .details.attribute {display:none;}
 .observation .details.attribute img{max-width:400px;height:auto;}
 .observation .actions ul{display:inline;list-style:none;margin:0;padding:0;}
 .observation .actions ul li{display:inline;white-space:nowrap;}
@@ -70,21 +71,17 @@
   display: block;
 }
 
-.observations.table .header a:after {
-  content: '\00A0';
-  visibility: hidden;
-  padding-right: 10px;
-}
-
-.observations.table .header.order_by a:after,
-.observations.table .header:hover a:after {
+.observations.table .header.order_by a,
+.observations.table .header:hover a {
   background: right center url(/images/toggle_arrow_up.png) no-repeat;
   visibility: visible;
+  padding-right: 16px;
 }
 
-.observations.table .header.order_by.desc a:after {
+.observations.table .header.order_by.desc a {
   background: right center url(/images/toggle_arrow_down.png) no-repeat;
   visibility: visible;
+  padding-right: 16px;
 }
 
 .observations.table .header.order_by a:after,
@@ -129,6 +126,7 @@
 .observations.table .observation .actions ul.counts li:after {
   content: '';
 }
+.observations.table .observation .details { display:none; }
 
 /* Mini */
 
@@ -239,6 +237,161 @@
 
 .observations.mini.compact .actions,
 .observations.mini.infowindow .actions { margin-top: 5px;}
+
+/* Grid */
+.observations.grid .observation {
+  position:relative;
+  z-index:0;
+  text-align:center;
+  width: 75px;
+  height: 75px;
+  margin: 0 5px 5px 0;
+  vertical-align:top;
+  background-color: #eee;
+  margin-bottom:5px;
+  display:-moz-inline-stack;
+  display:inline-block;
+  zoom:1;
+  *display:inline;
+}
+.observations.grid .observed_on,
+.observations.grid .created_at,
+.observations.grid .place,
+.observations.grid .user,
+.observations.grid .details,
+.observations.grid .curator_ident {
+  display:none;
+}
+.observations.grid .actions .counts {
+  display:block;
+  top: 0px;
+  left: 0px;
+}
+.observations.grid .actions ul:last-child,
+.observations.grid .actions ul.editview {display:none;}
+.observations.grid .observation .actions ul li:after {content:'';}
+.observations.grid .research_grade_notice, 
+.observations.grid .id_please_notice {
+  top: 0px;
+  right: 0px;
+}
+.observations.grid .icon {
+  position:absolute;
+  top: 20px;
+  width:75px;
+  text-align:center;
+}
+.observations.grid .species_guess,
+.observations.grid .readable,
+.observations.grid p,
+.observations.grid .research_grade_notice, 
+.observations.grid .id_please_notice,
+.observations.grid .actions .counts {
+  font-family: "Trebuchet MS", Helvetica, Arial, sans-serif;
+  font-size: 8pt;
+  line-height:1.2;
+}
+.observations.grid .species_guess a,
+.observations.grid .research_grade_notice, 
+.observations.grid .id_please_notice,
+.observations.grid .actions .counts {
+  padding: 2px;
+  z-index:1;
+  color: white;
+  position:absolute;
+  opacity: 0.4;
+  background-color:transparent;
+  text-shadow: 1px 1px 1px black;
+}
+.observations.grid .observation:hover .species_guess a,
+.observations.grid .observation:hover .research_grade_notice, 
+.observations.grid .observation:hover .id_please_notice,
+.observations.grid .observation:hover .actions .counts {
+  opacity: 1;
+}
+.observations.grid .species_guess a {
+  left: 0;
+  bottom: 0;
+  width:100%;
+  text-align:left;
+}
+/*.observations.grid .observation:hover .species_guess a {
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(transparent), to(rgba(0,0,0,0.2)));
+  background-image: -webkit-linear-gradient(top, transparent, rgba(0,0,0,0.2));
+  background-image:    -moz-linear-gradient(top, transparent, rgba(0,0,0,0.2));
+  background-image:     -ms-linear-gradient(top, transparent, rgba(0,0,0,0.2));
+  background-image:      -o-linear-gradient(top, transparent, rgba(0,0,0,0.2));
+}
+.observations.grid .observation:hover .actions {
+  width: 100%;
+  height: 2em;
+  z-index:1;
+  display: block;
+  position:absolute;
+  top: 0;
+  left: 0;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,0,0,0.2)), to(transparent));
+  background-image: -webkit-linear-gradient(top, rgba(0,0,0,0.2), transparent);
+  background-image:    -moz-linear-gradient(top, rgba(0,0,0,0.2), transparent);
+  background-image:     -ms-linear-gradient(top, rgba(0,0,0,0.2), transparent);
+  background-image:      -o-linear-gradient(top, rgba(0,0,0,0.2), transparent);
+}*/
+.observations.grid .research_grade_notice,
+.observations.grid .id_please_notice {-webkit-border-radius:0px;-moz-border-radius:0px;border:0 transparent;border-radius:0px;padding:2px 5px; white-space: nowrap;}
+.observations.grid .research_grade_notice,
+.observations.grid .id_please_notice,
+.observations.grid .observation .actions .counts,
+.observations.grid .observation .actions .counts .count,
+.observations.grid .observation .actions .counts a {color:white;}
+.observations.grid .research_grade_notice .full,
+.observations.grid .id_please_notice .full { display:none; }
+.observations.grid .ui-icon-comment {
+  position:relative; 
+  width:12px; 
+  height: 12px; 
+  background-position: -130px -99px;
+  background-image: url(/images/jquery-ui/ui-icons_ffffff_256x240.png);
+  margin-right: 2px;
+}
+.observations.grid .ui-icon-comment:before {
+  z-index: -1;
+  content: ' ';
+  display:block;
+  position: relative;
+  width:12px; 
+  height: 12px; 
+  background-position: -130px -99px;
+  left: 1px;
+  top: 1px;
+  background-image: url(/images/jquery-ui/ui-icons_222222_256x240.png);
+}
+
+.observations.grid .species_guess .othernames {display:none;}
+.observations.grid .photos {
+  display:block;
+  position:absolute;
+  top: 0;
+  left: 0;
+  width: 75px;
+  height: 75px;
+}
+.observations.grid .photos img {width:75px;}
+.observations.grid .photos .readmore, .observations.grid .photos .nophoto {display:none;}
+
+.observations.medium.grid .photos a.photo {display:block;}
+.observations.medium.grid .observation {overflow: hidden;}
+.observations.medium.grid .observation,
+.observations.medium.grid .photos,
+.observations.medium.grid .photos a,
+.observations.medium.grid .icon {width:173px; height: 173px; }
+.observations.medium.grid .photos img { width:auto; position:absolute;}
+.observations.medium.grid .species_guess a { padding: 5px;}
+.observations.medium.grid .research_grade_notice, 
+.observations.medium.grid .id_please_notice,
+.observations.medium.grid .actions .counts {width:auto;padding: 3px 5px;}
+.observations.medium.grid .icon {top: 40px;}
+.observations.medium.grid .observation:hover .research_grade_notice .full,
+.observations.medium.grid .observation:hover .id_please_notice .full { display:inline; }
 
 /* Infowindow */
 .observations.infowindow {
@@ -560,9 +713,11 @@
 #detailscol .span-14{width:540px;}
 #detailscol textarea{width:520px;}
 .observation .error ul{margin-bottom:0;}
-
-.observation .curator_ident {
-  
-}
-
 .other_photos {float: left;}
+
+.observationcontrols a {margin-right:5px;}
+.observationcontrols .ui-icon {margin-right:2px;}
+.observationcontrols a, .observationcontrols a:hover {color: #222;}
+.observationcontrols a.disabled {color: #888;}
+
+.ui-tooltip.observations .observation {border: 0 transparent; margin-bottom: 0;}

@@ -104,10 +104,8 @@ class TaxaController < ApplicationController
           :include => :taxon_names, :methods => [:common_name]))
       end
       format.json do
-        render(
-          :json => @taxa.to_json(
-            :include => :taxon_names, 
-            :methods => [:common_name] ) )
+        @taxa = Taxon::ICONIC_TAXA if @taxa.blank? && params[:q].blank?
+        render :json => @taxa.to_json(Taxon.default_json_options)
       end
     end
   end
@@ -384,9 +382,13 @@ class TaxaController < ApplicationController
         end
       end
       format.json do
-        render :json => @taxa.to_json(
-          :include => [:iconic_taxon, :taxon_names, :photos],
-          :methods => [:common_name, :image_url, :default_name])
+        options = Taxon.default_json_options
+        options[:include].merge!(
+          :iconic_taxon => {:only => [:id, :name]}, 
+          :taxon_names => {:only => [:id, :name, :lexicon]}
+        )
+        options[:methods] += [:common_name, :image_url, :default_name]
+        render :json => @taxa.to_json(options)
       end
     end
   end
@@ -441,10 +443,10 @@ class TaxaController < ApplicationController
                 :include => :taxon_names, :methods => [:common_name] )
       end
       format.json do
-        render(
-          :json => @taxon.children.to_json(
-            :include => :taxon_names, 
-            :methods => [:common_name] ) )
+        options = Taxon.default_json_options
+        options[:include].merge!(:taxon_names => {:only => [:id, :name, :lexicon]})
+        options[:methods] += [:common_name]
+        render :json => @taxon.children.all(:include => [{:taxon_photos => :photo}, :taxon_names]).to_json(options)
       end
     end
   end
@@ -670,8 +672,12 @@ class TaxaController < ApplicationController
   end
   
   def update_photos
-    @taxon.photos = retrieve_photos
+    photos = retrieve_photos
+    @taxon.photos = photos
     @taxon.save
+    unless photos.count == 0
+      Taxon.send_later(:update_ancestor_photos, @taxon.id, photos.first.id, :dj_priority => 2)
+    end
     flash[:notice] = "Taxon photos updated!"
     redirect_to taxon_path(@taxon)
   rescue Errno::ETIMEDOUT
@@ -1067,15 +1073,15 @@ class TaxaController < ApplicationController
   def try_show(exception)
     raise exception if params[:action].blank?
     name, format = params[:action].split('_').join(' ').split('.')
-    request.format = format unless format.blank?
+    request.format = format if request.format.blank? && !format.blank?
     name = name.to_s.downcase
     
     # Try to look by its current unique name
     unless @taxon
       begin
         taxa = Taxon.all(:conditions => ["unique_name = ?", name], :limit => 2) unless @taxon
-      rescue ActiveRecord::StatementInvalid => e
-        raise e unless e.message =~ /invalid byte sequence/
+      rescue ActiveRecord::StatementInvalid, PGError => e
+        raise e unless e.message =~ /invalid byte sequence/ || e.message =~ /incomplete multibyte character/
         name = Iconv.iconv('UTF8', 'LATIN1', name).first
         taxa = Taxon.all(:conditions => ["unique_name = ?", name], :limit => 2)
       end
@@ -1251,7 +1257,7 @@ class TaxaController < ApplicationController
   def ensure_flickr_write_permission
     @provider_authorization = current_user.provider_authorizations.first(:conditions => {:provider_name => 'flickr'})
     if @provider_authorization.blank? || @provider_authorization.scope != 'write'
-      session[:return_to] = request.request_uri if request.get?
+      session[:return_to] = request.get? ? request.request_uri : request.env['HTTP_REFERER']
       redirect_to auth_url_for('flickr', :scope => 'write')
       return false
     end

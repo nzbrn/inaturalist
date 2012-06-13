@@ -13,6 +13,7 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 require 'yaml'
 INAT_CONFIG = YAML.load(File.open("#{RAILS_ROOT}/config/config.yml"))[RAILS_ENV]
+
 # flickr api keys - these need to be set before Flickraw gets included
 FLICKR_API_KEY = INAT_CONFIG['flickr']['FLICKR_API_KEY']
 FLICKR_SHARED_SECRET = INAT_CONFIG['flickr']['FLICKR_SHARED_SECRET']
@@ -74,6 +75,7 @@ Rails::Initializer.run do |config|
   config.active_record.observers = :user_observer, :listed_taxon_sweeper
   
   # Gems, see also Gemfile
+  config.gem 'pg'
   config.gem 'will_paginate', :version => '2.3.15'
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => 'http://gems.github.com', :version => '2.0.2'
   config.gem "dbf", :version => "<= 1.2.9"
@@ -90,6 +92,7 @@ Rails::Initializer.run do |config|
   config.gem "ambethia-smtp-tls", :lib => "smtp-tls", :source => "http://gems.github.com/"
   config.gem "flickraw"
   config.gem 'rest-client', :lib => 'rest_client'
+  config.gem 'hoptoad_notifier'
   config.gem "carlosparamio-geoplanet", :lib => 'geoplanet', :source => "http://gems.github.com/"
   config.gem 'daemon-spawn', :lib => 'daemon_spawn'
   config.gem 'nokogiri'
@@ -109,7 +112,8 @@ Rails::Initializer.run do |config|
   config.gem "friendly_id", :version => "~> 3.2.1"
   config.gem "koala"
   config.gem "preferences"
-
+  config.gem 'mail_view'
+  
   # Set default time zone to UTC
   config.time_zone = 'UTC'
 end

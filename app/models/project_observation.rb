@@ -7,16 +7,20 @@ class ProjectObservation < ActiveRecord::Base
   validates_rules_from :project, :rule_methods => [:observed_in_place?, :georeferenced?, :identified?, :in_taxon?, :on_list?]
   validates_uniqueness_of :observation_id, :scope => :project_id, :message => "already added to this project"
   
-  after_save :refresh_project_list
+  after_create  :refresh_project_list
   after_destroy :refresh_project_list
-  after_create :update_observations_counter_cache_later
+  
+  after_create  :update_observations_counter_cache_later
   after_destroy :update_observations_counter_cache_later
-  after_create :update_taxa_counter_cache_later
+  
+  after_create  :update_taxa_counter_cache_later
   after_destroy :update_taxa_counter_cache_later
-  after_create :update_project_observed_taxa_counter_cache_later
+  
+  after_create  :update_project_observed_taxa_counter_cache_later
   after_destroy :update_project_observed_taxa_counter_cache_later
   
   def observed_by_project_member?
+    return false if project.blank? || observation.blank?
     project.project_users.exists?(:user_id => observation.user_id)
   end
   
@@ -60,7 +64,7 @@ class ProjectObservation < ActiveRecord::Base
         nil
       end
     else
-      observation.send(column)
+      observation.send(column) rescue send(column)
     end
   end
   
@@ -97,19 +101,20 @@ class ProjectObservation < ActiveRecord::Base
     return false if observation.taxon.blank?
     list.listed_taxa.detect{|lt| lt.taxon_id == observation.taxon_id}
   end
+  
   ##### Static ##############################################################
   def self.to_csv(project_observations, options = {})
     return nil if project_observations.blank?
     project = options[:project] || project_observations.first.project
     columns = Observation.column_names
-    columns += [:scientific_name, :common_name, :url, :image_url, :tag_list, :user_login].map(&:to_s)
-    except = [:map_scale, :timeframe, :iconic_taxon_id, :delta].map(&:to_s)
+    columns += [:scientific_name, :common_name, :url, :image_url, :tag_list, :user_login].map{|c| c.to_s}
+    except = [:map_scale, :timeframe, :iconic_taxon_id, :delta, :user_agent, :location_is_exact, :geom].map{|e| e.to_s}
     unless project.curated_by?(options[:user])
       except += %w(private_latitude private_longitude private_positional_accuracy)
     end
     columns -= except
     headers = columns.map{|c| Observation.human_attribute_name(c)}
-    project_columns = %w(curator_ident_taxon_id curator_ident_taxon_name curator_ident_user_id curator_ident_user_login)
+    project_columns = %w(curator_ident_taxon_id curator_ident_taxon_name curator_ident_user_id curator_ident_user_login tracking_code)
     columns += project_columns
     headers += project_columns.map{|c| c.to_s.humanize}
     FasterCSV.generate do |csv|

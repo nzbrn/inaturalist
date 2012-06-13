@@ -5,12 +5,14 @@ class ProjectsController < ApplicationController
     :cache_path => Proc.new {|c| c.params}, 
     :if => Proc.new {|c| c.request.format.widget?}
   
+  before_filter :return_here, :only => [:index, :show, :contributors, :members, :show_contributor, :terms]
   before_filter :login_required, :except => [:index, :show, :search, :map, :contributors, :observed_taxa_count]
   before_filter :load_project, :except => [:create, :index, :search, :new, :by_login, :map, :browse]
   before_filter :ensure_current_project_url, :only => :show
   before_filter :load_project_user, :except => [:index, :search, :new, :by_login]
   before_filter :load_user_by_login, :only => [:by_login]
-  before_filter :ensure_can_edit, :only => [:edit, :update, :destroy]
+  before_filter :ensure_can_edit, :only => [:edit, :update]
+  before_filter :filter_params, :only => [:update, :create]
   
   ORDERS = %w(title created)
   ORDER_CLAUSES = {
@@ -19,14 +21,29 @@ class ProjectsController < ApplicationController
   }
   
   def index
-    project_observations = ProjectObservation.all(
-      :select => "MAX(id) AS id, project_id",
-      :order => "id desc", :limit => 9, :group => "project_id")
-    @projects = Project.all(:conditions => ["id IN (?)", project_observations.map(&:project_id)])
-    @created = Project.all(:order => "id desc", :limit => 9)
-    if logged_in?
-      @started = current_user.projects.all(:order => "id desc", :limit => 9)
-      @joined = current_user.project_users.all(:include => :project, :order => "id desc", :limit => 9).map(&:project)
+    respond_to do |format|
+      format.html do
+        project_observations = ProjectObservation.all(
+          :select => "MAX(id) AS id, project_id",
+          :order => "id desc", :limit => 9, :group => "project_id")
+        @projects = Project.all(:conditions => ["id IN (?)", project_observations.map(&:project_id)])
+        @created = Project.all(:order => "id desc", :limit => 9)
+        @featured = Project.featured.all
+        if logged_in?
+          @started = current_user.projects.all(:order => "id desc", :limit => 9)
+          @joined = current_user.project_users.all(:include => :project, :order => "id desc", :limit => 9).map(&:project)
+        end
+      end
+      format.json do
+        scope = Project.scoped({})
+        scope = scope.featured if params[:featured]
+        scope = scope.near_point(params[:latitude], params[:longitude]) if params[:latitude] && params[:longitude]
+        scope = scope.from_source_url(params[:source]) if params[:source]
+        @projects = scope.paginate(:page => params[:page], :per_page => 100)
+        opts = Project.default_json_options.merge(:include => :project_list)
+        opts[:methods] << :project_observations_count
+        render :json => @projects.to_json(opts)
+      end
     end
   end
   
@@ -38,7 +55,10 @@ class ProjectsController < ApplicationController
   
   def show
     respond_to do |format|
-      format.html do
+      format.any(:html, :mobile) do
+        if logged_in?
+          @provider_authorizations = current_user.provider_authorizations.all
+        end
         @observed_taxa_count = @project.observed_taxa_count
         @top_observers = @project.project_users.all(:order => "taxa_count desc, observations_count desc", :limit => 10, :conditions => "taxa_count > 0")
         @project_users = @project.project_users.paginate(:page => 1, :per_page => 5, :include => :user, :order => "id DESC")
@@ -61,6 +81,7 @@ class ProjectsController < ApplicationController
           render :action => "show_iframe"
         end
       end
+      
       format.json do
         render :json => @project
       end
@@ -102,9 +123,15 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1
   # DELETE /projects/1.xml
   def destroy
-    @project = Project.find(params[:id])
+    project_user = current_user.project_users.first(:conditions => {:project_id => @project.id})
+    if project_user.blank? || !project_user.is_admin?
+      flash[:error] = "Only the project admin can delete this project."
+      redirect_to @project
+      return
+    end
+    
     @project.destroy
-
+    
     respond_to do |format|
       format.html do
         flash[:notice] = "#{@project.title} was deleted"
@@ -120,14 +147,25 @@ class ProjectsController < ApplicationController
   
   def by_login
     @started = @selected_user.projects.all(:order => "id desc", :limit => 100)
-    @projects = Project.paginate(:page => params[:page],
-      :include => :project_users,
-      :conditions => ["project_users.user_id = ?", @selected_user],
-      :order => "projects.title")
+    @project_users = @selected_user.project_users.paginate(:page => params[:page],
+      :include => [:project, :user],
+      :order => "lower(projects.title)")
+    @projects = @project_users.map{|pu| pu.project}
+    respond_to do |format|
+      format.html
+      format.json do
+        project_options = Project.default_json_options.update(:include => :project_list)
+        project_options[:methods] << :project_observation_rule_terms
+        render :json => @project_users.to_json(:include => {
+          :user => {:only => :login},
+          :project => project_options
+        })
+      end
+    end
   end
   
   def members
-    @project_users = @project.project_users.paginate(:page => params[:page], :include => :user, :order => "id DESC")
+    @project_users = @project.project_users.paginate(:page => params[:page], :include => :user, :order => "users.login ASC")
   end
   
   def observed_taxa_count
@@ -155,7 +193,8 @@ class ProjectsController < ApplicationController
   end
   
   def show_contributor
-    @contributor = @project.project_users.find_by_id(params[:project_user_id])
+    @contributor = @project.project_users.find_by_id(params[:project_user_id].to_i)
+    @contributor ||= @project.project_users.first(:include => :user, :conditions => ["users.login = ?", params[:project_user_id]])
     if @contributor.blank?
       flash[:error] = "Contributor cannot be found"
       redirect_to project_contributors_path(@project)
@@ -163,7 +202,25 @@ class ProjectsController < ApplicationController
     end
     
     @project_observations = @project.project_observations.paginate(:page => params[:page], 
+      :per_page => 28,
       :include => :observation, :conditions => ["observations.user_id = ?", @contributor.user])
+    
+    @research_grade_count = @project.project_observations.count(
+      :joins => :observation,
+      :conditions => [
+        "observations.user_id = ? AND observations.quality_grade = ?", 
+        @contributor.user,
+        Observation::RESEARCH_GRADE
+    ])
+    
+    @research_grade_species_count = @project.project_observations.count(
+      :joins => {:observation => :taxon},
+      :conditions => [
+        "observations.user_id = ? AND observations.quality_grade = ? AND taxa.rank_level < ?", 
+        @contributor.user,
+        Observation::RESEARCH_GRADE,
+        Taxon::GENUS_LEVEL
+    ])
   end
   
   def list
@@ -196,47 +253,27 @@ class ProjectsController < ApplicationController
     end
   end
   
-  def make_curator
+  def change_role
     @project_user = @project.project_users.find_by_id(params[:project_user_id])
+    current_project_user = current_user.project_users.first(:conditions => {:project_id => @project.id})
+    role = params[:role] if ProjectUser::ROLES.include?(params[:role])
+    
     if @project_user.blank?
       flash[:error] = "Project user cannot be found"
       redirect_to project_members_path(@project)
       return
     end
-    if @project.user_id != current_user.id
-      flash[:error] = "Only an admin can add project curator status"
+    
+    unless current_project_user.is_manager?
+      flash[:error] = "Only a project manager can add project curator status"
       redirect_to project_members_path(@project)
       return
     end
-    @project_user.role = 'curator'
+    
+    @project_user.role = role
     
     if @project_user.save
-      Project.send_later(:update_curator_idents_on_make_curator, @project.id, @project_user.id)
-      flash[:notice] = "Added curator role"
-      redirect_to project_members_path(@project)
-    else
-      flash[:error] = "Project user was invalid: #{@project_user.errors.full_messages.to_sentence}"
-      redirect_to project_members_path(@project)
-      return
-    end
-  end
-  
-  def remove_curator
-    @project_user = @project.project_users.find_by_id(params[:project_user_id])
-    if @project_user.blank?
-      flash[:error] = "Project user cannot be found"
-      redirect_to project_members_path(@project)
-      return
-    end
-    if @project.user_id != current_user.id
-      flash[:error] = "Only an admin can remove curator status"
-      redirect_to project_members_path(@project)
-      return
-    end
-    @project_user.role = nil
-    if @project_user.save
-      Project.send_later(:update_curator_idents_on_remove_curator, @project.id, @project_user.user.id)
-      flash[:notice] = "Removed curator role"
+      flash[:notice] = "#{role.blank? ? 'Removed' : 'Added'} #{role} role"
       redirect_to project_members_path(@project)
     else
       flash[:error] = "Project user was invalid: #{@project_user.errors.full_messages.to_sentence}"
@@ -270,10 +307,9 @@ class ProjectsController < ApplicationController
   
   def join
     @observation = Observation.find_by_id(params[:observation_id])
-    @project_curators = @project.project_users.all(:conditions => {:role => "curator"})
+    @project_curators = @project.project_users.all(:conditions => ["role IN (?)", [ProjectUser::MANAGER, ProjectUser::CURATOR]])
     if @project_user
-      flash[:notice] = "You're already a member of this project!"
-      redirect_to @project
+      respond_to_join(:notice => "You're already a member of this project!")
       return
     end
     return unless request.post?
@@ -281,45 +317,78 @@ class ProjectsController < ApplicationController
     @project_user = @project.project_users.create(:user => current_user)
     unless @observation
       if @project_user.valid?
-        flash[:notice] = "Welcome to #{@project.title}"
-        redirect_to @project and return
+        respond_to_join(:notice => "Welcome to #{@project.title}")
       else
-        flash[:error] = "Sorry, there were problems with your request: " + 
-        @project_user.errors.full_messages.to_sentence
-        redirect_to @project and return
+        respond_to_join(:error => "Sorry, there were problems with your request: #{@project_user.errors.full_messages.to_sentence}")
       end
+      return
     end
     
     unless @project_user.valid?
-      flash[:error] = "Sorry, there were problems with your request: " + 
-      @project_user.errors.full_messages.to_sentence
-      redirect_to @observation and return
+      respond_to_join(:dest => @observation,
+        :error => "Sorry, there were problems with your request: #{@project_user.errors.full_messages.to_sentence}")
+      return
     end
+    
     @project_observation = ProjectObservation.create(:project => @project, :observation => @observation)
     unless @project_observation.valid?
-      flash[:error] = "There were problems adding your observation to this project: " + 
-        @project_observation.errors.full_messages.to_sentence
-      redirect_to @observation and return
+      respond_to_join(:dest => @observation, 
+        :error => "There were problems adding your observation to this project: #{@project_observation.errors.full_messages.to_sentence}")
+      return
     end
+    
     if @project_invitation = ProjectInvitation.first(:conditions => {:project_id => @project.id, :observation_id => @observation.id})
       @project_invitation.destroy
     end
-    flash[:notice] = "You've joined the \"#{@project_invitation.project.title}\" project and your observation was added"
-    redirect_to @observation
+    
+    respond_to_join(:dest => @observation, :notice => "You've joined the \"#{@project_invitation.project.title}\" project and your observation was added")
   end
   
   def leave
-    unless @project_user && request.post?
-      flash[:error] = "You aren't a member of that project."
-      redirect_to @project and return
+    unless @project_user && (request.post? || request.delete?)
+      respond_to do |format|
+        format.html do
+          flash[:error] = "You aren't a member of that project."
+          redirect_to @project
+        end
+        format.json do
+          render :status => :ok, :json => {}
+        end
+      end
+      return
     end
+    
+    if @project_user.user_id == @project.user_id
+      msg = "You can't leave a project you created."
+      respond_to do |format|
+        format.html do
+          flash[:error] = msg
+          redirect_to @project
+        end
+        format.json do
+          render :status => :unprocessable_entity, :json => {:error => msg}
+        end
+      end
+      return
+    end
+    
+    
     unless @project_user.role == nil
       Project.send_later(:update_curator_idents_on_remove_curator, @project.id, @project_user.user.id)
     end
     Project.send_later(:delete_project_observations_on_leave_project, @project.id, @project_user.user.id)
     @project_user.destroy
-    flash[:notice] = "You have left #{@project.title}"
-    redirect_to @project
+    
+    respond_to do |format|
+      format.html do
+        flash[:notice] = "You have left #{@project.title}"
+        redirect_to @project
+      end
+      
+      format.json do
+        render :status => :ok, :json => {}
+      end
+    end
   end
   
   def stats
@@ -386,7 +455,7 @@ class ProjectsController < ApplicationController
       return
     end
     
-    unless @project_observation.observation.user_id == current_user.id || current_user.project_users.first(:conditions => {:project_id => @project_observation.project.id, :role => 'curator'})
+    unless @project_observation.observation.user_id == current_user.id || (@project_user && @project_user.is_curator?)
       flash[:error] = "You can't remove other people's observations."
       redirect_back_or_default(@project)
       return
@@ -468,7 +537,9 @@ class ProjectsController < ApplicationController
     end
     respond_to do |format|
       format.html
-      format.json { render :json => @projects }
+      format.json do
+        render :json => @projects.to_json(:methods => [:icon_url], :include => :project_list)
+      end
     end
   end
   
@@ -503,6 +574,44 @@ class ProjectsController < ApplicationController
     unless @project.editable_by?(current_user)
       flash[:error] = "You don't have permission to edit that project."
       return redirect_to @project
+    end
+    true
+  end
+  
+  def respond_to_join(options = {})
+    error = options[:error]
+    notice = options[:notice]
+    dest = options[:dest] || @project
+    respond_to do |format|
+      if error
+        format.html do
+          flash[:error] = error
+          redirect_to dest
+        end
+        
+        format.json do
+          render :status => :unprocessable_entity, :json => {:errors => @project_user.errors.full_messages}
+        end
+      else
+        format.html do
+          flash[:notice] = notice
+          redirect_to dest
+        end
+        
+        format.json do
+          render :json => @project_user
+        end
+      end
+    end
+  end
+  
+  def filter_params
+    params[:project].delete(:featured_at) unless current_user.is_admin?
+    
+    if current_user.is_admin?
+      params[:project][:featured_at] = params[:project][:featured_at] == "1" ? Time.now : nil
+    else
+      params[:project].delete(:featured_at)
     end
     true
   end

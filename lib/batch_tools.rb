@@ -9,12 +9,17 @@ module BatchTools
       def do_in_batches(options = {}, &block)
         batch_size = options.delete(:batch_size) || 1000
         count_options = options.reject {|k,v| k.to_s == 'order'}
-        if count_options[:select] && (distinct = count_options[:select][/DISTINCT \(.+?\)/, 0])
-          count_options[:select] = distinct
+        if count_options[:select]
+          if distinct = count_options[:select][/DISTINCT \(.+?\)/, 0]
+            count_options[:select] = distinct
+          elsif distinct = count_options[:select][/DISTINCT ON \((.+?)\)/, 1]
+            count_options[:select] = "DISTINCT #{distinct}"
+          end
         end
         est = false
         begin 
           full_count = self.count(count_options)
+          full_count = full_count.size if full_count.is_a?(Enumerable)
         rescue => e
           Rails.logger.error "[ERROR #{Time.now}] Batch tool count failed: #{e}"
           full_count = self.count

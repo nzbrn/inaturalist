@@ -12,22 +12,19 @@
   <meta property="og:url" content="<%= taxon_url(@taxon) %>"/> 
   <meta property="og:site_name" content="iNaturalist"/> 
   <meta property="fb:admins" content="611249211,800415373"/>
-  <meta property="fb:app_id" content="26558815027" /> 
-  <% unless @taxon.wikipedia_summary.blank? -%>
-    <meta name="description" content="<%= strip_tags(@taxon.wikipedia_summary).gsub('"', "'") %>"/>
-    <%-
-      og_description = if @photos.blank?
-        html_attributize(@taxon.wikipedia_summary)
-      else
-        "(Photo: #{@photos.first.attribution}) #{html_attributize @taxon.wikipedia_summary}"
-      end
-    -%>
-    <meta property="og:description" content="<%= og_description %>"/>
-  <% end -%>
+  <meta property="fb:app_id" content="26558815027" />
+	<%-
+	   description = @taxon.wikipedia_summary.blank? ? @taxon.name : @taxon.wikipedia_summary
+	   og_description = description
+	   og_description = "(Photo: #{@photos.first.attribution}) #{og_description}" unless @photos.blank?
+	-%>
+	<meta name="description" content="<%= html_attributize description %>"/>
+	<meta property="og:description" content="<%= html_attributize og_description %>"/>
+	
 <%- end -%>
 
 <%- content_for(:extracss) do %>
-<%= stylesheet_link_tag 'taxa/show', 'observations' %>
+<%= stylesheet_link_tag 'taxa/show' %>
 <style type="text/css" media="screen">
   #noobservations .readable.description {
     margin-bottom: 0.5em;
@@ -140,6 +137,7 @@
   
   .toggle_menu .menu {
     right: 0;
+    left: auto;
   }
   
   #all_names {
@@ -243,7 +241,7 @@
   .ui-tabs .ui-tabs-panel { padding: 10px 0; }
   #taxon_links { 
     position: relative;
-    z-index: 1000;
+    z-index: 1;
   }
 </style>
 
@@ -336,6 +334,18 @@
             $(h.w).find('#inat_obs_taxon_photos .taxon_photos').photoSelector({
               baseURL: '<%= taxon_observation_photos_url(@taxon) %>',
               urlParams: {
+                authenticity_token: encodeURIComponent(<%= form_authenticity_token.inspect %>),
+                limit: 15
+              },
+              afterQueryPhotos: function() {
+                iNaturalist.modalCenter(h.w)
+              }
+            });
+
+						$(h.w).find('#eol_taxon_photos .taxon_photos').photoSelector({
+              baseURL: '<%= eol_photo_fields_url %>',
+              urlParams: {
+								taxon_id: '<%= @taxon.id %>',
                 authenticity_token: encodeURIComponent(<%= form_authenticity_token.inspect %>),
                 limit: 15
               },

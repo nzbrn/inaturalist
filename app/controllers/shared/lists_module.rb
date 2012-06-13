@@ -14,6 +14,7 @@ module Shared::ListsModule
   end
   
   def show
+    @view = params[:view] || params[:view_type]
     respond_to do |format|
       format.html do
         # Make sure request is being handled by the right controller
@@ -35,12 +36,7 @@ module Shared::ListsModule
 
         @iconic_taxon_counts = get_iconic_taxon_counts(@list, @iconic_taxa)
         @total_listed_taxa ||= @list.listed_taxa.count
-        #if @list.is_a?(ProjectList)
-        #  @total_observed_taxa = @list.project.observed_taxa_count
-        #else
         @total_observed_taxa ||= @list.listed_taxa.count(:conditions => "last_observation_id IS NOT NULL")
-        #end
-        @view = params[:view]
         @view = PHOTO_VIEW unless LIST_VIEWS.include?(@view)
 
         case @view
@@ -75,18 +71,44 @@ module Shared::ListsModule
       end
       
       format.csv do
-        job_id = Rails.cache.read(@list.generate_csv_cache_key)
+        job_id = Rails.cache.read(@list.generate_csv_cache_key(:view => @view))
         job = Delayed::Job.find_by_id(job_id)
         if job
           # Still working
         else
           # no job id, no job, let's get this party started
-          Rails.cache.delete(@list.generate_csv_cache_key)
-          job = @list.send_later(:generate_csv, :path => "public/lists/#{@list.to_param}.csv")
-          Rails.cache.write(@list.generate_csv_cache_key, job.id, :expires_in => 1.hour)
+          Rails.cache.delete(@list.generate_csv_cache_key(:view => @view))
+          job = if @view == "taxonomic"
+            @list.send_later(:generate_csv, :path => "public/lists/#{@list.to_param}.taxonomic.csv", :taxonomic => true)
+          else
+            @list.send_later(:generate_csv, :path => "public/lists/#{@list.to_param}.csv")
+          end
+          Rails.cache.write(@list.generate_csv_cache_key(:view => @view), job.id, :expires_in => 1.hour)
         end
         prevent_caching
-        render :status => :accepted, :text => "This file takes a little while to generate.  It should be ready shortly at #{request.request_uri}"
+        render :status => :accepted, :text => "This file takes a little while to generate.  It should be ready shortly at #{request.url}"
+      end
+      
+      format.json do
+        per_page = params[:per_page].to_i
+        per_page = 200 unless (1..200).include?(per_page)
+        @listed_taxa = @list.listed_taxa.paginate(:page => params[:page], 
+          :per_page => per_page,
+          :order => "observations_count DESC",
+          :include => [{:taxon => [:photos, :taxon_names]}])
+        @listed_taxa_json = @listed_taxa.map do |lt|
+          lt.as_json(
+            :except => [:manually_added, :updater_id, :observation_month_counts, :taxon_range_id, :source_id],
+            :include => { :taxon => Taxon.default_json_options }
+          )
+        end
+        render :json => {
+          :list => @list,
+          :listed_taxa => @listed_taxa_json,
+          :current_page => @listed_taxa.current_page,
+          :total_pages => @listed_taxa.total_pages,
+          :total_entries => @listed_taxa.total_entries
+        }
       end
     end
   end
@@ -106,10 +128,9 @@ module Shared::ListsModule
   
   def create
     # Sometimes STI can be annoying...
-    [List, LifeList, CheckList, ProjectList].each do |klass|
-      next unless p = params[klass.to_s.underscore]
-      @list = klass.new(p)
-    end
+    klass = Object.const_get(params[:list].delete(:type)) rescue List
+    klass = List unless klass.ancestors.include?(List)
+    @list = klass.new(params[klass.to_s.underscore])
 
     @list.user = current_user
     

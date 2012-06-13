@@ -42,7 +42,12 @@ Some notes:
     css_class += ' id_please'
   end
 -%>
-<div id="observation-<%= observation.id rescue rand(999) %>" class="<%= css_class %>">
+<div id="observation-<%= observation.id rescue rand(999) %>" class="<%= css_class %>" 
+    data-taxon-id=<%= observation.taxon_id %>
+    data-iconic-taxon-id=<%= observation.iconic_taxon_id %>
+    data-latitude=<%= observation.latitude %>
+    data-longitude=<%= observation.longitude %>
+    data-iconic-taxon-name=<%= observation.iconic_taxon_name %>>
   <%= top if top %>
   <% if check_box_name -%>
     <div class="check_box attribute">
@@ -50,7 +55,9 @@ Some notes:
     </div>
   <% end -%>
   <div class="icon attribute">
-    <%= iconic_taxon_image(observation.taxon, :size => 15) %>
+    <%= iconic_taxon_image(observation.taxon, :size => 15, 
+      "data-square-url" => iconic_taxon_image_url(observation.taxon, :size => 15),
+      "data-small-url" => iconic_taxon_image_url(observation.taxon, :size => 32)) %>
   </div>
   <div class="photos attribute">
     <h4 class="label">Photos</h4>
@@ -60,8 +67,14 @@ Some notes:
           No photos
         </div>
       <% else %>
-        <%- photos = observation.observation_photos.sort_by{|op| op.position || observation.photos.size + op.id.to_i}.map(&:photo) %>
-        <%= link_to image_tag(photos.first.square_url), observation, :class => 'flickr photo' %>
+        <%- photos = observation.observation_photos.sort_by{|op| 
+          op.position || observation.photos.size + op.id.to_i
+        }.map{|op| op.photo}.compact %>
+        <%= link_to image_tag(photos.first.square_url,
+          "data-square-url" => photos.first.square_url,
+          "data-small-url" => photos.first.small_url,
+          "data-medium-url" => photos.first.medium_url
+        ), observation, :class => 'flickr photo'%>
         <% if photos.size > 1 -%>
           <%= link_to "#{photos.size} photos", observation, :class => 'readmore' %>
         <% end -%>
@@ -137,7 +150,7 @@ Some notes:
       </span>
     </div>
   <% end -%>
-  <div id="obs-<%= observation.id %>-details" class="details attribute" style="display: none">
+  <div id="obs-<%= observation.id %>-details" class="details attribute">
     <% unless observation.description.blank? %>
       <h4 class="label">Description</h4>
       <div class="description">
@@ -153,28 +166,30 @@ Some notes:
     <% end %>
   </div>
   <div class="actions attribute">
-    <ul class="counts">
-      <% if observation.comments.count > 0 -%>
-        <li class="comments_count">
-          <a href="<%= url_for(observation) %>">
-            <span class="count"><%= observation.comments.count %></span>
-            <span class="ui-icon ui-icon-comment inlineblock">comment<%= 's' if observation.comments.count != 1 %></span>
-          </a>
-        </li>
-      <% end -%>
-      <% if observation.num_identifications_by_others > 0 -%>
-        <li class="identifications_count">
-          <a href="<%= url_for(observation) %>">
-            <span class="count"><%= observation.num_identifications_by_others %></span>
-            ID<%= 's' if observation.num_identifications_by_others != 1 %>
-          </a>
-        </li>
-      <% end -%>
-    </ul>
+    <% if observation.comments.count > 0 || observation.num_identifications_by_others > 0 -%>
+      <ul class="counts">
+        <% if observation.comments.count > 0 -%>
+          <li class="comments_count">
+            <a href="<%= url_for(observation) %>">
+              <span class="count"><%= observation.comments.count %></span>
+              <span class="ui-icon ui-icon-comment inlineblock">comment<%= 's' if observation.comments.count != 1 %></span>
+            </a>
+          </li>
+        <% end -%>
+        <% if observation.num_identifications_by_others > 0 -%>
+          <li class="identifications_count">
+            <a href="<%= url_for(observation) %>">
+              <span class="count"><%= observation.num_identifications_by_others %></span>
+              ID<%= 's' if observation.num_identifications_by_others != 1 %>
+            </a>
+          </li>
+        <% end -%>
+      </ul>
+    <% end -%>
     <%- if observation.id_please? %>
       <ul>
         <li class="last">
-          <%= link_to "ID Please!", observation, :class => "id_please_notice", 
+          <%= link_to "ID<span class='full'> Please</span>!", observation, :class => "id_please_notice", 
             "data-tip" => "#{observation.user.login} would like some help identifying this!",
             "data-tip-show-delay" => 1000 %>
         </li>
@@ -182,14 +197,14 @@ Some notes:
     <%- elsif observation.research_grade? %>
       <ul>
         <li class="last">
-          <%= link_to "Research Grade", observation_url(observation, :anchor => "data_quality_assessment"), 
+          <%= link_to "R<span class='full'>esearch </span>G<span class='full'>rade</span>", observation_url(observation, :anchor => "data_quality_assessment"), 
             :class => "research_grade_notice", 
             "data-tip" => "\"Research grade\" observations have a date, photo, coordinates, and a community-supported ID.  Click through to see the data quality assessment.",
             "data-tip-show-delay" => 1000 %>
         </li>
       </ul>
     <% end -%>
-    <ul>
+    <ul class="editview">
       <% if logged_in? && current_user.id == observation.user_id -%>
         <li class="editlink"><%= link_to "Edit", edit_observation_path(observation) %></li>
       <% end -%>

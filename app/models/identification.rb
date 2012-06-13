@@ -1,6 +1,4 @@
 class Identification < ActiveRecord::Base
-  acts_as_activity_streamable
-  
   belongs_to :observation
   belongs_to :user
   belongs_to :taxon
@@ -13,7 +11,7 @@ class Identification < ActiveRecord::Base
   
   after_create  :update_observation, 
                 :increment_user_counter_cache, 
-                :notify_observer, 
+                # :notify_observer, 
                 :expire_caches
                 
   after_save    :update_obs_stats, 
@@ -26,6 +24,9 @@ class Identification < ActiveRecord::Base
                 :expire_caches
   
   attr_accessor :skip_observation
+  
+  notifies_subscribers_of :observation, :notification => "activity", :include_owner => true
+  auto_subscribes :user, :to => :observation
   
   named_scope :for, lambda {|user|
     {:include => :observation,
@@ -40,10 +41,15 @@ class Identification < ActiveRecord::Base
     {:conditions => ["identifications.user_id = ?", user]}
   }
   
+  def to_s
+    "<Identification #{id} observation_id: #{observation_id} taxon_id: #{taxon_id} user_id: #{user_id}"
+  end
+  
   # Callbacks ###############################################################
   
   # Update the observation if you're adding an ID to your own obs
   def update_observation
+    return false unless observation
     return true unless self.user_id == self.observation.user_id
     return true if @skip_observation
 
@@ -61,23 +67,17 @@ class Identification < ActiveRecord::Base
   def update_observation_after_destroy
     return true unless self.observation
     return true unless self.observation.user_id == self.user_id
+    return true if @skip_observation
     
     # update the species_guess
     species_guess = observation.species_guess
     if !taxon.blank? && !taxon.taxon_names.exists?(:name => species_guess)
       species_guess = nil
     end
-    Observation.update_all(
-      ["taxon_id = ?, species_guess = ?, iconic_taxon_id = ?", nil, species_guess, nil],
-      "id = #{self.observation_id}"
-    )
     
-    # make sure update_obs_stats operates on an updated version of the obs obj
-    self.observation.taxon_id = nil
-    self.observation.species_guess = nil
-    self.observation.iconic_taxon_id = nil
-    
-    ProjectUser.send_later(:update_taxa_obs_and_observed_taxa_count_after_update_observation, self.observation.id, self.user_id)
+    observation.skip_identifications = true
+    observation.update_attributes(:species_guess => species_guess, :taxon => nil, :iconic_taxon_id => nil)
+    ProjectUser.send_later(:update_taxa_obs_and_observed_taxa_count_after_update_observation, observation.id, self.user_id)
     true
   end
   
@@ -86,7 +86,8 @@ class Identification < ActiveRecord::Base
   #
   def update_obs_stats
     return true unless observation
-    observation.update_stats
+    return true if @skip_observation
+    observation.update_stats(:include => self)
     true
   end
   
@@ -132,7 +133,6 @@ class Identification < ActiveRecord::Base
   # Revise the project_observation curator_identification_id if the
   # a curator's identification is deleted to be nil or that of another curator
   def revisit_curator_identification
-    return true if self.observation.id.blank?
     Identification.send_later(:run_revisit_curator_identification, self.observation_id, self.user_id)
     true
   end
@@ -144,15 +144,19 @@ class Identification < ActiveRecord::Base
   # the observer's identification.  If this identification has the same taxon
   # or a child taxon of the observer's idnetification, then they agree.
   #
-  def is_agreement?
-    return false if observation.taxon_id.blank?
-    return false if observation.user_id == user_id
-    return true if taxon_id == observation.taxon_id
-    taxon.in_taxon? observation.taxon_id
+  def is_agreement?(options = {})
+    return false if frozen?
+    o = options[:observation] || observation
+    return false if o.taxon_id.blank?
+    return false if o.user_id == user_id
+    return true if taxon_id == o.taxon_id
+    taxon.in_taxon? o.taxon_id
   end
   
-  def is_disagreement?
-    return false if observation.user_id == user_id
+  def is_disagreement?(options = {})
+    return false if frozen?
+    o = options[:observation] || observation
+    return false if o.user_id == user_id
     !is_agreement?
   end
   
@@ -183,7 +187,7 @@ class Identification < ActiveRecord::Base
   def self.run_update_curator_identification(ident)
     obs = ident.observation
     ident.observation.project_observations.each do |po|
-      if ident.user.project_users.exists?(:project_id => po.project_id, :role => 'curator')
+      if ident.user.project_users.exists?(["project_id = ? AND role IN (?)", po.project_id, [ProjectUser::MANAGER, ProjectUser::CURATOR]])
         po.update_attributes(:curator_identification_id => ident.id)
         ProjectUser.send_later(:update_observations_counter_cache_from_project_and_user, po.project_id, obs.user_id)
         ProjectUser.send_later(:update_taxa_counter_cache_from_project_and_user, po.project_id, obs.user_id)
@@ -200,10 +204,10 @@ class Identification < ActiveRecord::Base
       return
     end
     obs.project_observations.each do |po|
-      if usr.project_users.exists?(:project_id => po.project_id, :role => 'curator') #The ident that was deleted is owned by user who is a curator of a project that that obs belongs to
+      if usr.project_users.exists?(["project_id = ? AND role IN (?)", po.project_id, [ProjectUser::MANAGER, ProjectUser::CURATOR]]) #The ident that was deleted is owned by user who is a curator of a project that that obs belongs to
         other_curator_id = false
         po.observation.identifications.each do |other_ident| #that project observation has other identifications that belong to users who are curators use those
-          if other_ident.user.project_users.exists?(:project_id => po.project_id, :role => 'curator')
+          if other_ident.user.project_users.exists?(["project_id = ? AND role IN (?)", po.project_id, [ProjectUser::MANAGER, ProjectUser::CURATOR]])
             po.update_attributes(:curator_identification_id => other_ident.id)
             other_curator_id = true
           end

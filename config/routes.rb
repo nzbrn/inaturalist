@@ -32,6 +32,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.edit_after_auth "/users/edit_after_auth", :controller => "users", :action => "edit_after_auth"
 
+  map.eol_photo_fields "/eol/photo_fields", :controller => "eol", :action => "photo_fields"
   map.connect "/facebook/photo_fields", :controller => "facebook", :action => "albums"
   map.connect "/flickr/invite", :controller => "photos", :action => "invite", :provider => "flickr"
   map.connect "/facebook/invite", :controller => "photos", :action => "invite", :provider => "facebook"
@@ -44,6 +45,8 @@ ActionController::Routing::Routes.draw do |map|
   map.with_options(:controller => 'users') do |users|
     users.dashboard '/users/dashboard', :action => 'dashboard'
     users.curate_users '/users/curation', :action => 'curation'
+    users.updates_count '/users/updates_count', :action => 'updates_count'
+    users.new_updates '/users/new_updates', :action => 'new_updates'
   end
   
   # Resources
@@ -70,7 +73,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.local_photo_fields 'photos/local_photo_fields', :controller => 'photos', :action => 'local_photo_fields'
   map.resources :photos, :only => [:show, :update]
-  map.resources :observation_photos, :only => [:create, :show]
+  map.resources :observation_photos, :only => [:create, :update, :show]
   map.connect   'flickr/photos.:format',
                 :controller => 'flickr',
                 :action => 'photos',
@@ -140,6 +143,8 @@ ActionController::Routing::Routes.draw do |map|
     p.project_terms "project/:id/terms", :action => "terms"
     p.projects_by_login 'projects/user/:login', :action => 'by_login',
       :requirements => { :login => simplified_login_regex }
+    p.formatted_projects_by_login 'projects/user/:login.:format', :action => 'by_login',
+      :requirements => { :login => simplified_login_regex }
     p.project_members "projects/:id/members", :action => "members"
     p.project_contributors "projects/:id/contributors", :action => "contributors"
     p.formatted_project_contributors "projects/:id/contributors.:format", :action => "contributors"
@@ -147,8 +152,7 @@ ActionController::Routing::Routes.draw do |map|
     p.formatted_project_observed_taxa_count "projects/:id/observed_taxa_count.:format", :action => "observed_taxa_count"
     p.formatted_project_species_count "projects/:id/species_count.:format", :action => "observed_taxa_count"
     p.project_show_contributor "projects/:id/contributors/:project_user_id", :action => "show_contributor"
-    p.make_curator 'projects/:id/make_curator/:project_user_id', :action => 'make_curator'
-    p.remove_curator 'projects/:id/remove_curator/:project_user_id', :action => 'remove_curator'
+    p.change_project_user_role 'projects/:id/change_role/:project_user_id', :action => 'change_role', :conditions => {:method => :post}
     p.remove_project_user 'projects/:id/remove_project_user/:project_user_id', :action => 'remove_project_user'
     p.project_stats 'projects/:id/stats', :action => 'stats'
     p.formatted_project_stats 'projects/:id/stats.:format', :action => 'stats'
@@ -220,12 +224,19 @@ ActionController::Routing::Routes.draw do |map|
     :controller => 'lists', 
     :action => 'generate_csv',
     :requirements => { :id => id_param_pattern }
+  map.list_show_formatted_view 'lists/:id.:view_type.:format',
+    :controller => 'lists', 
+    :action => 'show',
+    :requirements => { :id => id_param_pattern }
   
   map.resources :comments
+  map.comments_by_login 'comments/user/:login', :controller => 'comments', 
+    :action => 'user', :requirements => { :login => simplified_login_regex }
   map.resources :project_invitations, :except => [:index, :show]
   map.with_options :controller => 'project_invitations' do |project_invitation|
     project_invitation.accept_project_invitation 'project_invitation/:id/accept', :action => 'accept', :conditions => {:method => :post}
   end
+  map.resources :project_observations, :only => [:create, :destroy]
   
   #
   # Taxon and Name routes
@@ -288,7 +299,9 @@ ActionController::Routing::Routes.draw do |map|
       :year => /\d{1,4}/,
       :month => /\d{1,2}/
     }
+  map.resources :posts
   map.resources :posts, :controller => 'posts', 
+    :name_prefix => 'journal_',
     :path_prefix => "/journal/:login",
     :requirements => { :login => simplified_login_regex }
   
@@ -316,6 +329,8 @@ ActionController::Routing::Routes.draw do |map|
     places.cached_place_guide 'places/cached_guide/:id', :action => 'cached_guide', :conditions => {:method => :get}
     places.autocomplete 'places/autocomplete', :action => 'autocomplete'
     places.formatted_autocomplete 'places/autocomplete.:format', :action => 'autocomplete'
+    places.place_guide_widget 'places/guide_widget/:id', :action => 'guide_widget', :conditions => {:method => :get}
+    places.place_widget 'places/:id/widget', :action => 'widget', :conditions => {:method => :get}
   end
   
   map.guide '/guide', :controller => 'places', :action => 'guide'
@@ -323,6 +338,14 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :flags, :requirements => { :id => %r(\d+) }
   map.admin '/admin', :controller => 'admin', :action => 'index'
   map.resources :taxon_ranges, :except => [:index, :show]
+  map.resources :subscriptions, :only => [:index, :edit, :create, :update, :destroy]
+  map.with_options :controller => 'subscriptions' do |subscriptions|
+    subscriptions.delete_subscription 'subscriptions/:resource_type/:resource_id', 
+      :action => 'destroy', 
+      :conditions => {:method => :delete}
+    subscriptions.edit_subscription_by_resource 'subscriptions/:resource_type/:resource_id/edit',
+      :action => 'edit'
+  end
   
   map.calendar '/calendar/:login', :controller => 'calendars', :action => 'index'
   map.calendar_compare '/calendar/:login/compare', :controller => 'calendars', :action => 'compare'

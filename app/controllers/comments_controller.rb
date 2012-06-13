@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
   before_filter :login_required, :except => :index
+  before_filter :admin_required, :only => [:user]
   cache_sweeper :comment_sweeper, :only => [:create, :destroy]
   
   MOBILIZED = [:edit]
@@ -16,12 +17,20 @@ class CommentsController < ApplicationController
     @paging_comments = Comment.scoped({})
     @paging_comments = @paging_comments.by(current_user) if logged_in? && params[:mine]
     @paging_comments = @paging_comments.paginate(find_options)
-    @comments = Comment.find(@paging_comments.map(&:id), :include => :user, :order => "id desc")
+    @comments = Comment.find(@paging_comments.map{|c| c.id}, :include => :user, :order => "id desc")
     @extra_comments = Comment.all(:conditions => [
       "parent_id IN (?) AND created_at >= ?", 
       @comments.map(&:parent_id), @comments.last.created_at
-    ]).sort_by(&:id)
-    @comments_by_parent_id = @extra_comments.group_by(&:parent_id)
+    ]).sort_by{|c| c.id}
+    @comments_by_parent_id = @extra_comments.group_by{|c| c.parent_id}
+    if params[:partial]
+      render :partial => 'listing', :collection => @comments, :layout => false
+    end
+  end
+  
+  def user
+    @display_user = User.find_by_id(params[:id]) || User.find_by_login(params[:login])
+    @comments = @display_user.comments.paginate(:page => params[:page], :order => "id DESC")
   end
   
   def show
@@ -83,7 +92,7 @@ class CommentsController < ApplicationController
   private
   def redirect_to_parent
     if @comment.parent.is_a?(Post)
-      redirect_to post_path(@comment.parent.user.login, @comment.parent)
+      redirect_to journal_post_path(@comment.parent.user.login, @comment.parent)
     else
       redirect_to(url_for(@comment.parent) + "#comment-#{@comment.id}")
     end

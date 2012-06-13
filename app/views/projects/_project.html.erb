@@ -1,5 +1,6 @@
 <%-
   project ||= object || @project
+  project_user ||= nil
   last ||= false
 -%>
 <div class="stacked column span-8 project<%= ' last' if last %>">
@@ -11,8 +12,15 @@
     <h4><%= link_to h(project.title), project %></h4>
     <% unless project.description.blank? %>
       <div class="description">
-        <%= h strip_tags(truncate(project.description, :length => 110)) %>
+        <%= h truncate(strip_tags(project.description), :length => 110) %>
       </div>
     <% end %>
+    <% if project_user -%>
+      <div>
+        <%= link_to "View #{possessive(project_user.user)} contributions", 
+          project_show_contributor_path(project, project_user.user.login),
+          :class => "readmore" %>
+      </div>
+    <% end -%>
   </div>  
 </div>

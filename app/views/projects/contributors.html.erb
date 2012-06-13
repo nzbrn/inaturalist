@@ -3,56 +3,17 @@
 <%- end -%>
 <% content_for(:extracss) do %>
 <style type="text/css" media="screen">
-  td .usericon {
-    vertical-align: middle;
-  }
-  
-  td {
-    vertical-align: middle;
-  }
-  
-  td .description {
-    display: block;
-  }
-  
-  #active .usericon {
-    float: left;
-  }
-  
-  #active .attr {
-    display: block;
-    padding-left: 58px;
-    color: #888;
-  }
-  
-  #active .attr strong {
-    font-weight: normal;
-    color: #333;
-  }
-  
-  #active .attr.login {
-    font-size: 120%;
-  }
-  
-  #active .user {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 1em;
-    margin-bottom: 1em;
-  }
-  
-  #letter_nav {
-    font-size: 100%;
-    margin-bottom: 1em;
-    text-align: left;
-  }
-  
-  #invite {
-    float: right;
-  }
-  
-  #invite .button {
-    margin-right: 0;
-  }
+  td .usericon{vertical-align:middle;}
+  td{vertical-align:middle;}
+  td .description{display:block;}
+  #active .usericon{float:left;}
+  #active .attr{display:block;padding-left:58px;color:#888;}
+  #active .attr strong{font-weight:normal;color:#333;}
+  #active .attr.login{font-size:120%;}
+  #active .user{border-bottom:1px solid #ddd;padding-bottom:1em;margin-bottom:1em;}
+  #letter_nav{font-size:100%;margin-bottom:1em;text-align:left;}
+  #invite{float:right;}
+  #invite .button{margin-right:0;}
 </style>
 <% end %>
 <div id="pageheader" class="clear">
@@ -76,7 +37,7 @@
       No members yet.
     </div>
   <% else %>
-    <table class="readable">
+    <table>
     <% for project_user in @contributors %>
       <tr>
         <td width="33%">
@@ -84,13 +45,16 @@
             observations_by_login_path(project_user.user.login),
             :alt => h(project_user.user.login),
             :title => "#{h(project_user.user.login)}, joined #{project_user.created_at.to_date.to_s(:long)}" %>
-          <%= link_to truncate(h(project_user.user.login), :length => 20), project_show_contributor_path(@project,project_user) %>
+          <%= link_to truncate(h(project_user.user.login), :length => 20), project_show_contributor_path(@project, project_user.user.login) %>
         </td>
         <td width="33%">
           <span class="description"><%= project_user.taxa_count %> taxa observed</span>
         </td>
         <td width="33%">
           <span class="description"><%= project_user.observations_count %> total observations</span>
+        </td>
+        <td>
+          <%= link_to "View contributions", project_show_contributor_path(@project, project_user.user.login), :class => "readmore" %>
         </td>
     <% end %>
     </table>

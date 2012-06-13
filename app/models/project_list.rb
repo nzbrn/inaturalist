@@ -18,12 +18,13 @@ class ProjectList < LifeList
   # Curators and admins can alter the list.
   def editable_by?(user)
     return false if user.blank?
-    project.project_users.exists?(:role => "curator", :user_id => user)
+    project.project_users.exists?(["role IN ('curator', 'manager') AND user_id = ?", user])
   end
   
   def cache_columns_query_for(lt)
     lt = ListedTaxon.find_by_id(lt) unless lt.is_a?(ListedTaxon)
     return nil unless lt
+    ancestry_clause = [lt.taxon_ancestor_ids, lt.taxon_id].flatten.map{|i| i.blank? ? nil : i}.compact.join('/')
     sql_key = "EXTRACT(month FROM observed_on) || substr(quality_grade,1,1)"
     <<-SQL
       SELECT
@@ -38,7 +39,7 @@ class ProjectList < LifeList
         po.project_id = #{project_id} AND
         (
           o.taxon_id = #{lt.taxon_id} OR 
-          t.ancestry LIKE '#{lt.taxon.ancestry}/%'
+          t.ancestry LIKE '#{ancestry_clause}/%'
         )
       GROUP BY #{sql_key}
     SQL

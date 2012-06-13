@@ -9,20 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120411221842) do
-
-  create_table "activity_streams", :force => true do |t|
-    t.integer  "user_id"
-    t.integer  "subscriber_id"
-    t.integer  "activity_object_id"
-    t.string   "activity_object_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "batch_ids",            :limit => 512
-  end
-
-  add_index "activity_streams", ["subscriber_id"], :name => "index_activity_streams_on_subscriber_id"
-  add_index "activity_streams", ["user_id", "activity_object_type"], :name => "index_activity_streams_on_user_id_and_activity_object_type"
+ActiveRecord::Schema.define(:version => 20120609003704) do
 
   create_table "announcements", :force => true do |t|
     t.string   "placement"
@@ -43,6 +30,7 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
   end
 
   add_index "colors_taxa", ["taxon_id", "color_id"], :name => "index_colors_taxa_on_taxon_id_and_color_id"
+  add_index "colors_taxa", ["taxon_id"], :name => "index_colors_taxa_on_taxon_id"
 
   create_table "comments", :force => true do |t|
     t.integer  "user_id"
@@ -71,12 +59,6 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
   add_index "counties_simplified_01", ["geom"], :name => "index_counties_simplified_01_on_geom", :spatial => true
   add_index "counties_simplified_01", ["place_geometry_id"], :name => "index_counties_simplified_01_on_place_geometry_id"
   add_index "counties_simplified_01", ["place_id"], :name => "index_counties_simplified_01_on_place_id"
-
-  create_table "counties_simplified_1", :id => false, :force => true do |t|
-    t.integer       "id"
-    t.integer       "place_id"
-    t.multi_polygon "geom",     :limit => nil
-  end
 
   create_table "countries_large_polygons", :id => false, :force => true do |t|
     t.integer  "id"
@@ -137,6 +119,17 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
 
   add_index "deleted_users", ["login"], :name => "index_deleted_users_on_login"
   add_index "deleted_users", ["user_id"], :name => "index_deleted_users_on_user_id"
+
+  create_table "flaggings", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "taxon_id"
+    t.string   "reason"
+    t.integer  "resolver_id"
+    t.boolean  "resolved",        :default => false
+    t.string   "resolution_note"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "flags", :force => true do |t|
     t.string   "flag"
@@ -258,16 +251,15 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.string   "observations_month_counts"
     t.integer  "taxon_range_id"
     t.integer  "source_id"
-    t.boolean  "comprehensive",                           :default => false
     t.boolean  "manually_added",                          :default => false
   end
 
+  add_index "listed_taxa", ["created_at"], :name => "index_listed_taxa_on_place_id_and_created_at"
   add_index "listed_taxa", ["first_observation_id"], :name => "index_listed_taxa_on_first_observation_id"
   add_index "listed_taxa", ["last_observation_id"], :name => "index_listed_taxa_on_last_observation_id"
   add_index "listed_taxa", ["list_id", "taxon_ancestor_ids", "taxon_id"], :name => "index_listed_taxa_on_list_id_and_taxon_ancestor_ids_and_taxon_i"
   add_index "listed_taxa", ["list_id", "taxon_id"], :name => "index_listed_taxa_on_list_id_and_taxon_id"
   add_index "listed_taxa", ["list_id"], :name => "index_listed_taxa_on_list_id_and_lft"
-  add_index "listed_taxa", ["place_id", "created_at"], :name => "index_listed_taxa_on_place_id_and_created_at"
   add_index "listed_taxa", ["place_id", "observations_count"], :name => "index_listed_taxa_on_place_id_and_observations_count"
   add_index "listed_taxa", ["place_id", "taxon_id"], :name => "index_listed_taxa_on_place_id_and_taxon_id"
   add_index "listed_taxa", ["source_id"], :name => "index_listed_taxa_on_source_id"
@@ -319,6 +311,17 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
 
   add_index "observation_fields", ["name"], :name => "index_observation_fields_on_name"
 
+  create_table "observation_links", :force => true do |t|
+    t.integer  "observation_id"
+    t.string   "rel"
+    t.string   "href"
+    t.string   "href_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "observation_links", ["observation_id", "href"], :name => "index_observation_links_on_observation_id_and_href"
+
   create_table "observation_photos", :force => true do |t|
     t.integer  "observation_id", :null => false
     t.integer  "photo_id",       :null => false
@@ -357,6 +360,7 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.decimal  "private_longitude",                               :precision => 15, :scale => 10
     t.integer  "private_positional_accuracy"
     t.string   "geoprivacy"
+    t.point    "geom",                             :limit => nil
     t.string   "quality_grade",                                                                   :default => "casual"
     t.string   "user_agent"
     t.string   "positioning_method"
@@ -369,7 +373,6 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.string   "cultivated"
     t.string   "stage"
     t.string   "user_expertise"
-    t.point    "geom",                             :limit => nil
     t.text     "legacy"
   end
 
@@ -448,6 +451,7 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.datetime      "created_at"
     t.datetime      "updated_at"
     t.multi_polygon "geom",              :limit => nil, :null => false
+    t.string        "source_filename"
   end
 
   add_index "place_geometries", ["geom"], :name => "index_place_geometries_on_geom", :spatial => true
@@ -474,6 +478,7 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.datetime "updated_at"
     t.boolean  "delta",                                             :default => false
     t.integer  "user_id"
+    t.string   "source_filename"
   end
 
   add_index "places", ["bbox_area"], :name => "index_places_on_bbox_area"
@@ -556,6 +561,7 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "curator_identification_id"
+    t.string   "tracking_code"
   end
 
   add_index "project_observations", ["curator_identification_id"], :name => "index_project_observations_on_curator_identification_id"
@@ -589,9 +595,13 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.string   "project_type"
     t.string   "cached_slug"
     t.integer  "observed_taxa_count", :default => 0
+    t.datetime "featured_at"
+    t.string   "source_url"
+    t.string   "tracking_codes"
   end
 
   add_index "projects", ["cached_slug"], :name => "index_projects_on_cached_slug", :unique => true
+  add_index "projects", ["source_url"], :name => "index_projects_on_source_url"
   add_index "projects", ["user_id"], :name => "index_projects_on_user_id"
 
   create_table "provider_authorizations", :force => true do |t|
@@ -677,13 +687,28 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.multi_polygon "geom",     :limit => nil
   end
 
-  create_table "states_simplified_1", :id => false, :force => true do |t|
-    t.integer       "id"
+  create_table "states_simplified_1", :force => true do |t|
+    t.integer       "place_geometry_id"
     t.integer       "place_id"
-    t.multi_polygon "geom",     :limit => nil
+    t.multi_polygon "geom",              :limit => nil, :null => false
   end
 
   add_index "states_simplified_1", ["geom"], :name => "index_states_simplified_1_on_geom", :spatial => true
+  add_index "states_simplified_1", ["place_geometry_id"], :name => "index_states_simplified_1_on_place_geometry_id"
+  add_index "states_simplified_1", ["place_id"], :name => "index_states_simplified_1_on_place_id"
+
+  create_table "subscriptions", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "resource_type"
+    t.integer  "resource_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "taxon_id"
+  end
+
+  add_index "subscriptions", ["resource_type", "resource_id"], :name => "index_subscriptions_on_resource_type_and_resource_id"
+  add_index "subscriptions", ["taxon_id"], :name => "index_subscriptions_on_taxon_id"
+  add_index "subscriptions", ["user_id"], :name => "index_subscriptions_on_user_id"
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"
@@ -798,8 +823,8 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.integer       "range_file_size"
     t.text          "description"
     t.integer       "source_id"
-    t.integer       "source_identifier"
     t.multi_polygon "geom",               :limit => nil
+    t.integer       "source_identifier"
   end
 
   add_index "taxon_ranges", ["geom"], :name => "index_taxon_ranges_on_geom", :spatial => true
@@ -829,6 +854,25 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.integer  "rank_level"
   end
 
+  create_table "updates", :force => true do |t|
+    t.integer  "subscriber_id"
+    t.integer  "resource_id"
+    t.string   "resource_type"
+    t.string   "notifier_type"
+    t.integer  "notifier_id"
+    t.string   "notification"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "resource_owner_id"
+    t.datetime "viewed_at"
+  end
+
+  add_index "updates", ["notifier_type", "notifier_id"], :name => "index_updates_on_notifier_type_and_notifier_id"
+  add_index "updates", ["resource_owner_id"], :name => "index_updates_on_resource_owner_id"
+  add_index "updates", ["resource_type", "resource_id"], :name => "index_updates_on_resource_type_and_resource_id"
+  add_index "updates", ["subscriber_id"], :name => "index_updates_on_subscriber_id"
+  add_index "updates", ["viewed_at"], :name => "index_updates_on_viewed_at"
+
   create_table "users", :force => true do |t|
     t.string   "login",                     :limit => 40
     t.string   "name",                      :limit => 100
@@ -844,7 +888,7 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
     t.string   "state",                                    :default => "passive"
     t.datetime "deleted_at"
     t.string   "time_zone"
-    t.string   "description"
+    t.text     "description"
     t.string   "icon_file_name"
     t.string   "icon_content_type"
     t.integer  "icon_file_size"
@@ -872,5 +916,25 @@ ActiveRecord::Schema.define(:version => 20120411221842) do
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
   add_index "users", ["observations_count"], :name => "index_users_on_observations_count"
   add_index "users", ["state"], :name => "index_users_on_state"
+
+  create_table "users_old", :force => true do |t|
+    t.string   "login"
+    t.string   "email"
+    t.string   "crypted_password",          :limit => 40
+    t.string   "salt",                      :limit => 40
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "remember_token"
+    t.datetime "remember_token_expires_at"
+    t.string   "password_reset_code",       :limit => 40
+    t.text     "description"
+    t.string   "favorite_thing_1"
+    t.string   "favorite_thing_2"
+    t.string   "favorite_thing_3"
+    t.string   "time_zone",                               :default => "UTC"
+    t.string   "icon_file_name"
+    t.string   "icon_content_type"
+    t.integer  "icon_file_size"
+  end
 
 end

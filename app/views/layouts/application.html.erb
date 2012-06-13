@@ -5,6 +5,9 @@
      xmlns:og="http://ogp.me/ns#">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <% if logged_in? && @provider_authorizations -%>
+      <meta name="authenticators" content="<%= @provider_authorizations.map{|pa| pa.provider}.join(',') %>">
+    <% end -%>
     <title><%= APP_CONFIG[:site_name] %> &middot; <%= yield :title %></title>
     <link rel="icon" type="image/png" href="/images/favicon.png"/>
     <%= render :partial => 'shared/common_stylesheets'%>
@@ -15,6 +18,9 @@
                                "jquery/plugins/jquery.ui.autocomplete.html",
                                "jquery/plugins/jquery.chooser",
                                "jquery/plugins/jquery-ui-timepicker-addon",
+                               "jquery/plugins/jquery.imagesloaded.min",
+                               "jquery/plugins/inat/taxon_selectors.js",
+                               "jquery/plugins/jquery.timeago.js",
                                'application', 
                                'inaturalist' %>
     <%= csrf_meta_tag %>
@@ -24,7 +30,7 @@
   </head>
 <body>
   <% unless @headless -%>
-    <% cache(:controller => 'welcome', :action => 'header', :for => logged_in? ? current_user.id : nil, :version => 5) do %>
+    <% cache(:controller => 'welcome', :action => 'header', :for => logged_in? ? current_user.id : nil, :version => 8) do %>
       <%= render :partial => 'shared/header' %>
     <% end %>
   <% end -%>
@@ -45,5 +51,12 @@
   <div id="comment_preview" class="modalbox" style="display: none"></div>
 
   <%= render :partial => 'shared/footer' unless @footless %>
+  
+  <% if logged_in? -%>
+    <script type="text/javascript" charset="utf-8">
+      setUpdatesCount(<%= session[:updates_count].to_i %>)
+      setTimeout(getUpdatesCount, 1000)
+    </script>
+  <% end -%>
 </body>
 </html>

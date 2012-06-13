@@ -14,7 +14,7 @@
       </div>
       <ul class="subnav" style="display: none">
         <% if logged_in? -%>
-          <li><%= link_to "By You", observations_by_login_path(current_user.login) %></li>
+          <li><%= link_to "By you", observations_by_login_path(current_user.login) %></li>
         <% end -%>
         <li><%= link_to "ID Please", id_please_path %></li>
         <li class="formwrapper">
@@ -58,6 +58,17 @@
           :class => 'subnavlink' %>
       </div>
       <ul class="subnav" style="display: none">
+        <% if logged_in? -%>
+          <% for project in current_user.project_users.all(:include => :project, :limit => 7, 
+              :order => "(projects.user_id = #{current_user.id}) DESC, projects.updated_at ASC").map{|pu| pu.project}.sort_by{|p| p.title.downcase} %>
+            <li>
+              <%= link_to truncate(project.title), project, :style => project.icon.file? ? "background-image: url(#{project.icon.url(:mini)})" : nil %>
+            </li>
+          <% end %>
+          <li>
+            <%= link_to "All your projects", projects_by_login_url(current_user.login) %>
+          </li>
+        <% end -%>
         <li class="formwrapper">
           <% form_tag({:controller => 'projects', :action => 'search'}, :method => :get, :class => 'clear buttonrow') do %>
             <%= text_field_tag 'q', params[:q], :id => 'header_projects_q', :class => 'text', :value => '',
@@ -95,13 +106,22 @@
     <li><span class="inter">or</span></li>
     <li><%= link_to "Sign up!", signup_url, :class => "signup_link" %></li>
     <% else %>
-    <li style="margin-right: 10px">
-      <span class="inter">
-        Welcome 
-        <%= link_to user_image(current_user, :size => 'mini'), user_path(:id => current_user.login) %>
-        <%= link_to current_user.login, user_path(:id => current_user.login) %>!
-        (<%= link_to "Sign out", logout_path %>)
+    <li id="usernav" style="margin-right:5px;">
+      <span class="inter user">
+        <%= link_to user_image(current_user, :size => 'thumb'), user_path(:id => current_user.login) %>
+        <strong class="inlineblock"><%= link_to current_user.login, user_path(:id => current_user.login) %></strong>
       </span>
+    </li>
+    <li id="updatesnav" class="subnavwrapper">
+      <div class="clear subnavtab">
+        <%= link_to "<span class='ui-icon ui-icon-comment'></span><span class='count'>0</span>", 
+          home_path, 
+          :id => "headerupdatesnotice",
+          :class => "updates" %>
+      </div>
+      <div id="updatessubnav" class="subnav meta">
+        <div class="loadingwrapper"><%= loading %></div>
+      </div>
     </li>
     <li class="subnavwrapper">
       <div class="clear subnavtab">
@@ -122,6 +142,8 @@
         <li><%= link_to "Lists", lists_by_login_path(current_user.login), :class => 'lists_link' %></li>
         <li><%= link_to "Journal", journal_by_login_path(current_user.login), :class => 'journal_link' %></li>
         <li><%= link_to "Profile", person_path(current_user), :class => 'profile_link' %></li>
+        <li><%= link_to "Account", edit_person_path(current_user), :class => 'profile_link' %></li>
+        <li><%= link_to "Sign out", logout_path %></li>
       </ul>
     </li>
     <%- end -%>

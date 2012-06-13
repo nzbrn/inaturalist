@@ -1,0 +1,46 @@
+<%-
+  resource = object || resource
+  updates ||= []
+  class_name = resource.class.to_s.underscore
+-%>
+
+<div class="updatecontent">
+  <table cellspacing="0" cellpadding="0">
+    <% for update in updates %>
+      <%-
+        notifier = nil
+        notifier = if @update_cache && @update_cache[update.notifier_type.underscore.pluralize.to_sym]
+          @update_cache[update.notifier_type.underscore.pluralize.to_sym][update.notifier_id]
+        end
+        notifier ||= update.notifier
+      -%>
+      <tr>
+        <td valign="top" style="padding-right:10px;">
+          <%= user_image(notifier.user, :size => "thumb", :width => 32, :height => 32) %>
+        </td>
+        <td valign="top">
+          <% if notifier.is_a?(Comment) -%>
+            <%= formatted_user_text(notifier.body) %>
+          <% elsif notifier.is_a?(Identification) %>
+            <div style="margin-bottom:10px;">
+              <%= taxon_image(notifier.taxon, :style => "max-width:32px; vertical-align:middle;") %>
+              <span><%= notifier.user.login %>'s ID:</span>
+              <%= render :partial => 'shared/taxon', 
+                         :locals => { :taxon => notifier.taxon,
+                                      :link_url => taxon_url(notifier.taxon) } %>
+            </div>
+          <% end -%>
+          <div style="color:#aaaaaa;font-size:smaller;margin-bottom:10px;">
+            Posted by 
+            <%= link_to(truncate(notifier.user_id == @user.id ? "you" : notifier.user.login, :length => 20), 
+              person_url(notifier.user)) %>
+            <span class="when">
+              <span class="date"><%= time_ago_in_words(notifier.created_at) %></span> ago
+            </span>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+  <%= link_to "View #{class_name.humanize.downcase}", url_for_resource_with_host(resource), :class => "readmore" %>
+</div>

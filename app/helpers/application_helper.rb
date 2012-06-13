@@ -46,12 +46,22 @@ module ApplicationHelper
   
   def compact_date(date)
     return 'the past' if date.nil?
-    if date == Date.today 
-      'Today'
+    if date.is_a?(Time)
+      date = date.in_time_zone(current_user.time_zone) if current_user
+      time = date
+      date = date.to_date
+    end
+    today = if current_user
+      Time.now.in_time_zone(current_user.time_zone).to_date
+    else
+      Date.today
+    end
+    if date == today
+      time ? time.strftime("%I:%M %p").downcase.sub(/^0/, '')  : 'Today'
     elsif date.year == Date.today.year 
-      date.strftime("%b. %e") 
+      date.strftime("%b %e") 
     else 
-      date.strftime("%b. %e, %Y") 
+      date.strftime("%b %e, %Y") 
     end 
   end
   
@@ -108,7 +118,7 @@ module ApplicationHelper
   end
 
   def is_me?(user = @selected_user)
-    logged_in? && (user === current_user)
+    logged_in? && (user.id == current_user.id)
   end
   
   def is_not_me?(user = @selected_user)
@@ -281,14 +291,18 @@ module ApplicationHelper
   def user_image(user, options = {})
     size = options.delete(:size)
     style = "vertical-align:middle; #{options[:style]}"
-    url = "http://#{request.host}#{":#{request.port}" if request.port}#{user.icon.url(size || :mini)}"
+    url = if request
+      "http://#{request.host}#{":#{request.port}" if request.port}#{user.icon.url(size || :mini)}"
+    else
+      "#{APP_CONFIG[:site_url]}#{user.icon.url(size || :mini)}"
+    end
     image_tag(url, options.merge(:style => style))
   end
   
   def observation_image(observation, options = {})
     style = "vertical-align:middle; #{options[:style]}"
     url = observation_image_url(observation, options)
-    url ||= iconic_taxon_image_url(observation.iconic_taxon)
+    url ||= iconic_taxon_image_url(observation.iconic_taxon_id)
     image_tag(url, options.merge(:style => style))
   end
   
@@ -299,6 +313,13 @@ module ApplicationHelper
     options[:class] = "image_and_content #{options[:class]}".strip
     options[:style] = "#{options[:style]}; padding-left: #{image_size.to_i + 10}px; position: relative; min-height: #{image_size}px;"
     concat content_tag(:div, image_wrapper + content, options)
+  end
+  
+  # remove unecessary whitespace btwn divs
+  def compact(&block)
+    content = capture(&block)
+    content.gsub!(/div\>[\n\s]+\<div/, 'div><div')
+    concat content
   end
   
   def color_pluralize(num, singular)
@@ -541,6 +562,88 @@ module ApplicationHelper
   
   def url_for_license(code)
     "http://creativecommons.org/licenses/#{code[/CC\-(.+)/, 1].downcase}/3.0/"
+  end
+  
+  def update_image_for(update, options = {})
+    options[:style] = "vertical-align:middle; #{options[:style]}"
+    resource = if @update_cache && @update_cache[update.resource_type.underscore.pluralize.to_sym]
+      @update_cache[update.resource_type.underscore.pluralize.to_sym][update.resource_id]
+    end
+    resource ||= update.resource
+    case update.resource_type
+    when "User"
+      image_tag("#{root_url}#{resource.icon.url(:thumb)}", options.merge(:alt => "#{resource.login} icon"))
+    when "Observation"
+      observation_image(resource, options.merge(:size => "square"))
+    when "ListedTaxon"
+      image_tag("#{root_url}images/checklist-icon-color-32px.png", options)
+    when "Post"
+      image_tag("#{root_url}#{resource.user.icon.url(:thumb)}", options)
+    when "Place"
+      image_tag("#{root_url}images/icon-maps.png", options)
+    else
+      image_tag("#{root_url}images/logo-grey-32px.png", options)
+    end
+  end
+  
+  def update_tagline_for(update, options = {})
+    resource = if @update_cache && @update_cache[update.resource_type.underscore.pluralize.to_sym]
+      @update_cache[update.resource_type.underscore.pluralize.to_sym][update.resource_id]
+    end
+    resource ||= update.resource
+    case update.resource_type
+    when "User"
+      if options[:count].to_i == 1
+        "#{options[:skip_links] ? resource.login : link_to(resource.login, url_for_resource_with_host(resource))} added an observation"
+      else
+        "#{options[:skip_links] ? resource.login : link_to(resource.login, url_for_resource_with_host(resource))} added #{options[:count]} observations"
+      end
+    when "Observation", "ListedTaxon"
+      class_name = update.resource.class.to_s.underscore.humanize.downcase
+      notifier = if @update_cache && @update_cache[update.notifier_type.underscore.pluralize.to_sym]
+        @update_cache[update.notifier_type.underscore.pluralize.to_sym][update.notifier_id]
+      end
+      notifier ||= update.notifier
+      if notifier.respond_to?(:user)
+        notifier_user = if @update_cache && @update_cache[:users]
+          @update_cache[:users][notifier.user_id]
+        end
+        notifier_user = notifier.user
+      end
+      s = if update.notification == "activity" && notifier_user
+        notifier_class_name = notifier.class.to_s.underscore.humanize.downcase
+        "#{options[:skip_links] ? notifier_user.login : link_to(notifier_user.login, person_url(notifier_user))} " + 
+        "added #{notifier_class_name =~ /^[aeiou]/i ? 'an' : 'a'} <strong>#{notifier_class_name}</strong> to "
+      else
+        s = "New activity on "
+      end
+      s += "#{class_name =~ /^[aeiou]/i ? 'an' : 'a'} #{options[:skip_links] ? class_name : link_to(class_name, url_for_resource_with_host(resource))}"
+      s += " by #{you_or_login(update.resource_owner)}" if update.resource_owner
+      s
+    when "Post"
+      "New activity on \"#{options[:skip_links] ? resource.title : link_to(resource.title, url_for_resource_with_host(resource))}\" by #{update.resource_owner.login}"
+    when "Place"
+      "New observations from #{options[:skip_links] ? resource.display_name : link_to(resource.display_name, url_for_resource_with_host(resource))}"
+    else
+      "update"
+    end
+  end
+  
+  def url_for_resource_with_host(resource)
+    "#{APP_CONFIG[:site_url]}#{url_for(resource)}"
+  end
+  
+  def commas_and(list)
+    return list.first.to_s if list.size == 1
+    return list.join(' and ') if list.size == 2
+    "#{list[0..-2].join(', ')}, and #{list.last}"
+  end
+  
+  def update_cached(record, association)
+    if @update_cache && @update_cache[association.to_s.pluralize.to_sym]
+      cached = @update_cache[association.to_s.pluralize.to_sym][record.send("#{association}_id")]
+    end
+    cached ||= record.send(association)
   end
   
 end

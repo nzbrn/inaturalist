@@ -2,15 +2,24 @@
   <%= @title = "Observations by #{you_or_login(@selected_user)} on #{Date.parse(@date).to_s(:long) rescue @date}" %>
 <%- end -%>
 <%- content_for(:extracss) do -%>
-  <%= stylesheet_link_tag "observations" %>
   <style type="text/css" media="screen">
     .bigun {text-align: center; height: 150px; border-radius: 150px; background-color: #eee; position: relative;}
-    .bigun .inner { width: 150px; height: 72px; top: 50%; margin-top: -47px; position: absolute;}
+    .bigun .inner { left: 0; width: 150px; height: 72px; top: 50%; margin-top: -47px; position: absolute;}
     .bigun .count { font-size: 300%;}
     .bigun .label { font-size: 120%;}
     .iconic_taxon_sprite { vertical-align: middle; }    
     .lilun { display: table-cell; vertical-align: middle; height: 150px;}
+    
+    .observations.medium.grid .observation, .observations.medium.grid .photos, .observations.medium.grid .icon {
+      width: 185px;
+      height: 185px;
+    }
   </style>
+<%- end -%>
+
+<%- content_for(:extrajs) do -%>
+  <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+  <%= javascript_include_tag 'inaturalist/map3' %>
 <%- end -%>
 
 <div id="pageheader" class="clear">
@@ -141,4 +150,12 @@
   </div>
 <% end -%>
 
-<%= render :partial => "observations/map" %>
+<div class="observationcontrols stacked"></div>
+<div class="observations medium grid">
+  <%- compact do %>
+    <%= render(:partial => "observations/cached_component", :collection => @observations) %>
+  <% end -%>
+</div>
+<script type="text/javascript" charset="utf-8">
+  $('.observationcontrols').observationControls()
+</script>

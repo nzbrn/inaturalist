@@ -4,7 +4,6 @@
 # just lists of taxa that interest them for some reason.
 #
 class List < ActiveRecord::Base
-  acts_as_activity_streamable
   belongs_to :user
   has_many :rules, :class_name => 'ListRule', :dependent => :destroy
   has_many :listed_taxa, :dependent => :destroy
@@ -61,13 +60,14 @@ class List < ActiveRecord::Base
   # been observed.
   #
   def refresh(options = {})
+    find_options = {}
     if taxa = options[:taxa]
-      collection = listed_taxa.all(:conditions => ["taxon_id IN (?)", taxa])
+      find_options[:conditions] = ["list_id = ? AND taxon_id IN (?)", self.id, taxa]
     else
-      collection = listed_taxa.all
+      find_options[:conditions] = ["list_id = ?", self.id]
     end
     
-    collection.each do |listed_taxon|
+    ListedTaxon.do_in_batches(find_options) do |listed_taxon|
       listed_taxon.skip_update_cache_columns = options[:skip_update_cache_columns]
       # re-apply list rules to the listed taxa
       listed_taxon.save
@@ -106,7 +106,7 @@ class List < ActiveRecord::Base
   def cache_columns_query_for(lt)
     lt = ListedTaxon.find_by_id(lt) unless lt.is_a?(ListedTaxon)
     return nil unless lt
-    ancestry_clause = [lt.taxon_ancestor_ids, lt.taxon_id].map{|i| i.blank? ? nil : i}.compact.join('/')
+    ancestry_clause = [lt.taxon_ancestor_ids, lt.taxon_id].flatten.map{|i| i.blank? ? nil : i}.compact.join('/')
     sql_key = "EXTRACT(month FROM observed_on) || substr(quality_grade,1,1)"
     <<-SQL
       SELECT
@@ -145,7 +145,10 @@ class List < ActiveRecord::Base
   end
   
   def generate_csv(options = {})
-    headers = %w(taxon_name occurrence_status establishment_means user_login first_observation_id last_observation_id id created_at updated_at)
+    controller = options[:controller] || FakeView.new
+    attrs = %w(taxon_name occurrence_status establishment_means adding_user_login first_observation last_observation url created_at updated_at)
+    ranks = %w(kingdom phylum class sublcass superorder order suborder superfamily family subfamily tribe genus)
+    headers = options[:taxonomic] ? ranks + attrs : attrs
     fname = options[:fname] || "#{to_param}.csv"
     fpath = options[:path] || File.join(options[:dir] || Dir::tmpdir, fname)
     
@@ -164,10 +167,38 @@ class List < ActiveRecord::Base
       find_options[:conditions] = ["list_id = ?", id]
     end
     
+    ancestor_cache = {}
     FasterCSV.open(tmp_path, 'w') do |csv|
       csv << headers
       ListedTaxon.do_in_batches(find_options) do |lt|
-        csv << headers.map{|h| lt.send(h)}
+        row = []
+        if options[:taxonomic]
+          ancestor_ids = lt.taxon.ancestor_ids.map{|tid| tid.to_i}
+          uncached_ancestor_ids = ancestor_ids - ancestor_cache.keys
+          if uncached_ancestor_ids.size > 0
+            Taxon.all(:select => "id, rank, name", :conditions => ["id IN (?)", uncached_ancestor_ids]).compact.each do |t|
+              ancestor_cache[t.id] = t
+            end
+          end
+          ancestors = ancestor_ids.map{|tid| t = ancestor_cache[tid]; t.try(:name) == 'Life' ? nil : t}.compact
+          ancestors << lt.taxon
+          row += ranks.map do |rank|
+            ancestors.detect{|t| t.rank == rank}.try(:name)
+          end
+        end
+        attrs.each do |h|
+          row << case h
+          when 'adding_user_login'
+            lt.user_login
+          when 'url'
+            controller.instance_eval { listed_taxon_url(lt) }
+          when 'first_observation', 'last_observation' 
+            controller.instance_eval { observation_url(lt.send(h)) } if lt.send(h)
+          else
+            lt.send(h)
+          end
+        end
+        csv << row
       end
       csv << []
       csv << ["List created at", created_at]
@@ -184,12 +215,17 @@ class List < ActiveRecord::Base
     fpath
   end
   
-  def generate_csv_cache_key
-    "generate_csv_#{id}"
+  def generate_csv_cache_key(options = {})
+    if options[:view] = "taxonomic"
+      "generate_csv_taxonomic_#{id}"
+    else
+      "generate_csv_#{id}"
+    end
   end
   
   def self.icon_preview_cache_key(list)
-    {:controller => "lists", :action => "icon_preview", :list_id => list}
+    list_id = list.is_a?(List) ? list.id : list
+    {:controller => "lists", :action => "icon_preview", :list_id => list_id}
   end
   
   def self.refresh_for_user(user, options = {})
@@ -231,7 +267,7 @@ class List < ActiveRecord::Base
   def self.refresh_with_observation(observation, options = {})
     observation = Observation.find_by_id(observation) unless observation.is_a?(Observation)
     unless taxon = Taxon.find_by_id(observation.try(:taxon_id) || options[:taxon_id])
-      Rails.logger.error "[ERROR #{Time.now}] LifeList.refresh_with_observation " + 
+      Rails.logger.error "[ERROR #{Time.now}] List.refresh_with_observation " + 
         "failed with blank taxon, observation: #{observation}, options: #{options.inspect}"
       return
     end
@@ -243,30 +279,25 @@ class List < ActiveRecord::Base
     # get listed taxa for this taxon and its ancestors that are on the observer's life lists
     listed_taxa = ListedTaxon.all(:include => [:list],
       :conditions => ["taxon_id IN (?) AND list_id IN (?)", taxon_ids, target_list_ids])
-    new_list_ids = target_list_ids - listed_taxa.map{|lt| lt.taxon_id == taxon.id ? lt.list_id : nil}
-    new_taxa = [taxon, taxon.species].compact
-    new_list_ids.each do |list_id|
-      new_taxa.each do |new_taxon|
-        lt = ListedTaxon.new(:list_id => list_id, :taxon_id => new_taxon.id)
-        lt.skip_update = true
-        unless lt.save
-          Rails.logger.info "[INFO #{Time.now}] Failed to create #{lt}: #{lt.errors.full_messages.to_sentence}"
-        end
-      end
+    if respond_to?(:create_new_listed_taxa_for_refresh)
+      create_new_listed_taxa_for_refresh(taxon, listed_taxa, target_list_ids)
     end
     listed_taxa.each do |lt|
-      unless lt.save
-        lt.destroy
-        next
-      end
-      if lt.first_observation_id.blank? && lt.last_observation_id.blank? && !lt.manually_added?
-        lt.destroy
-      end
+      refresh_listed_taxon(lt)
     end
+  end
+  
+  def self.refresh_listed_taxon(lt)
+    lt.save
   end
   
   def self.refresh_with_observation_lists(observation, options = {})
     user = observation.try(:user) || User.find_by_id(options[:user_id])
-    user ? user.life_list_ids : []
+    return [] unless user
+    if options[:skip_subclasses]
+      user.lists.all(:select => "id, type", :conditions => "type IS NULL").map{|l| l.id}
+    else
+      user.list_ids
+    end
   end
 end

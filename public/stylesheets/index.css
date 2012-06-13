@@ -533,6 +533,7 @@ ul.leafylist li li:first-child {
   position: relative;
   padding: 0;
   border: 0 none;
+  z-index:1;
 }
 
 .toggle_menu .togglelink {
@@ -544,6 +545,7 @@ ul.leafylist li li:first-child {
   position: relative;
   z-index: 10;
   background-color: white;
+  color: #36C;
   border-color: #ccc;
   border-bottom: 1px solid white;
   background-position: 3px 50%;  
@@ -564,6 +566,7 @@ ul.leafylist li li:first-child {
   position: absolute;
   z-index: 1;
   top: 26px;
+  left: 0;
   background-color: white;
   border: 1px solid #ccc;
   padding: 0.5em;
@@ -636,7 +639,7 @@ ul.leafylist li li:first-child {
 
 /* Comments */
 #new_comment #comment_body{width:100%;height:150px;}
-.comment{padding:1em;}
+.comment{padding:10px;}
 #new-comment{position:relative;}
 #new-comment textarea{margin-top:0;}
 #new-comment .meta{position:absolute;left:0;}
@@ -646,6 +649,11 @@ ul.leafylist li li:first-child {
 .comment .body ul{font-family:Georgia,serif;font-size:125%;}
 .comment .body img{max-width:100%;height:auto;}
 .comment .comment_actions{font-size:90%;}
+
+.item.comment {padding:0;}
+.item.comment .meta {float:none; width:auto; margin:0;}
+.item.comment .body{padding-left:0;}
+
 #pageheader #tools{margin-top:0.5em;}
 .count { color: #74AC00; }
 .good  { color: #74AC00; }
@@ -703,10 +711,9 @@ a.csvlink{background-image:url(/images/silk/table.png);}
 }
 
 .simpleTaxonSelectorImage {
-  width: 32px;
+  width: 31px;
   float: left;
-  margin-right: 10px;
-  margin-top: 3px;
+  margin-right: 5px;
 }
 
 .simpleTaxonSelector .taxon.Unknown          { color: inherit;  background-image: url('/images/iconic_taxa/unknown-15px.png'); }
@@ -722,6 +729,7 @@ a.csvlink{background-image:url(/images/silk/table.png);}
 .simpleTaxonSelector .taxon.Aves             { color: #1E90FF;  background-image: url('/images/iconic_taxa/aves-15px.png'); }
 .simpleTaxonSelector .taxon.Mammalia         { color: #1E90FF;  background-image: url('/images/iconic_taxa/mammalia-15px.png'); }
 .simpleTaxonSelector .taxon.Actinopterygii   { color: #1E90FF;  background-image: url('/images/iconic_taxa/actinopterygii-15px.png'); }
+.simpleTaxonSelector .taxon.Chromista        { color: #993300;  background-image: url('/images/iconic_taxa/chromista-15px.png'); }
 
 .taxon_links .taxon {
   padding-left: 25px;
@@ -743,6 +751,7 @@ a.csvlink{background-image:url(/images/silk/table.png);}
 .taxon_links .taxon.Aves             { color: #1E90FF;  background-image: url('/images/iconic_taxa/aves-15px.png'); }
 .taxon_links .taxon.Mammalia         { color: #1E90FF;  background-image: url('/images/iconic_taxa/mammalia-15px.png'); }
 .taxon_links .taxon.Actinopterygii   { color: #1E90FF;  background-image: url('/images/iconic_taxa/actinopterygii-15px.png'); }
+.taxon_links .taxon.Chromista        { color: #993300;  background-image: url('/images/iconic_taxa/chromista-15px.png'); }
 
 /* Users table */
 
@@ -771,6 +780,7 @@ ul.taxonomic_tree li.Amphibia         { list-style-image: url('/images/iconic_ta
 ul.taxonomic_tree li.Reptilia         { list-style-image: url('/images/iconic_taxa/reptilia-15px.png'); }
 ul.taxonomic_tree li.Aves             { list-style-image: url('/images/iconic_taxa/aves-15px.png'); }
 ul.taxonomic_tree li.Mammalia         { list-style-image: url('/images/iconic_taxa/mammalia-15px.png'); }
+ul.taxonomic_tree li.Chromista         { list-style-image: url('/images/iconic_taxa/chromista-15px.png'); }
 ul.taxonomic_tree li.unknown          { list-style-image: url('/images/iconic_taxa/unknown-15px.png'); }
 ul.taxonomic_tree .taxon .othernames {
   display: block;
@@ -887,6 +897,7 @@ form.inline .label {
 .iconic_taxon_sprite.fungi { background-image: url(/images/iconic_taxa/fungi-sprite.png); }
 .iconic_taxon_sprite.protozoa { background-image: url(/images/iconic_taxa/protozoa-sprite.png); }
 .iconic_taxon_sprite.plantae { background-image: url(/images/iconic_taxa/plantae-sprite.png); }
+.iconic_taxon_sprite.chromista { background-image: url(/images/iconic_taxa/chromista-sprite.png); }
 
 .gmapv3control {
   color: black;
@@ -958,6 +969,7 @@ ul .providerlink, ul .button.providerlink { width: 190px; }
   background-image: url(/images/spinner-small-ffffff_on_aaaaaa.gif);
 }
 
+abbr.date {border:0 transparent;}
 .date a:hover { border-bottom: 1px dotted #36c;}
 
 .monthgraph {
@@ -1008,7 +1020,7 @@ a.id_please_notice:hover{color:#584925;}
 .overlaycontrol { text-align: right; }
 .overlaycontrol ul { list-style: none; margin: 0; text-align: left;}
 
-.shades { position: fixed; width: 100%; height: 100%; top: 0; left: 0;}
+.shades { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index:10;}
 .shades .underlay {background-color: black; opacity: 0.5;filter:Alpha(Opacity=50); position: absolute; width: 100%; height: 100%; top: 0; left: 0;}
 .shades .overlay {position: absolute; width: 100%; height: 100%; top: 0; left: 0;}
 .shades .status.loading{background:url("/images/spinner-small.gif") no-repeat scroll 5px 50% white;padding:2px 5px 2px 25px;border-radius:15px;-moz-border-radius:15px;-webkit-border-radius:15px;box-shadow:0 0 20px #aaa;-webkit-box-shadow:0 0 20px #aaa;-moz-box-shadow:0 0 20px #aaa;}
@@ -1037,6 +1049,17 @@ a.id_please_notice:hover{color:#584925;}
   background-position: center center;
   background-repeat: no-repeat;
 }
+
+.inat-icon,
+.ui-widget-content .inat-icon {
+  background-image: url(/images/sprites-222222.png);
+  background-repeat: no-repeat;
+}
+a:hover .inat-icon, .inat-icon:hover { background-image: url(/images/sprites-222222.png) !important; }
+.disabled .inat-icon, .inat-icon.disabled {background-image: url(/images/sprites-888888.png);}
+.ui-icon-grid { background-position: 0 0;}
+.ui-icon-list { background-position: -16px 0;}
+.ui-icon-map { background-position: -32px 0;}
 
 .source_nested_form_fields .ui-chooser-choice { max-width: 300px; padding: 5px 10px; }
 .ui-tabs li.ui-corner-top, .ui-tabs ul.ui-corner-all { -moz-border-radius: 0px; -webkit-border-radius: 0px; -khtml-border-radius: 0px; border-radius: 0px;}
@@ -1114,3 +1137,66 @@ table .numeric { text-align: center; }
 
 #redo_search_in_map_area_button{background:0% 50% url(/images/silk/arrow_refresh.png) no-repeat;padding-left:20px;}
 #redo_search_in_map_area_loading.loading{display:inline;}
+
+.item_user{width:48px;}
+.item_content{width:532px;}
+.item_content .identification_image{margin-right:0.5em;}
+.item_content .identification_image,
+.item_content .identification_body{
+  display:-moz-inline-stack;
+  display:inline-block;
+  zoom:1;
+  *display:inline;
+  float:none;
+}
+.item_content .identification_body { margin-top: 7px; }
+.item_content .identification_image img{width:32px;vertical-align:middle;}
+.item_content .identification{padding:0.5em;background-color:#eee;margin-bottom:0.5em;}
+.item_content p{margin-bottom:0.5em;}
+
+.alert, .alert:hover {background-color: #cd0a0a; color: white; }
+.alert .ui-icon { background-image: url(/images/jquery-ui/ui-icons_ffffff_256x240.png); }
+
+.notmonth { color: #ccc;}
+.calendar { width: 230px; }
+.calendar tbody td, .calendar th { color: #ccc;}
+.calendar tbody td a { font-weight: bold; }
+.calendar tbody td.notmonth { color: #eee;}
+.calendar.first { clear: left; }
+.calendar caption { background-color: transparent; text-transform: uppercase; letter-spacing: 0.4em; text-align:center;}
+.calendar td, .calendar th { border: 0 transparent; text-align: center;}
+.calendar th { font-weight: normal; }
+.calendar .daylink {
+  width: 22px; height: 22px; 
+  background-color: #eee; border-radius: 11px;text-align:center;line-height:1.9; cursor:pointer;
+}
+
+.iconic_taxon_sprite { vertical-align:middle;}
+.taxon.chooseritem { white-space: nowrap; }
+.taxon.chooseritem .othernames { display:inline; }
+#taxonchooser_chooser .ui-chooser-choice { padding: 4px 5px 3px;}
+#taxonchooser_chooser .ui-chooser-choice { padding: 5px 5px 4px;}
+
+.subscriptionsettings .ui-icon {
+  background-image: url(/images/jquery-ui/ui-icons_888888_256x240.png);
+  border: 0 none;
+}
+.subscriptionsettings .ui-icon:hover {
+  background-image: url(/images/jquery-ui/ui-icons_222222_256x240.png);
+}
+
+.edit_subscription_inline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.edit_subscription_inline .taxonchooser {width: 200px;}
+.edit_subscription_inline .simpleTaxonSelectorImage {
+  width: 27px;
+}
+
+ul.plain {list-style:none;margin:0;padding:0}
+.small.photo {max-width:240px;}
+.medium.photo {max-width:500px;}
+.large.photo {max-width:1024px;}

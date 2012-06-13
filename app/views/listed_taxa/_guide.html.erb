@@ -87,7 +87,7 @@
     </div>
     
     <div>
-      <%= link_to "View taxon page for this place", listed_taxon, :class => "readmore" %>
+      <%= link_to "View taxon page for this #{@place ? 'place' : 'list' }", listed_taxon, :class => "readmore" %>
     </div>
     <div>
       <%= link_to "View taxon page", taxon, :class => "readmore" %>
@@ -133,7 +133,7 @@
       <div id="<%= dom_id(listed_taxon, 'photostab') %>" class="photostab">
         <% for photo in photos %>
           <div class="inlineblock">
-            <%= link_to image_tag(photo.medium_url), photo.becomes(Photo) %>
+            <%= link_to image_tag(photo.medium_url, :class => "medium photo"), photo.becomes(Photo) %>
             <div class="meta">
               Photo: <%= link_to photo.attribution, native_url_for_photo(photo) %>
             </div>
