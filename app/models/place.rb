@@ -20,6 +20,10 @@ class Place < ActiveRecord::Base
     :observations => {:notification => "new_observations", :include_owner => false}
   }
   
+  has_subscribers :to => {
+    :observations => {:notification => "new_observations", :include_owner => false}
+  }
+  
   # Place to put a GeoPlanet response to avoid re-querying
   attr_accessor :geoplanet_response
   attr_accessor :html
