@@ -47,3 +47,17 @@ unless nzor = Source.find_by_title('NZOR')
   )
   nzor.save
 end
+
+%w(Birds Fungi Herpetofauna Invertebrates Mammals Plants Other).each do |kingdom|
+  name = "NZBRN #{kingdom}"
+  unless source = Source.find_by_title(name)
+    puts "Creating source for #{name}..."
+    source = Source.new(
+      :in_text => name,
+      :citation => "#{name}. <http://www.nzbrn.org.nz/#{kingdom.downcase}/>.",
+      :url => "http://www.nzbrn.org.nz/#{kingdom.downcase}/",
+      :title => name
+    )
+    source.save
+  end
+end
