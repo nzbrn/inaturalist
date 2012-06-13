@@ -92,7 +92,6 @@ Rails::Initializer.run do |config|
   config.gem "ambethia-smtp-tls", :lib => "smtp-tls", :source => "http://gems.github.com/"
   config.gem "flickraw"
   config.gem 'rest-client', :lib => 'rest_client'
-  config.gem 'hoptoad_notifier'
   config.gem "carlosparamio-geoplanet", :lib => 'geoplanet', :source => "http://gems.github.com/"
   config.gem 'daemon-spawn', :lib => 'daemon_spawn'
   config.gem 'nokogiri'
@@ -107,12 +106,10 @@ Rails::Initializer.run do |config|
   config.gem 'machinist'
   config.gem 'faker'
   config.gem 'fastercsv'
-  # config.gem 'newrelic_rpm'
   config.gem 'delayed_paperclip'
   config.gem "friendly_id", :version => "~> 3.2.1"
   config.gem "koala"
   config.gem "preferences"
-  config.gem 'mail_view'
   
   # Set default time zone to UTC
   config.time_zone = 'UTC'

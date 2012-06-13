@@ -49,9 +49,6 @@ class PicasaController < ApplicationController
           "your Picasa user ID. The issue has been reported, so we'll look " + 
           "into it. In the meantime, you might try uploading photos " + 
           "directly, or linking your Flickr or Facebook accounts."
-        HoptoadNotifier.notify(
-          Exception.new("Failed to extract Picasa user ID from user response (#{@picasa_user})"), 
-          :request => request, :session => session)
         redirect_to :action => "options"
         return
       end
