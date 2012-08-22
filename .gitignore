@@ -29,3 +29,4 @@ public/attachments
 *.swo
 GeoLiteCity.dat
 .vagrant
+vendor/plugins/ratatosk/spec/debug.log
