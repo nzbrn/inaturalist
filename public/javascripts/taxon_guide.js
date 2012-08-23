@@ -31,11 +31,11 @@ var TaxonGuide = {
     $('#observedchart').parent().hide()
     $('#filters select[multiple]').multiselect({
       header: false,
-      noneSelectedText: "Colors",
+      noneSelectedText: "Colours",
       minWidth: 130,
       selectedText: function(selected, total, elts) {
         if (selected > 2) {
-          return '<strong>'+selected+' colors</strong>'
+          return '<strong>'+selected+' colours</strong>'
         }
         var html = ''
         for (var i=0; i < elts.length; i++) {

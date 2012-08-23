@@ -18,7 +18,7 @@ class FacebookController < ApplicationController
       Rails.logger.error "[Error #{Time.now}] Facebook connection failed, error ##{e.type} (#{e}):  #{e.message}"
       flash[:error] = "Ack! Something went horribly wrong, like a giant " + 
                        "squid ate your Facebook info.  You can contact us at " +
-                       "help@inaturalist.org if you still can't get this " + 
+                       "help@naturewatch.org.nz if you still can't get this " + 
                        "working.  Error: #{e.message}"
     end
   end

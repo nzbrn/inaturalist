@@ -10,7 +10,7 @@
     scope="system">
   <dataset>
     <alternateIdentifier>http://www.inaturalist.org/observations?quality_grade=research</alternateIdentifier>
-    <title xml:lang="en">iNaturalist research-grade observations</title>
+    <title xml:lang="en">NatureWatch NZ research-grade observations</title>
     
     <%= render :partial => 'observations/gbif_eml_agent.eml.erb', :locals => {:tag => "creator", :data => @creator} %>
     
@@ -21,7 +21,7 @@
     <!-- This is the RESOURCE language and not the metadata language which is at the bottom -->
     <language>en_US</language>
     <abstract>
-      <para>Research-grade observations from iNaturalist.org.</para>
+      <para>Research-grade observations from NatureWatch NZ.</para>
     </abstract>
     <intellectualRights>
       <para>
@@ -70,7 +70,7 @@
     
     <purpose>
       <para>
-        iNaturalist.org is a website where anyone can record their
+        NatureWatch NZ (www.naturewatch.org.nz) is a website where anyone can record their
         observations from nature. Members record observations for numerous
         reasons, including participation in citizen science projects, class
         projects, and personal fulfillment.
@@ -88,8 +88,8 @@
       <qualityControl>
         <description>
           <para>
-            iNaturalist observations achieve research grade when 1) the
-            iNaturalist community agrees with the observer's ID, where an
+            NatureWatch NZ observations achieve research grade when 1) the
+            NatureWatch NZ community agrees with the observer's ID, where an
             "agreeing" identification is one that matches exactly or is of a
             child taxon of the observer's ID, 2) the observation has a date,
             3) the observation is georeferenced, 4) the observation has a

@@ -15,12 +15,12 @@
 <%- end -%>
 
 <%- content_for(:extrahead) do -%>
-  <meta property="og:title" content="iNaturalist Places"/> 
+  <meta property="og:title" content="NatureWatch NZ Places"/> 
   <meta property="og:image" content="<%= image_url('place_preview.jpg') %>"/> 
-  <meta property="og:site_name" content="iNaturalist"/> 
+  <meta property="og:site_name" content="NatureWatch NZ"/> 
   <meta property="fb:admins" content="611249211,800415373"/>
   <meta property="fb:app_id" content="26558815027" />
-  <meta property="og:description" name="description" content="The world is full of interesting places, each filled with weird and wonderful life forms. Some are on the other side of the world, while others are just down the street! iNaturalist Places let you browse life from around the planet.  Start exploring!"/> 
+  <meta property="og:description" name="description" content="New Zealand is full of interesting places, each filled with weird and wonderful species. Some species are restricted to remote mountain locations, while others are just down the street. NatureWatch NZ Places let you browse life from around the New Zealand. Start exploring!"/> 
 <%- end -%>
 
 <%- content_for(:extrajs) do -%>
@@ -106,13 +106,11 @@
   <div class="column span-16">
     <h3>About Places</h3>
     <p>
-      The world is full of interesting places, each filled with weird and
-      wonderful life forms. Some are on the other side of the world, while
-      others are just down the street!
+      New Zealand is full of interesting places, each filled with weird and wonderful species. Some species are restricted to remote mountain locations, while others are just down the street. NatureWatch NZ Places let you browse life from around the New Zealand. If we don't have the place you're looking for, you can even add it yourself.
     </p>
 
     <p>
-      iNaturalist Places are a way to record what lives where. If you're
+      NatureWatch NZ Places are a way to record what lives where. If you're
       looking for a particular species, you'll know where to search. Each
       place has a check list to record all the species that occur there, so
       they can also be useful for looking up things you've found at particular
@@ -123,12 +121,12 @@
       <%= image_tag "place_preview.jpg" %>
     </div>
     <div class="last column span-11">
-      <h3>Species from around the world</h3>
+      <h3>Species from around New Zealand</h3>
       <p>
-        Each place page displays all the species iNat knows about from
+        Each place page displays all the species NatureWatch NZ knows about from
         that place, including information about their abundance, conservation
         status, and who was first to observe that species from that place on
-        iNat. You can filter the species by taxonomic group, color,
+        NatureWatch NZ. You can filter the species by taxonomic group, colour,
         conservation status, or plain old search.
       </p>
     </div>
@@ -136,9 +134,7 @@
     <div class="column span-11">
       <h3>Localized species accounts</h3>
       <p>
-        View photos, species ranges, iNat observations, and more! We've
-        assembled information from many different sources and combined them
-        for a quick summary of each species in each place.
+        View photos, species ranges, NatureWatch NZ observations, and more! We've assembled information from many different sources and combined them for a quick summary of each species in each place.
       </p>
     </div>
     <div class="last column span-5">
@@ -161,7 +157,7 @@
   <div class="last column span-8">
     <div class="clear box">
       <p>
-        You can help out by <%= link_to "adding new places", new_place_path, :rel => "nofollow" %>
+        We've still got a lot of places to add so you'll see more places showing up all the time. You can help out by <%= link_to "adding new places", new_place_path, :rel => "nofollow" %>
         and filling in check lists for the places you know!
       </p>
       <ul class="readable leafylist">

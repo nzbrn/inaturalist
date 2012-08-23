@@ -13,11 +13,11 @@
 
 <div class="last column span-20">
   <p>
-    Howdy. If you're just getting started with iNat, check out
+    Gidday. If you're just getting started with NatureWatch NZ, check out
     <%= link_to "Getting Started", :action => "getting_started" %> guide to tour some of the site's features. If you have a
     question about the site, please peruse the FAQ below. If you're still
     looking for answers, please 
-    <a href="http://groups.google.com/group/inaturalist" title="iNaturalist | Google Groups">post your question to our Google Group</a>.
+    <a href="http://groups.google.com/group/nzbrn" title="NatureWatch NZ | Google Groups">post your question to our Google Group</a>.
   </p>
   
   <h3>Frequently Asked Questions</h3>
@@ -27,11 +27,12 @@
       General
     </h4>
     <ol>
-      <li><a href="#general1">What is iNaturalist?</a></li>
-      <li><a href="#general2">Who is behind iNaturalist?</a></li>
+      <li><a href="#general1">What is NatureWatch NZ?</a></li>
+      <li><a href="#general2">Who is behind NatureWatch NZ?</a></li>
+      <li><a href="#general2_5">What is the butterfly in your logo?</a></li>
       <li><a href="#general3">What technologies and data sources does the project use?</a></li>
-      <li><a href="#general4">What can I do to help iNaturalist?</a></li>
-      <li><a href="#general5">How do I contact iNaturalist?</a></li>
+      <li><a href="#general4">What can I do to help NatureWatch NZ?</a></li>
+      <li><a href="#general5">How do I contact NatureWatch NZ?</a></li>
       <li><a href="#general6">What are admins and curators?</a></li>
       <li><a href="#inappropriate">What is considered inappropriate content?</a></li>
     </ol>
@@ -40,12 +41,12 @@
     </h4>
     <ol>
       <li><a href="#observations1">What is an observation?</a></li>
-      <li><a href="#observations2">Why doesn't iNaturalist recognize the name I've entered?</a></li>
+      <li><a href="#observations2">Why doesn't NatureWatch NZ recognize the name I've entered?</a></li>
       <li><a href="#observations3">How can I get help identifying what I saw?</a></li>
-      <li><a href="#observations4">What does it mean to link iNaturalist to my Flickr account?</a></li>
+      <li><a href="#observations4">What does it mean to link NatureWatch NZ to my Flickr account?</a></li>
       <li><a href="#observations5">Can I add photos without a Flickr account?</a></li>
       <li><a href="#observations6">What are tags?</a></li>
-      <li><a href="#observations7">Can I include my iNat observations on my own website of blog?</a></li>
+      <li><a href="#observations7">Can I include my NatureWatch NZ observations on my own website of blog?</a></li>
       <li><a href="#observations8">What kind of photos should I attach to observations?  Can I attach photos I didn't take?</a></li>
       <li><a href="#geoprivacy">What is geoprivacy?</a></li>
       <li><a href="#obscured">What is does it mean for an observation to be obscured?</a></li>
@@ -66,57 +67,58 @@
   </h4>
   <ol>
     <li>
-      <h5><a name="general1">What is iNaturalist?</a></h5>
+      <h5><a name="general1">What is NatureWatch NZ?</a></h5>
       <p>
-        iNaturalist provides a place to record and organize nature findings,
+        NatureWatch NZ, like <a href="http://www.inaturalist.org">iNaturalist</a> on which it is based, provides a place to record and organize nature findings,
         meet other nature enthusiasts, and learn about the natural world. It
         encourages the participation of a wide variety of nature
-        enthusiasts, including, but not exclusive to, hikers, hunters,
+        enthusiasts, including, but not exclusive to, trampers, hunters,
         birders, beach combers, mushroom foragers, park rangers, ecologists,
         and fishermen. Through connecting these different perceptions and
-        expertise of the natural world, iNaturalist hopes to create
+        expertise of the natural world, NatureWatch NZ hopes to create
         extensive community awareness of local biodiversity and promote
         further exploration of local environments.
       </p>
     </li>
     <li>
-      <h5><a name="general2">Who is behind iNaturalist?</a></h5>
+      <h5><a name="general2">Who is behind NatureWatch NZ?</a></h5>
       <p>
-        iNaturalist was originally the Master'ss Final Project of Nathan Agrin,
-        Jessica Kline, and Ken-ichi Ueda at UC Berkeley's 
-        <a href="http://www.ischool.berkeley.edu">School of Information</a>.
-        Currently Ken-ichi maintains the project, with occasional help
-        and guidance from Nate.
+        NatureWatch NZ is operated by the New Zealand Bio-Recording Network, a charitable trust devoted to facilitating community bio-recording in New Zealand. The NatureWatch NZ website is powered by <a href="http://www.inaturalist.org">iNaturalist</a>, an open-source community nature observation system developed in California.
+      </p>
+    </li>
+    <li>
+      <h5><a name="general2_5">What is the butterfly in your logo?</a></h5>
+      <p>
+        For our logo, NatureWatch NZ chose the <a href="http://en.wikipedia.org/wiki/New_Zealand_red_admiral">kahukura</a> ("red cloak") butterfly, also known as the red admiral. The kahukura is one of New Zealand's few large butterflies and is found nowhere else in the world. It's larvae like to feed on nettles, especially the mighty New Zealand tree nettle (<i>Urtica ferox</i>). You can still see kahukura flying about in New Zealand towns and cities, mostly because their larvae can eat some of the weedy European nettles. However, there is <a href="http://www.nzes.org.nz/nzje/free_issues/NZJEcol28_1_105.pdf">evidence</a> that they are in decline and are heavily parasitised by parasitoids of the introduced cabbage white butterfly. They are an iconic piece of native biodiversity that will benefit from lots of NatureWatch NZ observations keeping track of how they're doing.
       </p>
     </li>
     <li>
       <h5><a name="general3">What technologies and data sources does the project use?</a></h5>
       <p>
-        iNaturalist is built using <a
+        NatureWatch NZ and <a href="http://www.inaturalist.org">iNaturalist</a> are built using <a
         href="http://www.rubyonrails.org/">Ruby on Rails</a>, <a
-        href="http://mysql.com/">MySQL</a>, <a
+        href="http://www.postgresql.org/">postgres</a>, <a
         href="http://jquery.com/">jQuery</a> and <a
         href="http://code.google.com/apis/maps//">Google Maps</a>, and <a
-        href="http://flickr.com/">Flickr</a>. It also utilizes the <a
-        href="http://www.catalogueoflife.org">Catalogue of Life</a> and
-        <a href="http://ubio.org/">uBio</a> data sources for taxonomic data.
+        href="http://flickr.com/">Flickr</a>. NatureWatch NZ also utilizes <a
+        href="http://www.nzor.org.nz">NZOR</a> for its complete list of New Zealand species names and higher taxonomy.
       </p>
     </li>
     <li>
-      <h5><a name="general4">What can I do to help iNaturalist?</a></h5>
+      <h5><a name="general4">What can I do to help NatureWatch NZ?</a></h5>
       <p>
-        You can help iNaturalist by giving us your feedback; join our 
-        <a href="http://groups.google.com/group/inaturalist">Google group</a> 
+        You can help NatureWatch NZ by giving us your feedback, through our <a href="http://www.facebook.com/nzbrn/">Facebook</a> page or by joining our 
+        <a href="http://groups.google.com/group/nzbrn">Google group</a> 
         to sign up for usability studies, report bugs, and request new
-        features. You can also help iNaturalist by adding your observations
+        features. You can also help NatureWatch NZ by adding your observations
         and helping other community members identify their unidentified
         observations. If you know how to code and want to help work on some
         features,
-        <a href="http://github.com/inaturalist/inaturalist" title="inaturalist's inaturalist at master - GitHub">fork us on GitHub</a>!
+        <a href="https://github.com/nzbrn/inaturalist" title="NZBRN's NatureWatch NZ instance of iNaturalist - GitHub">fork us on GitHub</a>!
       </p>
     </li>
     <li>
-      <h5><a name="general5">How do I contact iNaturalist?</a></h5>
+      <h5><a name="general5">How do I contact NatureWatch NZ?</a></h5>
       <p>
         You can contact us at <a href="mailto:<%= APP_CONFIG[:help_email] %>"><%= APP_CONFIG[:help_email] %></a>
       </p>
@@ -126,16 +128,10 @@
     <li>
       <h5><a name="general6">What are admins and curators?</a></h5>
       <p>
-        iNat admins are the people who run the site. They have direct access
-        to the underlying code and the database, and they can change anything
-        on the site.
+        NatureWatch NZ admins are the people who run the site. They have direct access to the underlying code and the database, and they can change anything on the site.
       </p>
       <p>
-        Curators are iNat users who volunteer to help keep our taxonomic data
-        up to date. If you're interested in becoming a curator, please 
-        <a href="mailto:<%= APP_CONFIG[:help_email] %>">contact us</a>. Curators can
-        also promote other users to curator status. Please only promote people
-        you trust and that you know to have some taxonomic knowledge.
+        Curators are NatureWatch NZ users who volunteer to help keep our taxonomic data up to date. If you're interested in becoming a curator, please <a href="mailto:<%= APP_CONFIG[:help_email] %>">contact us</a>. Curators can also promote other users to curator status. Please only promote people you trust and that you know to have some taxonomic knowledge.
       </p>
     </li>
     
@@ -163,16 +159,12 @@
   <ol>
     <li>
       <h5><a name="observations1">What is an observation?</a></h5>
-      <p>An observation is the what, where, and when of a finding in nature. iNaturalist provides a place to add this information along with associated text, photos, and tags. iNaturalist encourages the recording of all nature findings, whether they feature identified species or simple narrative descriptions. (In iNaturalist the same lizard can be described as a Desert Horned Lizard as well as &quot;Mystery Lizard of Death Valley&quot;.)</p>
+      <p>An observation is the what, where, and when of a species seen or heard in nature. NatureWatch NZ provides a place to add this information along with associated text, photos, and tags. NatureWatch NZ encourages the recording of all nature findings, whether they feature identified species or simple narrative descriptions. In NatureWatch NZ the same gecko can be described as a jewelled gecko as well as &quot;Mystery gecko of Banks Peninsula&quot;. If you know what the species is, you should to use our Lookup button to link your observation to the formal name. If you don't know what it is, you can instead add a descriptive name and check the "ID Please" box.</p>
     </li>
     <li>
-      <h5><a name="observations2">Why doesn't iNaturalist recognize the name I've entered?</a></h5>
+      <h5><a name="observations2">Why doesn't NatureWatch NZ recognize the name I've entered?</a></h5>
       <p>
-        iNaturalist has name information for mammals, birds, reptiles,
-        and amphibians, and continues to add new species names into our
-        database. If we do not recognize a particular name, try
-        alternative names that we might recognize and add the original
-        name to the tags or description fields.
+        NatureWatch NZ has access to all know New Zealand species names via the <a href="http://www.nzor.org.nz">New Zealand Organisms Register</a> (NZOR). This may not contain all common names and in the odd instance may be missing an older synonym of a scientific name or not have included a recent name change, especially one that is not yet widely accepted. If we do not recognize a particular name, try alternative names that we might recognize and add the original name to the tags or description fields. And please let us know if it's something we or <a href="http://www.nzor.org.nz">NZOR</a> need to fix.
       </p>
     </li>
     <li>
@@ -180,13 +172,13 @@
       <p>
         Check the "ID Please" checkbox when adding / editing your
         observation and your observation will appear in
-        <a href="http://inaturalist.org/observations/id_please" title="<%= APP_CONFIG[:site_name] %> &middot; ID Please!">ID Please</a>.
+        <a href="http://www.naturewatch.org.nz/observations/id_please" title="<%= APP_CONFIG[:site_name] %> &middot; ID Please!">ID Please</a>.
       </p>
     </li>
     <li>
-      <h5><a name="observations4">What does it mean to link iNaturalist to my Flickr account?</a></h5>
+      <h5><a name="observations4">What does it mean to link NatureWatch NZ to my Flickr account?</a></h5>
       <p>
-        iNaturalist can link directly to the Flickr photo service so
+        NatureWatch NZ can link directly to the Flickr photo service so
         that you can add your Flickr photos to your observations. When
         you agree to link your Flickr account, you are simply linking
         two accounts; we do not have access to your Flickr password and
@@ -200,29 +192,24 @@
         We also support Picasa: <a href="http://inaturalist.org/picasa/options">Configure your Picasa account &raquo;</a>
       </p>
       <p>
-        We also support uploading photos directly to iNat, but it can be a bit
-        slow, so we only allow one upload at a time. Using Flickr or Picasa is
-        probably faster if you already use those services.
+        We also support uploading photos directly to NatureWatch NZ, but it can be a bit slow, so we only allow one upload at a time. Using Flickr or Picasa is probably faster if you already use those services and you can more easily connect many photos to a single observation.
       </p>
     </li>
     <li>
       <h5><a name="observations6">What are tags?</a></h5>
-      <p>Tags are keywords you can add to an observation to make them easier to find. For example, if a barracuda followed you on a scuba diving trip in Turks and Caicos, you might tag the observation &quot;scary, barracuda, scuba diving, vacation, turks and caicos&quot;.</p>
+      <p>Tags are keywords you can add to an observation to make them easier to find. For example, if a barracuda followed you on a scuba diving trip at the Three Kinds Island, you might tag the observation &quot;scary, barracuda, scuba diving, vacation, Three Kinds Island&quot;.</p>
     </li>
     <li>
-      <h5><a name="observations7">Can I include my iNat observations on my own website of blog?</a></h5>
+      <h5><a name="observations7">Can I include my NatureWatch NZ observations on my own website of blog?</a></h5>
       <p>
-        Sure, check out our <a href="http://inaturalist.org/observations/widget" title="Observations Widget">Observations Widget</a>.
+        Sure, check out our <a href="http://www.naturewatch.org.nz/observations/widget" title="Observations Widget">Observations Widget</a>.
       </p>
     </li>
     <li>
       <h5><a name="observations8">What kind of photos should I attach to observations?  Can I attach photos I didn't take?</a></h5>
       <p>
         Photos attached to observations should be of the individual observed
-        at the time of the observation. If you record an observation of a
-        tree, then go back a day later to take a picture, please add a new
-        observation for the picture, because it represents the tree at a
-        different point in time.
+        at the time of the observation or the habitat where it was seen. If you record an observation of a tree, then go back a day later to take a picture, please add a new observation for the picture, because it represents the tree at a different point in time.
       </p>
       
       <p>
@@ -276,8 +263,7 @@
         Coordinates are automatically obscured for all taxa that are "NEAR
         THREATENED" or worse according to the IUCN Red List. Some taxa may be
         declared threatened according to other conservation authorities, and
-        some may be simply marked as threatened by iNat site curators if they
-        believe it merits protection.
+        some may be simply marked as threatened by NatureWatch NZ site curators if they believe it merits protection.
       </p>
       
       <p>
@@ -313,7 +299,7 @@
         <dt>Life List</dt>
         <dd>
           <p>
-            Automatically updates based on your observations. Everyone on iNat
+            Automatically updates based on your observations. Everyone on NatureWatch NZ
             has a default life list that contains every species that person has
             observed. If you delete an observation or change your ID, the
             species will get removed. You can also manually add taxa to your
@@ -348,7 +334,7 @@
           </p>
           
           <p>
-            iNat users can also add additional check lists to places, but
+            NatureWatch NZ users can also add additional check lists to places, but
             these check lists are not automatically updated. They mainly
             provide a way for people to bring in outside sources of data or
             just list things based on their own experience.
@@ -361,7 +347,7 @@
       <p>
         While the life list is automatically populated from added
         observations, the species will not be added to this list if
-        iNaturalist does not recognize the name you used. We recommend
+        NatureWatch NZ does not recognize the name you used. We recommend
         trying alternative names that we might recognize.
       </p>
     </li>

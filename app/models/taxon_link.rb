@@ -2,7 +2,7 @@ class TaxonLink < ActiveRecord::Base
   belongs_to :taxon
   belongs_to :user
   validates_format_of :url, :with => URI.regexp, 
-    :message => "should look like a URL, e.g. http://inaturalist.org"
+    :message => "should look like a URL, e.g. http://www.naturewatch.org.nz"
   validates_presence_of :taxon_id
   
   before_save :set_site_title

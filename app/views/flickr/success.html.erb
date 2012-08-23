@@ -1,0 +1,13 @@
+<h2>Great!  We were able to link to your Flickr account.</h2>
+
+<div class="column span-13" id="flickr-photos">
+  <p>You should recognize some of these photos:</p>
+  <% @photos.each do |photo| -%>
+  <img src="<%= photo.source_url(:square) -%>" />
+  <% end -%>
+</div>
+
+<div class="column span-7 last">
+  <h3>You're all set to start exploring NatureWatch NZ:</h2>
+  <p><%= link_to "Get started with NatureWatch NZ", :controller => 'observations', :action => @user.login %></p>
+</div>

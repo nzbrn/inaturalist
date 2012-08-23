@@ -1,4 +1,4 @@
-# wrappers and constants for expressing iNat records as Darwin Core fields
+# wrappers and constants for expressing NatureWatch NZ records as Darwin Core fields
 class EolMedia
   
   TERMS = [
@@ -113,7 +113,7 @@ class EolMedia
     end
     
     def publisher
-      is_a?(LocalPhoto) ? "iNaturalist" : self.class.to_s.gsub(/Photo/, '').underscore.humanize
+      is_a?(LocalPhoto) ? "NatureWatch NZ" : self.class.to_s.gsub(/Photo/, '').underscore.humanize
     end
     
     def creator

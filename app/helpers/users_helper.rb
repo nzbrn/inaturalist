@@ -91,7 +91,7 @@ module UsersHelper
   end
   
   
-  # Below here, added for iNaturalist
+  # Below here, added for NatureWatch NZ
   
   def friend_link(user, potential_friend)
     case !user.friends.include?(potential_friend)
