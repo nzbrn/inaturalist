@@ -119,9 +119,9 @@ class ObservationsController < ApplicationController
       
       format.kml do
         render_observations_to_kml(
-          :snippet => "iNaturalist Feed for Everyone", 
-          :description => "iNaturalist Feed for Everyone", 
-          :name => "iNaturalist Feed for Everyone"
+          :snippet => "NatureWatch NZ Feed for Everyone", 
+          :description => "NatureWatch NZ Feed for Everyone", 
+          :name => "NatureWatch NZ Feed for Everyone"
         )
       end
       
@@ -924,9 +924,9 @@ class ObservationsController < ApplicationController
       
       format.kml do
         render_observations_to_kml(
-          :snippet => "iNaturalist Feed for User: #{@selected_user.login}",
-          :description => "iNaturalist Feed for User: #{@selected_user.login}",
-          :name => "iNaturalist Feed for User: #{@selected_user.login}"
+          :snippet => "NatureWatch NZ Feed for User: #{@selected_user.login}",
+          :description => "NatureWatch NZ Feed for User: #{@selected_user.login}",
+          :name => "NatureWatch NZ Feed for User: #{@selected_user.login}"
         )
       end
 
@@ -1125,7 +1125,7 @@ class ObservationsController < ApplicationController
       format.kml do
         render_observations_to_kml(
           :snippet => "#{@project.title.html_safe} Observations", 
-          :description => "Observations feed for the iNaturalist project '#{@project.title.html_safe}'", 
+          :description => "Observations feed for the NatureWatch NZ project '#{@project.title.html_safe}'", 
           :name => "#{@project.title.html_safe} Observations"
         )
       end
@@ -1797,9 +1797,9 @@ class ObservationsController < ApplicationController
       @net_hash = {
         :id => "AllObs", 
         :link_id =>"AllObs", 
-        :snippet => "iNaturalist Feed for Everyone", 
-        :description => "iNaturalist Feed for Everyone", 
-        :name => "iNaturalist Feed for Everyone", 
+        :snippet => "NatureWatch NZ Feed for Everyone", 
+        :description => "NatureWatch NZ Feed for Everyone", 
+        :name => "NatureWatch NZ Feed for Everyone", 
         :href => "#{root_url}#{request.request_uri}".gsub(/kml_type=network_link/, '')
       }
       render :layout => false, :action => 'network_link'

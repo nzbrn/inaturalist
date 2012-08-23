@@ -70,7 +70,7 @@
           <%= hidden_fields_for_params :without => [:colors, :page] %>
           <%= select_tag "colors[]", options_for_select(Color.all.map(&:value).sort, :selected => @colors), :multiple => true, :id => "colorsFilter", :class => "inlineblock" %>
           <%= submit_tag "Filter", :class => "glaucous button" %>
-          <%= link_to "&times;", url_for_params(:without => [:colors]), :class => "pale button", :style => "#{'display:none' if @colors.blank?}", :title => "Clear color filters" %>
+          <%= link_to "&times;", url_for_params(:without => [:colors]), :class => "pale button", :style => "#{'display:none' if @colors.blank?}", :title => "Clear colour filters" %>
         </div>
       <% end %>
       

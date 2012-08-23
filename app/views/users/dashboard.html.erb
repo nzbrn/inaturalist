@@ -125,7 +125,7 @@
         <% if params[:page].blank? -%>
           <p>
             <% if current_user.friendships.count == 0 -%>
-              Your dashboard helps you keep track of what people are doing on iNat.
+              Your dashboard helps you keep track of what people are doing on NatureWatch NZ.
               To follow someone's updates, click the <strong>"Follow [name]"</strong>
               link in the header when viewing their observations or profile.
               <%= link_to "Find some people to follow", people_path, :class => "readmore" %>
@@ -137,7 +137,7 @@
           <p>Here are some things you can do in the meantime:</p>
           <ul class="readable leafylist">
             <% unless @user.flickr_identity %>
-              <li><%= link_to 'Link your Flickr Account to iNaturalist', :controller => 'flickr', :action => 'link' %></li>
+              <li><%= link_to 'Link your Flickr Account to NatureWatch NZ', :controller => 'flickr', :action => 'link' %></li>
             <% end %>
             <li><%= link_to "Browse your observations", observations_by_login_path(@user.login) %></li>
             <li><%= link_to "Add new observations", :controller => 'observations', :action => 'new' %></li>

@@ -9,7 +9,7 @@
   <div id='header'>
     <ul class='navtabs' id='mainnav'>
       <li>
-        <a class='logolink' href='/' title='iNaturalist.org'>
+        <a class='logolink' href='/' title='NatureWatch NZ'>
           <img alt='logo' src='/images/logo-small.gif' />
         </a>
       </li>
@@ -28,8 +28,8 @@
     </ul>
   </div>
   <div class='container'>
-    <h1>iNaturalist API</h1>
-    <p>The iNat REST API is generally for retrieving data from iNaturalist. Data can be retrieved in different formats by appending .[format] to the endpoint, e.g. /observations.json to retrieve observations as JSON.</p>
+    <h1>NatureWatch NZ API</h1>
+    <p>The NatureWatch NZ REST API is generally for retrieving data from NatureWatch NZ. Data can be retrieved in different formats by appending .[format] to the endpoint, e.g. /observations.json to retrieve observations as JSON.</p>
     <strong>Contents</strong>
     <ul>
       <li>
@@ -77,11 +77,11 @@
       Primary endpoint for retrieving observations. JSON and ATOM responses are what
       you'd expect, but DwC is <a
       href='http://rs.tdwg.org/dwc/terms/simple/index.htm'>Simple Darin Core</a>, an
-      XML schema for biodiversity data. iNat uses JSON responses internally quite a
+      XML schema for biodiversity data. NatureWatch NZ uses JSON responses internally quite a
       bit, so it will probably always be the most information-rich.
       
       The widget response is a JS snippet that inserts HTML.  It should be used 
-      with a script tag, e.g. <pre>&lt;script src="http://www.inaturalist.org/observations.widget"&gt;&lt;/script&gt;</pre>
+      with a script tag, e.g. <pre>&lt;script src="http://www.NatureWatch.org.nz/observations.widget"&gt;&lt;/script&gt;</pre>
     </p>
     <p class='ui'>
       <strong>
@@ -119,7 +119,7 @@
           <dt>observed_on</dt>
           <dd>date observed</dd>
           <dt>date_added</dt>
-          <dd>date added to iNat</dd>
+          <dd>date added to NatureWatch NZ</dd>
         </dl>
       </dd>
       <dt>order</dt>
@@ -158,13 +158,13 @@
         Same as license param
       </dd>
       <dt>taxon_id</dt>
-      <dd>Filter by iNat taxon ID. Note that this will also select observations of descendant taxa.</dd>
+      <dd>Filter by NatureWatch NZ taxon ID. Note that this will also select observations of descendant taxa.</dd>
       <dd>
         <label>Allowed values:</label>
-        valid iNat taxon ID
+        valid NatureWatch NZ taxon ID
       </dd>
       <dt>taxon_name</dt>
-      <dd>Filter by iNat taxon name. Note that this will also select observations of descendant taxa. Note that names are not unique, so if the name matches multiple taxa, no observations may be returned.</dd>
+      <dd>Filter by NatureWatch NZ taxon name. Note that this will also select observations of descendant taxa. Note that names are not unique, so if the name matches multiple taxa, no observations may be returned.</dd>
       <dd>
         <label>Allowed values:</label>
         Name string
@@ -195,7 +195,7 @@
         casual | research
       </dd>
       <dt>out_of_range</dt>
-      <dd>Filter by whether or not iNat considers the observation out of range for the associated taxon.  This is based on iNat's range data.</dd>
+      <dd>Filter by whether or not NatureWatch NZ considers the observation out of range for the associated taxon.  This is based on NatureWatch NZ's range data.</dd>
       <dd>
         <label>Allowed values:</label>
         true
@@ -294,7 +294,7 @@
       GET
       /projects
     </h2>
-    <p>Retrieve information about projects on iNaturalist.</p>
+    <p>Retrieve information about projects on NatureWatch NZ.</p>
     <p class='ui'>
       <strong>
         Formats:
@@ -351,7 +351,7 @@
     </h4>
     <pre>/projects.json?featured=true</pre>
     <h4>Response</h4>
-    <pre>[{&#x000A;    "created_at": "2011-08-12T10:21:28-07:00",&#x000A;    "created_at_utc": "2011-08-12T17:21:28Z",&#x000A;    "title": "ASC Pika Project",&#x000A;    "project_type": "contest",&#x000A;    "project_observation_rule_terms": "must be on list",&#x000A;    "updated_at": "2012-04-26T19:38:51-07:00",&#x000A;    "updated_at_utc": "2012-04-27T02:38:51Z",&#x000A;    "source_url": "",&#x000A;    "id": 44,&#x000A;    "user_id": 477,&#x000A;    "featured_at": "2012-04-26T19:38:51-07:00",&#x000A;    "featured_at_utc": "2012-04-27T02:38:51Z",&#x000A;    "icon_url": "http://www.inaturalist.org/attachments/projects/icons/44/span2/APAlogo.png?1315005828",&#x000A;    "icon_file_size": 9454,&#x000A;    "icon_file_name": "APAlogo.png",&#x000A;    "icon_content_type": "image/png",&#x000A;    "description": "The goal of this project is to document the persistence or extirpation of American Pika throughout their range for science and conservation. <a href="/attachments/project_assets/95-flyer.html?1320257073">Read our flyer</a> to find out more! According to the pika range map compiled by the <a href="http://www.iucnredlist.org/apps/redlist/details/41267/0">IUCN</a>, American pika are thought to occur in two occur in 2 Countries, 12 States (or Canadian Provinces) and 276 Counties (or Canadian Regional Districts). We seek to collect recent observations verifying Pika persistence in each of these places. This project is supported by the North American Pika Consortium, the California Department of Fish and Game, and the Front Range Pika Project.",&#x000A;    "cached_slug": "asc-pika-project",&#x000A;    "project_list": {&#x000A;        "comprehensive": false,&#x000A;        "place_id": null,&#x000A;        "created_at": "2011-08-12T12:33:04-07:00",&#x000A;        "created_at_utc": "2011-08-12T19:33:04Z",&#x000A;        "title": "American Pika Atlas's Check List",&#x000A;        "updated_at": "2011-08-12T12:33:04-07:00",&#x000A;        "project_id": 44,&#x000A;        "updated_at_utc": "2011-08-12T19:33:04Z",&#x000A;        "taxon_id": null,&#x000A;        "id": 52561,&#x000A;        "user_id": null,&#x000A;        "last_synced_at": null,&#x000A;        "description": "Every species observed by members of American Pika Atlas",&#x000A;        "source_id": null&#x000A;    },&#x000A;    "terms": "Please only upload observations if you agree to make them available non-commercial scientific analyses. We will attribute you as the photographer if your photos are used in any published scientific analyses. If possible please include locations, dates, and photos with your observations.",&#x000A;    "observed_taxa_count": 2,&#x000A;    "icon_updated_at": "2011-09-02T16:23:48-07:00",&#x000A;    "rule_place": null,&#x000A;    "project_observations_count": 12&#x000A;}]</pre>
+    <pre>[{&#x000A;    "created_at": "2011-08-12T10:21:28-07:00",&#x000A;    "created_at_utc": "2011-08-12T17:21:28Z",&#x000A;    "title": "ASC Pika Project",&#x000A;    "project_type": "contest",&#x000A;    "project_observation_rule_terms": "must be on list",&#x000A;    "updated_at": "2012-04-26T19:38:51-07:00",&#x000A;    "updated_at_utc": "2012-04-27T02:38:51Z",&#x000A;    "source_url": "",&#x000A;    "id": 44,&#x000A;    "user_id": 477,&#x000A;    "featured_at": "2012-04-26T19:38:51-07:00",&#x000A;    "featured_at_utc": "2012-04-27T02:38:51Z",&#x000A;    "icon_url": "http://www.NatureWatch.org.nz/attachments/projects/icons/44/span2/APAlogo.png?1315005828",&#x000A;    "icon_file_size": 9454,&#x000A;    "icon_file_name": "APAlogo.png",&#x000A;    "icon_content_type": "image/png",&#x000A;    "description": "The goal of this project is to document the persistence or extirpation of American Pika throughout their range for science and conservation. <a href="/attachments/project_assets/95-flyer.html?1320257073">Read our flyer</a> to find out more! According to the pika range map compiled by the <a href="http://www.iucnredlist.org/apps/redlist/details/41267/0">IUCN</a>, American pika are thought to occur in two occur in 2 Countries, 12 States (or Canadian Provinces) and 276 Counties (or Canadian Regional Districts). We seek to collect recent observations verifying Pika persistence in each of these places. This project is supported by the North American Pika Consortium, the California Department of Fish and Game, and the Front Range Pika Project.",&#x000A;    "cached_slug": "asc-pika-project",&#x000A;    "project_list": {&#x000A;        "comprehensive": false,&#x000A;        "place_id": null,&#x000A;        "created_at": "2011-08-12T12:33:04-07:00",&#x000A;        "created_at_utc": "2011-08-12T19:33:04Z",&#x000A;        "title": "American Pika Atlas's Check List",&#x000A;        "updated_at": "2011-08-12T12:33:04-07:00",&#x000A;        "project_id": 44,&#x000A;        "updated_at_utc": "2011-08-12T19:33:04Z",&#x000A;        "taxon_id": null,&#x000A;        "id": 52561,&#x000A;        "user_id": null,&#x000A;        "last_synced_at": null,&#x000A;        "description": "Every species observed by members of American Pika Atlas",&#x000A;        "source_id": null&#x000A;    },&#x000A;    "terms": "Please only upload observations if you agree to make them available non-commercial scientific analyses. We will attribute you as the photographer if your photos are used in any published scientific analyses. If possible please include locations, dates, and photos with your observations.",&#x000A;    "observed_taxa_count": 2,&#x000A;    "icon_updated_at": "2011-09-02T16:23:48-07:00",&#x000A;    "rule_place": null,&#x000A;    "project_observations_count": 12&#x000A;}]</pre>
     <a name='/projects/:id'></a>
     <h2>
       GET
@@ -378,7 +378,7 @@
     <p>JS widget snippet of the top contributors to a project.</p>
     <div id='footer'>
       <div id='footer_text'>
-        <a href='/about'>About iNaturalist</a>
+        <a href='/about'>About NatureWatch NZ</a>
         &nbsp;
         <a href='/help'>Help</a>
         &nbsp;

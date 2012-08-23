@@ -1,7 +1,7 @@
 <div class='photoSelectorAlbums facebookAlbums'>
   <% if @reauthorization_needed -%>
     <p class="notice ui">
-      Facebook would like to confirm that you want your account connected to iNat.
+      Facebook would like to confirm that you want your account connected to NatureWatch NZ.
       <%= link_to "Confirm now", ProviderAuthorization::AUTH_URLS['facebook'], :class => "readmore" %>
     </p>
   <% elsif @albums.empty? %>

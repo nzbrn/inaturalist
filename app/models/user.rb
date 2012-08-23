@@ -230,7 +230,7 @@ class User < ActiveRecord::Base
     role_list.include?(role.to_s) || role_list.include?(User::JEDI_MASTER_ROLE)
   end
 
-  # Everything below here was added for iNaturalist
+  # Everything below here was added for NatureWatch NZ
   
   # TODO: named_scope
   def recent_observations(num = 5)
@@ -439,7 +439,7 @@ class User < ActiveRecord::Base
     self.activation_code = self.class.make_token
   end
   
-  # Everything below here was added for iNaturalist
+  # Everything below here was added for NatureWatch NZ
   def create_life_list
     life_list = LifeList.create(:user => self)
     self.life_list = life_list

@@ -1,8 +1,11 @@
 #header {
   margin: 0px 10px 1em;
-  height: 29px;
+  /* height expanded to add a larger and more legible NatureWatch NZ logo to the top left*/
+  /*height: 29px;*/
+  height: 50px;
   line-height: 1.25em;
-  border-bottom: 1px dotted #ccc;
+  /* lower border line turned off as it hangs too low down with the increased header height*/
+  /*border-bottom: 1px dotted #ccc;*/
   min-width: 900px;
 }
 

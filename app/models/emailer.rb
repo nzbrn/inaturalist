@@ -9,7 +9,7 @@ class Emailer < ActionMailer::Base
     Invite.create(:user => current_user, :invite_address => address)
     content_type "text/plain"
     recipients address
-    @subject << "#{params[:sender_name]} wants you to join them on iNaturalist" 
+    @subject << "#{params[:sender_name]} wants you to join them on NatureWatch NZ" 
     @body = {
       :personal_message => params[:personal_message], 
       :sending_user => params[:sender_name], 
