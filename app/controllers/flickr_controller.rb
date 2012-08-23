@@ -36,13 +36,13 @@ class FlickrController < ApplicationController
       
       if @flickr_identity.save
         # This redirects to the 'success' page if the user has justed signed
-        # up to iNaturalist and has linked their flickr accounts.
+        # up to NatureWatch NZ and has linked their flickr accounts.
         if @user.created_at > 5.minutes.ago
           redirect_to :action => 'success' and return
         else
           if @flickr_identity.created_at > 5.minutes.ago
             flash[:notice] = <<-EOF
-              Great Success! We linked your Flickr account to your iNaturalist
+              Great Success! We linked your Flickr account to your NatureWatch NZ
               account.
             EOF
           else
@@ -59,7 +59,7 @@ class FlickrController < ApplicationController
     rescue Net::Flickr::APIError => e
       logger.error "[Error #{Time.now}] Flickr connection failed (#{e}): #{e.message}"
       flash[:error] = <<-EOF
-        Ack! Something went wrong linking your iNaturalist account to Flickr.
+        Ack! Something went wrong linking your NatureWatch NZ account to Flickr.
         Try it again, or contact us at #{APP_CONFIG[:help_email]}.
         
         Error: #{e.message}
@@ -68,7 +68,7 @@ class FlickrController < ApplicationController
     end
   end
   
-  # This is the endpoint the user visits to link their iNaturalist account to
+  # This is the endpoint the user visits to link their NatureWatch NZ account to
   # their Flickr account directly after signup. Luckly we don't have to manage a
   # whole lot from Flickr, they either have an account or don't, and Flickr
   # handles the process of creating Flickr accounts and then authorizing the
@@ -81,7 +81,7 @@ class FlickrController < ApplicationController
   
   # A cheesy endpoint that is only accessed after the user has successfully
   # linked their flickr account after signup.  It asks if the user would like
-  # to auto import from their Flickr account into their iNaturalist account,
+  # to auto import from their Flickr account into their NatureWatch NZ account,
   # and then handles that simple form
   def success
     redirect_to(:action => 'options') and return if @user.flickr_identity.nil?
@@ -246,7 +246,7 @@ class FlickrController < ApplicationController
   def unlink_flickr_account
     if @user.flickr_identity
       @user.flickr_identity.destroy
-      flash[:notice] = "We've dissassociated your Flickr account from your iNaturalist account."
+      flash[:notice] = "We've dissassociated your Flickr account from your NatureWatch NZ account."
       redirect_to :action => 'options'
     else
       flash[:notice] = "Your Flickr account has not been linked before!"

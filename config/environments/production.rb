@@ -16,7 +16,7 @@ config.action_view.cache_template_loading            = true
 
 # Disable delivery errors if you bad email addresses should just be ignored
 config.action_mailer.raise_delivery_errors = false
-config.action_mailer.default_url_options = { :host => 'inat.nzbrn.org.nz' }
+config.action_mailer.default_url_options = { :host => 'naturewatch.org.nz' }
 config.action_mailer.delivery_method = :sendmail
 
 # Set the logger to roll over monthly

@@ -20,7 +20,7 @@ class ObservationPhotosController < ApplicationController
       respond_to do |format|
         format.json do
           if params[:observation_photo] && params[:observation_photo][:observation_id]
-            render :json => "Observation hasn't been added to iNaturalist", 
+            render :json => "Observation hasn't been added to NatureWatch NZ", 
               :status => :unprocessable_entity
           else
             render :json => "No observation specified", :status => :unprocessable_entity

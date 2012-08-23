@@ -1,6 +1,6 @@
 (function(){
 /**
- * iNaturalist map object
+ * NatureWatch NZ map object
  * Copyright (c) iNaturalist, 2007-2008
  * 
  * @created: 2008-01-01
@@ -11,7 +11,7 @@
 
 // requires GoogleMap classes
 if (typeof(GBrowserIsCompatible) != 'function')
- throw "The Google map libraries must be loaded to use the iNaturalist Map " +
+ throw "The Google map libraries must be loaded to use the NatureWatch NZ Map " +
        "extensions.";
 
 // extend parts of the Google Marker class

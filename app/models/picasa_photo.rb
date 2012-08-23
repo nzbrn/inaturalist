@@ -10,7 +10,7 @@ class PicasaPhoto < Photo
       errors.add(
         :license, 
         "must be a Creative Commons license if the photo wasn't added by " +
-        "an iNaturalist user using their linked Picasa account.")
+        "an NatureWatch NZ user using their linked Picasa account.")
     end
     
     # Check to make sure the user owns the flickr photo

@@ -665,7 +665,7 @@ class Taxon < ActiveRecord::Base
   end
   
   def lsid
-    "lsid:inaturalist.org:taxa:#{id}"
+    "lsid:naturewatch.org.nz:taxa:#{id}"
   end
   
   # Flagged method is called after every add_flag.  This callback method

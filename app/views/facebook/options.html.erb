@@ -11,19 +11,19 @@
     <% end -%>
   </p>
   <p>
-    Your iNaturalist account is currently linked to your Facebook account.
+    Your NatureWatch NZ account is currently linked to your Facebook account.
   </p>
   <p>
-    Keeping your iNaturalist account linked to your Facebook account allows you to
+    Keeping your NatureWatch NZ account linked to your Facebook account allows you to
     add multiple photos to your observations.  Of course, if you ever want
-    iNaturalist and Facebook to break up, we won't stop you, you just won't be
+    NatureWatch NZ and Facebook to break up, we won't stop you, you just won't be
     able to add photos. Sometimes this might be for the best, like if you create
-    a new Facebook account that you want to link iNaturalist to.
+    a new Facebook account that you want to link NatureWatch NZ to.
   </p>
 <% else -%>
-<h3>Your iNaturalist account is not linked to your Facebook account :(</h3>
+<h3>Your NatureWatch NZ account is not linked to your Facebook account :(</h3>
 <p class="description">
-  To connect Facebook with iNat, click the link on the right and sign into
+  To connect Facebook with NatureWatch NZ, click the link on the right and sign into
   Facebook.com. 
 </p>
 <p class="description">
@@ -33,8 +33,8 @@
 </p>
 
 <p class="description">
-  Also, keep in mind that if you log in to iNat via Facebook, we will
-  automatically re-link your iNat and Facebook accounts. Seems reasonable that
+  Also, keep in mind that if you log in to NatureWatch NZ via Facebook, we will
+  automatically re-link your NatureWatch NZ and Facebook accounts. Seems reasonable that
   if you use Facebook you'll want to be able to import Facebook photos, right?
 </p>
 <% end -%>
@@ -46,9 +46,9 @@
 %>
 <p><!-- auto import from Facebook into your queue -->
 <% if @user.facebook_identity && @user.facebook_identity.auto_import %>
-<!-- You currently have your iNaturalist account setup to import from your Facebook account automatically. -->
+<!-- You currently have your NatureWatch NZ account setup to import from your Facebook account automatically. -->
 <% elsif @user.facebook_identity && !@user.facebook_identity.auto_import %>
-<!-- You currently do not have your iNaturalist account setup to import from your Facebook account. -->
+<!-- You currently do not have your NatureWatch NZ account setup to import from your Facebook account. -->
 <% end %>
 </p>
 <%
@@ -60,7 +60,7 @@
 <div class="column span-10 last">
 <p>
 <% if @user.facebook_identity %>
-  <%= link_to 'Unlink your Facebook and iNaturalist Accounts', 
+  <%= link_to 'Unlink your Facebook and NatureWatch NZ Accounts', 
     omniauth_disconnect_path('facebook'), :class => 'delete button', 
     :style=>'font-size:13px;', :method => 'delete' %>
 <% else %>

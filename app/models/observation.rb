@@ -928,7 +928,7 @@ class Observation < ActiveRecord::Base
   
   
   def lsid
-    "lsid:inaturalist.org:observations:#{id}"
+    "lsid:naturewatch.org.nz:observations:#{id}"
   end
   
   def component_cache_key(options = {})

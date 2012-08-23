@@ -1,4 +1,4 @@
-# wrappers and constants for expressing iNat records as Darwin Core fields
+# wrappers and constants for expressing NatureWatch NZ records as Darwin Core fields
 module DarwinCore
   
   class Taxon
@@ -125,7 +125,7 @@ module DarwinCore
       %w(id id),
       %w(basisOfRecord http://rs.tdwg.org/dwc/terms/basisOfRecord HumanObservation),
       %w(modified http://purl.org/dc/terms/modified),
-      %w(institutionCode http://rs.tdwg.org/dwc/terms/institutionCode iNaturalist),
+      %w(institutionCode http://rs.tdwg.org/dwc/terms/institutionCode NatureWatchNZ),
       %w(collectionCode http://rs.tdwg.org/dwc/terms/collectionCode Observations),
       %w(datasetName http://rs.tdwg.org/dwc/terms/datasetName),
       %w(informationWithheld http://rs.tdwg.org/dwc/terms/informationWithheld),
@@ -195,7 +195,7 @@ module DarwinCore
       end
 
       def institutionCode
-        "iNaturalist"
+        "NatureWatchNZ"
       end
 
       def collectionCode
@@ -204,9 +204,9 @@ module DarwinCore
 
       def datasetName
         if quality_grade == Observation::RESEARCH_GRADE
-          "iNaturalist research-grade observations"
+          "NatureWatch NZ research-grade observations"
         else
-          "iNaturalist observations"
+          "NatureWatch NZ observations"
         end
       end
 

@@ -16,7 +16,7 @@
 
   <% form_for current_user, :builder => DefaultFormBuilder do |f| %>
     <%= error_messages_for :display_user %>
-    <%= f.text_field :login, :label => "Please confirm your iNat username", :class => "text", :required => true %>
+    <%= f.text_field :login, :label => "Please confirm your NatureWatch NZ username", :class => "text", :required => true %>
     <%= f.text_field :email, :class => "text", :required => true %>
     <%= f.time_zone_select(:time_zone, PRIORITY_ZONES, {}, {
       :label => "Your default time zone",
