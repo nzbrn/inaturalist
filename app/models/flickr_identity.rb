@@ -17,7 +17,7 @@ class FlickrIdentity < ActiveRecord::Base
     flickr_users.each do |flickr_user|
       results = flickr.photos.search({'user_id'  => flickr_user.flickr_user_id,
                                       'per_page' => 500, # max it out on initial import
-                                      'tags'     => 'inaturalist'})
+                                      'tags'     => 'naturewatchnz'})
       unless results.size == 0
         results.each do |photo|
           # map the photo to an observation

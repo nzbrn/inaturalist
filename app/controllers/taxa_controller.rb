@@ -112,7 +112,7 @@ class TaxaController < ApplicationController
 
   def show
     if params[:entry] == 'widget'
-      flash[:notice] = "Welcome to iNat! Click 'Add an observtion' to the lower right. You'll be prompted to sign in/sign up if you haven't already"
+      flash[:notice] = "Welcome to NatureWatch NZ! Click 'Add an observtion' to the lower right. You'll be prompted to sign in/sign up if you haven't already"
     end
     @taxon ||= Taxon.find_by_id(params[:id].to_i, :include => [:taxon_names]) if params[:id]
     return render_404 unless @taxon
@@ -685,7 +685,7 @@ class TaxaController < ApplicationController
     redirect_back_or_default(taxon_path(@taxon))
   rescue Koala::Facebook::APIError => e
     raise e unless e.message =~ /OAuthException/
-    flash[:error] = "Facebook needs the owner of that photo to re-confirm their connection to iNat."
+    flash[:error] = "Facebook needs the owner of that photo to re-confirm their connection to NatureWatch NZ."
     redirect_back_or_default(taxon_path(@taxon))
   end
   
@@ -734,17 +734,17 @@ class TaxaController < ApplicationController
       if @taxon.save
         format.html { redirect_to @taxon }
         format.js do
-          render :text => "Colors updated."
+          render :text => "Colours updated."
         end
       else
         format.html do
-          flash[:error] = "There was a problem saving those colors: " +
+          flash[:error] = "There was a problem saving those colours: " +
             @taxon.errors.full_messages.join(', ')
           redirect_to @taxon
         end
         format.js do
           render :update do |page|
-            page.alert "There were some problems saving those colors: " +
+            page.alert "There were some problems saving those colours: " +
               @taxon.errors.full_messages.join(', ')
           end
         end
@@ -1187,9 +1187,9 @@ class TaxaController < ApplicationController
     rescue FlickRaw::FailedResponse => e
       if e.message =~ /Insufficient permissions/
         auth_url = FlickRaw.auth_url :perms => 'write'
-        flash[:error] = "iNat can't add tags to your photos until " + 
+        flash[:error] = "NatureWatch NZ can't add tags to your photos until " + 
           "Flickr knows you've given us permission.  " + 
-          "<a href=\"#{auth_url}\">Click here to authorize iNat to add tags</a>."
+          "<a href=\"#{auth_url}\">Click here to authorize NatureWatch NZ to add tags</a>."
       else
         flash[:error] = "Something went wrong trying to to post those tags: #{e.message}"
       end

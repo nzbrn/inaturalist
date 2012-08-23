@@ -56,15 +56,15 @@ class PicasaController < ApplicationController
     
     @picasa_identity.save
     
-    flash[:notice] = "Congrats, your iNaturalist and Picasa accunts have been linked!"
+    flash[:notice] = "Congrats, your NatureWatch NZ and Picasa accunts have been linked!"
     redirect_to :action => "options"
   end
   
-  # Offer user option to unlink iNat & Picasa accounts
+  # Offer user option to unlink NatureWatch NZ & Picasa accounts
   def unlink
     if current_user.picasa_identity
       current_user.picasa_identity.destroy
-      flash[:notice] = "We've dissassociated your Picasa account from your iNaturalist account."
+      flash[:notice] = "We've dissassociated your Picasa account from your NatureWatch NZ account."
       redirect_to :action => 'options'
     else
       flash[:notice] = "Your Picasa account has not been linked before!"
