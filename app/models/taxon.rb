@@ -63,6 +63,7 @@ class Taxon < ActiveRecord::Base
   
   NAME_PROVIDER_TITLES = {
     'ColNameProvider' => 'Catalogue of Life',
+    'NZORNameProvider' => 'New Zealand Organisms Register',
     'UBioNameProvider' => 'uBio'
   }
   
