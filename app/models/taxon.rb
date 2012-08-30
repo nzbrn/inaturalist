@@ -60,9 +60,13 @@ class Taxon < ActiveRecord::Base
                           :unless => Proc.new { |taxon| taxon.parent_id.nil? },
                           :message => "already used as a child of this " + 
                                       "taxon's parent"
+  validates_uniqueness_of :source_identifier,
+                          :scope => [:source_id],
+                          :message => "already exists"
   
   NAME_PROVIDER_TITLES = {
     'ColNameProvider' => 'Catalogue of Life',
+    'NZORNameProvider' => 'New Zealand Organisms Register',
     'UBioNameProvider' => 'uBio'
   }
   
@@ -115,6 +119,7 @@ class Taxon < ActiveRecord::Base
     'super-family'    => 'superfamily',
     'sub-family'      => 'subfamily',
     'gen'             => 'genus',
+    'subgenus'             => 'genus',
     'sp'              => 'species',
     'infraspecies'    => 'subspecies',
     'ssp'             => 'subspecies',
@@ -512,6 +517,7 @@ class Taxon < ActiveRecord::Base
         :source => source,
         :source_identifier => source_identifier,
         :source_url => source_url,
+        :name_provider => name_provider,
         :lexicon => TaxonName::LEXICONS[:SCIENTIFIC_NAMES],
         :is_valid => true
       )
