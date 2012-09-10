@@ -73,7 +73,7 @@ module Ratatosk
     def find(q)
       @name_providers.each do |name_provider|
         begin
-          names = name_provider.find(q)
+          names = name_provider.find(q).compact
         rescue Timeout::Error => e
           # skip to next name provider if one times out
           if name_provider == @name_providers.last
@@ -82,8 +82,7 @@ module Ratatosk
             next
           end
         end
-        
-        # puts "[DEBUG] Found names: #{names.map(&:name).join(', ')}"
+        puts "[DEBUG] Found names: #{names.map(&:name).join(', ')}"
         
         # make sure names are unique on name and lexicon
         # This is sort of a duplication of the validation that should occur in
@@ -95,18 +94,19 @@ module Ratatosk
         # point of view.  The alternative would be to ALWAYS save taxon
         # objects upon creation in the TaxonNameAdapters, but I tried to avoid
         # incurring the DB writing overhead.
+        
         unique_names = {}
         unique_taxa = {}
         names.each do |n| 
           phylum_name = name_provider.get_phylum_for(n.taxon).name rescue nil
-          # puts "[DEBUG] #{n.name}'s phylum: #{phylum_name}"
+#           puts "[DEBUG] #{n.name}'s phylum: #{phylum_name}"
           unique_taxa[[n.taxon.name, phylum_name]] ||= n.taxon
           n.taxon = unique_taxa[[n.taxon.name, phylum_name]]
           unique_names[[n.name, n.lexicon, n.taxon.name, phylum_name]] = n
         end
         names = unique_names.values
         
-        # puts "[DEBUG] Unique names: #{names.map(&:name).join(', ')}"
+         #puts "[DEBUG] Unique names: #{names.map(&:name).join(', ')}"
         
         names = names.map do |name|
           if existing_taxon = find_existing_taxon(name.taxon)
@@ -117,10 +117,13 @@ module Ratatosk
             # If the name was invalid b/c its taxon was saved first, and the
             # taxon made a TaxonName from its own scientific name already,
             # just use that scientific name
-            # puts "[DEBUG] #{name} was invalid: #{name.errors.full_messages.to_sentence}"
+            #puts "[DEBUG] #{__LINE__}#{name} was invalid: #{name.errors.full_messages.to_sentence}"
+            #puts "[DEBUG] #{__LINE__}#{name.inspect} "
             if name.taxon.valid?
-              # puts "name.taxon.taxon_names: #{name.taxon.taxon_names.inspect}"
-              name = TaxonName.first(:conditions => ["name = ? AND taxon_id = ?", name.name, name.taxon_id])
+              #puts "[DEBUG] #{__LINE__}#{name.inspect} "
+               #puts "#{__LINE__}name.taxon.taxon_names: #{name.taxon.taxon_names.inspect}"
+               name = TaxonName.first(:conditions => ["lower(name) = ? AND taxon_id = ?", name.name.downcase, name.taxon_id])
+#              name = TaxonName.first(:conditions => ["name = ? AND taxon_id = ?", name.name, name.taxon_id])
               name ||= name.taxon.taxon_names.detect{|tn| tn.name == name.name}
             
             # If the taxon was invalid, try to see if something similar has 
@@ -138,7 +141,7 @@ module Ratatosk
           name
         end.compact.uniq
         
-        # puts "[DEBUG] Returning names: #{names.map(&:name).join(', ')}"
+         #puts "[DEBUG] Returning names: #{names.map(&:name).join(', ')}"
         return names unless names.empty?
       end
       []
@@ -150,7 +153,7 @@ module Ratatosk
     # attaching it to the existing taxon (the graft point).
     #
     def graft(taxon)
-      # puts "[DEBUG] Grafting #{taxon}..."
+      #puts "[DEBUG] Grafting #{taxon.inspect}..."
       # if this is an adapter of some kind, just get the underlying Taxon
       # object. It will smooth the way with nested_set...
       taxon = taxon.taxon unless taxon.is_a? Taxon
@@ -234,7 +237,7 @@ module Ratatosk
       
       ancestor_phylum = name_provider.get_phylum_for(lineage.first, lineage)
       lineage.each do |ancestor|
-        # puts "\t[DEBUG] Inspecting ancestor: #{ancestor}"
+         #puts "\t[DEBUG] Inspecting ancestor: #{ancestor}"
         
         existing_homonyms = if ancestor.new_record?
           Taxon.all(:conditions => ["name = ?", ancestor.name])
@@ -242,13 +245,13 @@ module Ratatosk
           Taxon.all(:conditions => ["id != ? AND name = ?", ancestor.id, ancestor.name])
         end
         
-        # puts "\t\t[DEBUG] Found homonyms: #{existing_homonyms.join(', ')}"
+         #puts "\t\t[DEBUG] Found homonyms: #{existing_homonyms.join(', ')}"
         
         if existing_homonyms.size == 1 && 
             %w"kingdom phylum".include?(existing_homonyms.first.rank)
           graft_point = existing_homonyms.first
           lineage = new_lineage
-          # puts "\t\t\t[DEBUG] Found a homonymous kingdom/phylum: #{graft_point}"
+           #puts "\t\t\t[DEBUG] Found a homonymous kingdom/phylum: #{graft_point}"
           break
         end
         
@@ -257,37 +260,37 @@ module Ratatosk
         end.first
         
         if graft_point
-          # puts "\t\t\t[DEBUG] Found a homonymous taxon: #{graft_point}"
+           #puts "\t\t\t[DEBUG] Found a homonymous taxon: #{graft_point}"
           lineage = new_lineage
           break
         end
         
         new_lineage << ancestor
       end
-      # puts "\t\t[DEBUG] GAARRGGHH graft_point pre default: #{graft_point}"
+       #puts "\t\t[DEBUG] GAARRGGHH graft_point pre default: #{graft_point}"
       graft_point ||= Taxon.find_by_name('Life') rescue Taxon.root
       [graft_point, lineage.compact]
     end
     
     def find_existing_taxon(taxon_adapter, name_provider = nil)
       # puts "[DEBUG] Looking for an existing taxon"
+      
       name_provider ||= NameProviders.const_get(taxon_adapter.name_provider).new
       if phylum = name_provider.get_phylum_for(taxon_adapter)
         existing_phylum = Taxon.find(:first, :conditions => [
-          "name = ? AND rank = 'phylum'", phylum.name
+          "lower(name) = ? AND rank = 'phylum'", phylum.name.downcase
         ])
       else
         existing_phylum = nil
       end
-
       existing_taxon = nil
       if existing_phylum
         # puts "[DEBUG] Found existing phylum: #{existing_phylum}"
         existing_taxon = existing_phylum.descendants.first(
-          :conditions => ["name = ?", taxon_adapter.name])
+          :conditions => ["lower(name) = ?", taxon_adapter.name.downcase])
       else
         existing_taxon = Taxon.first(
-          :conditions => ["name = ?", taxon_adapter.name])
+          :conditions => ["lower(name) = ?", taxon_adapter.name.downcase])
       end
 
       # puts "[DEBUG] Found existing taxon: #{existing_taxon}"

@@ -62,6 +62,7 @@ class Taxon < ActiveRecord::Base
                                       "taxon's parent"
   validates_uniqueness_of :source_identifier,
                           :scope => [:source_id],
+                          :allow_nil => true,
                           :message => "already exists"
   
   NAME_PROVIDER_TITLES = {

@@ -18,7 +18,11 @@ module Ratatosk
         #iterate over each of the search results building up a TaxonNameAdapter for each one.
         #this is different from what the catalogue of life seems to do
         hxml.at('Results').children.map do |r|
-          NZORTaxonNameAdapter.new(r)
+          begin
+            NZORTaxonNameAdapter.new(r)
+          rescue NameProviderError => e
+            puts "Error with the name provider"
+          end
         end
       end
 
@@ -29,7 +33,7 @@ module Ratatosk
       # Kingdom or an existing saved Taxon that is already in our local tree.
       #
       def get_lineage_for(taxon)
-        puts "DEBUG #{__method__} "
+        #puts "DEBUG #{__method__} "
         # If taxon was already fetched with classification data, use that
         #TODO use historically cached info
         if taxon.class != Taxon && taxon.hxml && taxon.hxml.at('ClassificationHierarchy')
@@ -147,6 +151,9 @@ module Ratatosk
       #returns the xml for the accepted name related to this common/english/vernacular TaxonName
       def accepted_name_hxml
         #get the accepted (scientific) name for this taxon
+        unless  hxml.at('Concepts') && hxml.at('Concepts').at('ToConcept') && hxml.at('Concepts').at('ToConcept').at('NameId')
+          raise NameProviderError, "Failed to get a taxon for the common name from NZOR"
+        end
         accepted_nzor_id = hxml.at('Concepts').at('ToConcept').at('NameId')
         unless accepted_nzor_id
           raise NameProviderError, "Failed to get a taxon for the common name from NZOR"
