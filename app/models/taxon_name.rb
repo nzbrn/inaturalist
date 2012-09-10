@@ -12,8 +12,8 @@ class TaxonName < ActiveRecord::Base
                           :case_sensitive => false
   validates_uniqueness_of :source_identifier,
                           :scope => [:source_id],
-                          :allow_nil => true,
-                          :message => "already exists"
+                          :message => "already exists",
+                          :allow_blank => true
 
   #TODO is the validates uniqueness correct?  Allows duplicate TaxonNames to be created with same 
   #source_url but different taxon_ids
