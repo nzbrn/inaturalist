@@ -84,9 +84,9 @@
     <div id="colors_facet" class="facet">
       <strong>
         <% if @colors.blank? -%>
-          <%= link_to_toggle "Colors", "#colors", :class => 'open' %>
+          <%= link_to_toggle "Colours", "#colors", :class => 'open' %>
         <% else %>
-          <%= link_to '&laquo; All Colors', url_for_params(:without => [:colors, :page]), :rel => "nofollow" %>
+          <%= link_to '&laquo; All Colours', url_for_params(:without => [:colors, :page]), :rel => "nofollow" %>
         <% end -%>
       </strong>
       <div id="colors">

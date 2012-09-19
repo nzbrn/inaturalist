@@ -484,7 +484,7 @@
   
   <% if @taxon.species_or_lower? -%>
     <div id="colors" class="clear">
-      <h3>Colors</h3>
+      <h3>Colours</h3>
       <% if @colors.blank?-%>
         <% if logged_in? -%>
           <div class="notice">
@@ -506,7 +506,7 @@
       </div>
       <% if logged_in? -%>
         <div id="edit_colors">
-          <%= link_to_toggle "Edit colors", "#edit_colors_dialog" %>
+          <%= link_to_toggle "Edit colours", "#edit_colors_dialog" %>
           <div id="edit_colors_dialog" style="display: none">
             <% remote_form_for @taxon, 
                 :url => {:action => 'update_colors', :id => @taxon, :format => 'js'},
@@ -541,7 +541,7 @@
               <% end %>
               <%= hidden_field_tag "taxon[color_ids][]", '' %>
               <div class="buttonrow">
-                <%= f.submit "Save Colors", :class => 'button', :style => 'margin: 0.5em auto' %>
+                <%= f.submit "Save Colours", :class => 'button', :style => 'margin: 0.5em auto' %>
                 <div class="inter loading status" style="display: none; clear: left">Saving...</div>
               </div>
             <% end %>
