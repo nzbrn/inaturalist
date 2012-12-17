@@ -304,7 +304,15 @@ class TaxaController < ApplicationController
       q = @q
     else
       q = sanitize_sphinx_query(@q)
-      q = "\"^#{q}$\" | #{q}"
+
+      # for some reason 1-term queries don't return an exact match first if enclosed 
+      # in quotes, so we only use them for multi-term queries
+      q = if q =~ /\s/
+        "\"^#{q}$\" | #{q}"
+      else
+        "^#{q}$ | #{q}"
+      end
+
       match_mode = :extended
     end
     drill_params = {}
@@ -411,10 +419,19 @@ class TaxaController < ApplicationController
   
   def autocomplete
     @q = params[:q] || params[:term]
-    @taxon_names = TaxonName.includes(:taxon => :taxon_names).
-      where("lower(name) LIKE ?", "#{@q.to_s.downcase}%").
-      limit(30).
-      sort_by{|tn| tn.taxon.ancestry || ''}
+    @is_active = if params[:is_active] == "true" || params[:is_active].blank?
+      true
+    elsif params[:is_active] == "false"
+      false
+    else
+      params[:is_active]
+    end
+
+    scope = TaxonName.includes(:taxon => :taxon_names).
+      where("lower(taxon_names.name) LIKE ?", "#{@q.to_s.downcase}%").
+      limit(30).scoped
+    scope = scope.where("taxa.is_active = ?", @is_active) unless @is_active == "any"
+    @taxon_names = scope.sort_by{|tn| tn.taxon.ancestry || ''}
     exact_matches = []
     @taxon_names.each_with_index do |taxon_name, i|
       next unless taxon_name.name.downcase.strip == @q.to_s.downcase.strip
