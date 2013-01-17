@@ -89,7 +89,7 @@ PRIORITY_ZONES = ActiveSupport::TimeZone.all.find_all { |z| z.name =~ %r{#{INAT_
 
 # Exception notifications
 if INAT_CONFIG['exception_notifications']
-  ExceptionNotification::Notifier.exception_recipients = INAT_CONFIG['exception_recipients']
-  ExceptionNotification::Notifier.sender_address = %("#{SITE_NAME} Application Error" <#{INAT_CONFIG['noreply_email']}>)
-  ExceptionNotification::Notifier.email_prefix = "[#{SITE_NAME} Error] "
+  #ExceptionNotification::Notifier.exception_recipients = INAT_CONFIG['exception_recipients']
+  #ExceptionNotification::Notifier.sender_address = %("#{SITE_NAME} Application Error" <#{INAT_CONFIG['noreply_email']}>)
+  #ExceptionNotification::Notifier.email_prefix = "[#{SITE_NAME} Error] "
 end
