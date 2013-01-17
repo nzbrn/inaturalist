@@ -88,7 +88,8 @@ class Observation < ActiveRecord::Base
       "to which you add the observation.",
     PRIVATE => "Coordinates completely hidden from public maps, true " + 
       "coordinates only visible to you and the curators of projects to " + 
-      "which you add the observation.",
+      "which you add the observation. Observations with private " + 
+      "coordinates will still be used to verify place check lists.",
   }
   CASUAL_GRADE = "casual"
   RESEARCH_GRADE = "research"
@@ -107,6 +108,42 @@ class Observation < ActiveRecord::Base
     const_set code.gsub(/\-/, '_'), code
   end
   PREFERRED_LICENSES = [CC_BY, CC_BY_NC]
+  CSV_COLUMNS = [
+    "id", 
+    "species_guess",
+    "scientific_name", 
+    "common_name", 
+    "iconic_taxon_name",
+    "taxon_id",
+    "id_please",
+    "num_identification_agreements",
+    "num_identification_disagreements",
+    "observed_on_string",
+    "observed_on", 
+    "time_observed_at",
+    "time_zone",
+    "place_guess",
+    "latitude", 
+    "longitude",
+    "positional_accuracy",
+    "private_latitude",
+    "private_longitude",
+    "private_positional_accuracy",
+    "geoprivacy",
+    "positioning_method",
+    "positioning_device",
+    "out_of_range",
+    "user_id", 
+    "user_login",
+    "created_at",
+    "updated_at",
+    "quality_grade",
+    "license",
+    "url", 
+    "image_url", 
+    "tag_list",
+    "description",
+  ]
   
   belongs_to :user, :counter_cache => true
   belongs_to :taxon, :counter_cache => true
@@ -254,6 +291,7 @@ class Observation < ActiveRecord::Base
              :update_out_of_range_later,
              :update_default_license,
              :update_all_licenses
+  after_create :set_uri
   before_destroy :keep_old_taxon_id
   after_destroy :refresh_lists_after_destroy, :refresh_check_lists
   
@@ -372,7 +410,7 @@ class Observation < ActiveRecord::Base
     when 'observed_on'
       order "observed_on #{order} #{extra}, time_observed_at #{order} #{extra}"
     when 'created_at'
-      order "observations.created_at #{order} #{extra}"
+      order "observations.id #{order} #{extra}"
     else
       order "#{order_by} #{order} #{extra}"
     end
@@ -447,33 +485,6 @@ class Observation < ActiveRecord::Base
     scope
   }
   
-  def self.conditions_for_date(column, date)
-    year, month, day = date.to_s.split('-').map do |d|
-      d = d.blank? ? nil : d.to_i
-      d == 0 ? nil : d
-    end
-    if date.to_s =~ /^\d{4}/ && year && month && day
-      ["#{column}::DATE = ?", "#{year}-#{month}-#{day}"]
-    elsif year || month || day
-      conditions, values = [[],[]]
-      if year
-        conditions << "EXTRACT(YEAR FROM #{column}) = ?"
-        values << year
-      end
-      if month
-        conditions << "EXTRACT(MONTH FROM #{column}) = ?"
-        values << month
-      end
-      if day
-        conditions << "EXTRACT(DAY FROM #{column}) = ?"
-        values << day
-      end
-      [conditions.join(' AND '), *values]
-    else
-      "1 = 2"
-    end
-  end
-  
   def self.near_place(place)
     place = Place.find_by_id(place) unless place.is_a?(Place)
     if place.swlat
@@ -536,6 +547,12 @@ class Observation < ActiveRecord::Base
       params[:ofv_params].each do |k,v|
         scope = scope.has_observation_field(v[:observation_field], v[:value])
       end
+    end
+
+    if INAT_CONFIG['site_only_observations'] && params[:site].blank?
+      scope = scope.where("observations.uri LIKE ?", "#{FakeView.root_url}%")
+    elsif (site_bounds = INAT_CONFIG['bounds']) && params[:swlat].blank?
+      scope = scope.in_bounding_box(site_bounds['swlat'], site_bounds['swlng'], site_bounds['nelat'], site_bounds['nelng'])
     end
     
     # return the scope, we can use this for will_paginate calls like:
@@ -1330,6 +1347,13 @@ class Observation < ActiveRecord::Base
       ) > 0
     end
   end
+
+  def set_uri
+    if uri.blank?
+      Observation.update_all(["uri = ?", FakeView.observation_url(id)], ["id = ?", id])
+    end
+    true
+  end
   
   def update_default_license
     return true unless [true, "1", "true"].include?(@make_license_default)
@@ -1560,6 +1584,34 @@ class Observation < ActiveRecord::Base
       Identification.create(:user => observation.user, :observation => observation, :taxon => taxon, :taxon_change => taxon_change)
       yield(observation) if block_given?
     end
+  end
+
+  def self.generate_csv_for(record, options = {})
+    fname = options[:fname] || "#{record.to_param}-observations.csv"
+    fpath = options[:path] || File.join(options[:dir] || Dir::tmpdir, fname)
+    tmp_path = File.join(Dir::tmpdir, fname)
+    FileUtils.mkdir_p File.dirname(tmp_path), :mode => 0755
+
+    columns = CSV_COLUMNS
+    if record.is_a?(User) && record != options[:user]
+      columns = columns.select{|c| c !~ /^private_/} unless record == options[:user]
+    end
+    columns -= %w(user_id user_login) if record.is_a?(User)
+    CSV.open(tmp_path, 'w') do |csv|
+      csv << columns
+      record.observations.includes(:taxon, {:observation_field_values => :observation_field}).find_each do |observation|
+        csv << columns.map{|c| observation.send(c)}
+      end
+    end
+    FileUtils.mkdir_p File.dirname(fpath), :mode => 0755
+    if tmp_path != fpath
+      FileUtils.mv tmp_path, fpath
+    end
+    fpath
+  end
+
+  def self.generate_csv_for_cache_key(record, options = {})
+    "#{record.class.name.underscore}_#{record.id}"
   end
   
 end

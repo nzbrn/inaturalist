@@ -1,4 +1,6 @@
 Inaturalist::Application.routes.draw do
+  wiki_root '/pages'
+
   # Riparian routes
   resources :flow_tasks do
     member do
@@ -56,7 +58,12 @@ Inaturalist::Application.routes.draw do
   resources :users, :except => [:new, :create]
   # resource :session
   # resources :passwords
-  resources :people, :controller => :users
+  resources :people, :controller => :users do
+    collection do
+      get :search
+      get 'leaderboard(/:year(/:month))' => :leaderboard, :as => 'leaderboard_for'
+    end
+  end
   match '/users/:id/suspend' => 'users#suspend', :as => :suspend_user, :constraints => { :id => /\d+/ }
   match '/users/:id/unsuspend' => 'users#unsuspend', :as => :unsuspend_user, :constraints => { :id => /\d+/ }
 
@@ -98,6 +105,7 @@ Inaturalist::Application.routes.draw do
   match 'observations/:id/edit_photos' => 'observations#edit_photos', :as => :edit_observation_photos
   match 'observations/:id/update_photos' => 'observations#update_photos', :as => :update_observation_photos, :via => :post
   match 'observations/:login' => 'observations#by_login', :as => :observations_by_login, :constraints => { :login => simplified_login_regex }
+  match 'observations/:login.all' => 'observations#by_login_all', :as => :observations_by_login_all, :constraints => { :login => simplified_login_regex }
   match 'observations/:login.:format' => 'observations#by_login', :as => :observations_by_login_feed, :constraints => { :login => simplified_login_regex }, :via => :get
   match 'observations/tile_points/:zoom/:x/:y.:format' => 'observations#tile_points', :as => :observation_tile_points, :constraints => { :zoom => /\d+/, :y => /\d+/, :x => /\d+/ }, :via => :get
   match 'observations/project/:id' => 'observations#project', :as => :project_observations
@@ -137,6 +145,7 @@ Inaturalist::Application.routes.draw do
   resources :projects do
     member do
       post :add_matching, :as => :add_matching_to
+      get :preview_matching, :as => :preview_matching_for
     end
   end
   resources :project_assets, :except => [:index, :show]
@@ -238,7 +247,7 @@ Inaturalist::Application.routes.draw do
   match 'identifications/:login' => 'identifications#by_login', :as => :identifications_by_login, :constraints => { :login => simplified_login_regex }, :via => :get
   match 'emailer/invite' => 'emailer#invite', :as => :emailer_invite
   match 'emailer/invite/send' => 'emailer#invite_send', :as => :emailer_invite_send, :via => :post
-  resources :taxon_links, :except => [:show, :index]
+  resources :taxon_links, :except => [:show]
   
   match 'places/:id/widget' => 'places#widget', :as => :place_widget, :via => :get
   match 'places/guide_widget/:id' => 'places#guide_widget', :as => :place_guide_widget, :via => :get
@@ -274,6 +283,8 @@ Inaturalist::Application.routes.draw do
     put 'commit_records/:type/(to/:taxon_id)' => 'taxon_changes#commit_records', :as => :commit_records
   end
   resources :taxon_schemes, :only => [:index, :show]
+  match 'taxon_schemes/:id/mapped_inactive_taxa' => 'taxon_schemes#mapped_inactive_taxa', :as => :mapped_inactive_taxa
+  match 'taxon_schemes/:id/orphaned_inactive_taxa' => 'taxon_schemes#orphaned_inactive_taxa', :as => :orphaned_inactive_taxa
   
   resources :taxon_splits, :controller => :taxon_changes
   resources :taxon_merges, :controller => :taxon_changes

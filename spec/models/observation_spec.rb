@@ -258,6 +258,19 @@ describe Observation, "creation" do
     o = Observation.make!(:user_agent => user_agent)
     o.user_agent.size.should be < 256
   end
+
+  it "should set the URI" do
+    o = Observation.make!
+    o.reload
+    o.uri.should eq(FakeView.observation_url(o))
+  end
+
+  it "should not set the URI if already set" do
+    uri = "http://www.somewhereelse.com/users/4"
+    o = Observation.make!(:uri => uri)
+    o.reload
+    o.uri.should eq(uri)
+  end
 end
 
 describe Observation, "updating" do
@@ -827,6 +840,15 @@ describe Observation do
       Observation.make!
       observations = Observation.paginate(:page => 1, :per_page => 2, :order => "id desc")
       observations.to_json.should_not match(/private_latitude/)
+    end
+
+    it "should not be included in by_login_all csv generated for others" do
+      observation = Observation.make!(:taxon => @taxon, :latitude => 38, :longitude => -122)
+      Observation.make!
+      path = Observation.generate_csv_for(observation.user)
+      txt = open(path).read
+      txt.should_not match(/private_latitude/)
+      txt.should_not match(/#{observation.private_latitude}/)
     end
   end
   

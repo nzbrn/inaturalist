@@ -139,9 +139,6 @@ class TaxaController < ApplicationController
         @ancestors = @taxon.ancestors.all(:include => :taxon_names)
         @iconic_taxa = Taxon::ICONIC_TAXA
         
-        @taxon_links = TaxonLink.for_taxon(@taxon).all(:include => :taxon)
-        @taxon_links = @taxon_links.sort_by{|tl| tl.taxon.ancestry || ''}.reverse
-        
         @check_listed_taxa = ListedTaxon.paginate(:page => 1,
           :include => [:place, :list],
           :conditions => ["place_id IS NOT NULL AND taxon_id = ?", @taxon]
@@ -161,6 +158,30 @@ class TaxaController < ApplicationController
             ]
           )
         end
+
+        @taxon_links = if @taxon.species_or_lower?
+          # fetch all relevant links
+          TaxonLink.for_taxon(@taxon).includes(:taxon)
+        else
+          # fetch links without species only
+          TaxonLink.for_taxon(@taxon).where(:species_only => false).includes(:taxon)
+        end
+        tl_place_ids = @taxon_links.map(&:place_id).compact
+        if !tl_place_ids.blank? # && !@places.blank?
+          if @places.blank?
+            @taxon_links.reject! {|tl| tl.place_id}
+          else
+            # fetch listed taxa for this taxon with places matching the links
+            place_listed_taxa = ListedTaxon.where("place_id IN (?)", tl_place_ids).where(:taxon_id => @taxon)
+
+            # remove links that have a place_id set but don't have a corresponding listed taxon
+            @taxon_links.reject! do |tl|
+              tl.place_id && place_listed_taxa.detect{|lt| lt.place_id == tl.place_id}.blank?
+            end
+          end
+        end
+        @taxon_links = @taxon_links.sort_by{|tl| tl.taxon.ancestry || ''}.reverse
+
         @observations = Observation.of(@taxon).recently_added.all(:limit => 3)
         
         @photos = Rails.cache.fetch(@taxon.photos_cache_key) do
@@ -175,7 +196,7 @@ class TaxaController < ApplicationController
               current_user, @taxon
           ])
           @listed_taxa_by_list_id = @listed_taxa.index_by{|lt| lt.list_id}
-          @current_user_lists = current_user.lists.all(:include => [:rules])
+          @current_user_lists = current_user.lists.includes(:rules)
           @lists_rejecting_taxon = @current_user_lists.select do |list|
             if list.is_a?(LifeList)
               list.rules.map {|rule| rule.validates?(@taxon)}.include?(false)
@@ -234,7 +255,7 @@ class TaxaController < ApplicationController
   end
 
   def new
-    @taxon = Taxon.new
+    @taxon = Taxon.new(:name => params[:name])
   end
 
   def create
@@ -381,9 +402,16 @@ class TaxaController < ApplicationController
     
     do_external_lookups
 
-    if !@taxa.blank? && exact_index = @taxa.index{|t| t.all_names.map(&:downcase).include?(params[:q].to_s.downcase)}
-      if exact_index > 0
-        @taxa.unshift @taxa.delete_at(exact_index)
+    unless @taxa.blank?
+      # if there's an exact match among the hits, make sure it's first
+      if exact_index = @taxa.index{|t| t.all_names.map(&:downcase).include?(params[:q].to_s.downcase)}
+        if exact_index > 0
+          @taxa.unshift @taxa.delete_at(exact_index)
+        end
+
+      # otherwise try and hit the db directly. Sphinx doesn't always seem to behave properly
+      elsif params[:page].to_i <= 1 && (exact = Taxon.where("lower(name) = ?", params[:q].to_s.downcase.strip).first)
+        @taxa.unshift exact
       end
     end
     
@@ -689,7 +717,7 @@ class TaxaController < ApplicationController
     end
     
     @listed_taxa = @places.map do |place| 
-      place.check_list.add_taxon(@taxon, :user_id => current_user.id)
+      place.check_list.try(:add_taxon, @taxon, :user_id => current_user.id)
     end.select{|p| p.valid?}
     @listed_taxa_by_place_id = @listed_taxa.index_by{|lt| lt.place_id}
   end
@@ -805,7 +833,7 @@ class TaxaController < ApplicationController
       @error_message = e.message
     end
     @taxon.reload
-    @error_message ||= "Graft failed" unless @taxon.grafted?
+    @error_message ||= "Graft failed. Please graft manually by editing the taxon." unless @taxon.grafted?
     
     respond_to do |format|
       format.html do
@@ -817,6 +845,13 @@ class TaxaController < ApplicationController
           render :status => :unprocessable_entity, :text => @error_message
         else
           render :text => "Taxon grafted to #{@taxon.parent.name}"
+        end
+      end
+      format.json do
+        if @error_message
+          render :status => :unprocessable_entity, :json => {:error => @error_message}
+        else
+          render :json => {:msg => "Taxon grafted to #{@taxon.parent.name}"}
         end
       end
     end
@@ -884,7 +919,7 @@ class TaxaController < ApplicationController
       :conditions => "resolved = true AND flaggable_type = 'Taxon'",
       :order => "flags.id desc")
     life = Taxon.find_by_name('Life')
-    @ungrafted = Taxon.roots.paginate(:conditions => ["id != ?", life], 
+    @ungrafted = Taxon.roots.active.paginate(:conditions => ["id != ?", life], 
       :page => 1, :per_page => 100, :include => [:taxon_names])
   end
 

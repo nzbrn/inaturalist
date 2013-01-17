@@ -1,6 +1,7 @@
 #encoding: utf-8
 class ObservationsController < ApplicationController
   caches_page :tile_points
+  caches_page :by_login_all, :if => Proc.new {|c| c.request.format == :csv}
   
   WIDGET_CACHE_EXPIRATION = 15.minutes
   caches_action :index, :by_login, :project,
@@ -24,7 +25,7 @@ class ObservationsController < ApplicationController
     by_login
   end
   
-  before_filter :load_user_by_login, :only => [:by_login]
+  before_filter :load_user_by_login, :only => [:by_login, :by_login_all]
   before_filter :authenticate_user!, 
                 :except => [:explore,
                             :index,
@@ -79,6 +80,7 @@ class ObservationsController < ApplicationController
       @observations = if perform_caching
         cache_params = params.reject{|k,v| %w(controller action format partial).include?(k.to_s)}
         cache_params[:page] ||= 1
+        cache_params[:site_name] = SITE_NAME if INAT_CONFIG['site_only_observations']
         cache_key = "obs_index_#{Digest::MD5.hexdigest(cache_params.to_s)}"
         Rails.cache.fetch(cache_key, :expires_in => 5.minutes) do
           get_paginated_observations(search_params, find_options).to_a
@@ -485,28 +487,13 @@ class ObservationsController < ApplicationController
       o
     end
     
-    if params[:project_id] && !current_user.project_users.find_by_project_id(params[:project_id])
-      # JSON conditions is a bit of a hack to accomodate mobile clients
-      unless params[:accept_terms] || request.format == :json
-        msg = "You need check that you agree to the project terms before joining the project"
-        @project = Project.find_by_id(params[:project_id])
-        @project_curators = @project.project_users.all(:conditions => {:role => "curator"})
-        respond_to do |format|
-          format.html do
-            flash[:error] = msg
-            render :action => 'new'
-          end
-          format.json do
-            render :json => {:errors => msg}, :status => :unprocessable_entity
-          end
-        end
-        return
-      end
-    end
-    
     self.current_user.observations << @observations
     
-    create_project_observations
+    if request.format != :json && !params[:accept_terms] && params[:project_id] && !current_user.project_users.find_by_project_id(params[:project_id])
+      flash[:error] = "But we didn't add this observation to the #{Project.find_by_id(params[:project_id]).title} project because you didn't agree to the project terms."
+    else
+      create_project_observations
+    end
     update_user_account
     
     # check for errors
@@ -1034,6 +1021,28 @@ class ObservationsController < ApplicationController
       
     end
   end
+
+  def by_login_all
+    path_for_csv = "public/observations/#{@selected_user.login}.all.csv"
+    if @selected_user.observations.count < 1000
+      Observation.generate_csv_for(@selected_user, :path => path_for_csv)
+      render :file => path
+    else
+      cache_key = Observation.generate_csv_for_cache_key(@selected_user)
+      job_id = Rails.cache.read(cache_key)
+      job = Delayed::Job.find_by_id(job_id)
+      if job
+        # Still working
+      else
+        # no job id, no job, let's get this party started
+        Rails.cache.delete(cache_key)
+        job = Observation.delay.generate_csv_for(@selected_user, :path => path_for_csv, :user => current_user)
+        Rails.cache.write(cache_key, job.id, :expires_in => 1.hour)
+      end
+      prevent_caching
+      render :status => :accepted, :text => "This file takes a little while to generate.  It should be ready shortly at #{request.url}"
+    end
+  end
   
   # shows observations in need of an ID
   def id_please
@@ -1420,11 +1429,7 @@ class ObservationsController < ApplicationController
     find_options[:page] = 1 if find_options[:page].to_i == 0
     find_options[:per_page] = @prefs["per_page"] if @prefs
     
-    # Set format-based page sizes
-    if request.format == :kml
-      find_options.update(:limit => 100) if search_params[:limit].blank?
-      find_options.update(:per_page => 100)
-    elsif !search_params[:per_page].blank?
+    if !search_params[:per_page].blank?
       find_options.update(:per_page => search_params[:per_page])
     elsif !search_params[:limit].blank?
       find_options.update(:per_page => search_params[:limit])
@@ -1742,6 +1747,10 @@ class ObservationsController < ApplicationController
         v[:observation_field].blank? ? nil : v[:observation_field].id
         @observations = @observations.has_observation_field(of.id, v[:value])
       end
+    end
+
+    if INAT_CONFIG['site_only_observations'] && params[:site].blank?
+      @observations = @observations.where("observations.uri LIKE ?", "#{root_url}%")
     end
 
     @observations = WillPaginate::Collection.create(obs_ids.current_page, obs_ids.per_page, obs_ids.total_entries) do |pager|

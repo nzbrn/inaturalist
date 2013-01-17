@@ -357,7 +357,7 @@ module ApplicationHelper
       txt += if o.observed_on.blank?
         "in the past "
       else
-        "on #{o.observed_on.to_s(:long)} "
+        "on #{o.observed_on.strftime("%d %b %Y")} "
       end
     end
     unless skip.include?(:place_guess)
@@ -497,6 +497,19 @@ module ApplicationHelper
     content_tag :span, :class => "taxon #{iconic_taxon_name} #{taxon.rank}" do
       link_to(iconic_taxon_image(taxon, :size => 15), url, options) + " " +
       link_to(taxon_name, url, options)
+    end
+  end
+
+  def link_to(*args, &block)
+    unless block_given?
+      body, url, options = args
+      if url_for(url) =~ /\?/
+        options ||= {}
+        options[:rel] = "nofollow" unless options[:rel].to_s =~ /nofollow/
+      end
+      super(body, url, options)
+    else
+      super
     end
   end
   

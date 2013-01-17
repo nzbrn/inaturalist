@@ -28,7 +28,8 @@ class Identification < ActiveRecord::Base
   attr_accessor :skip_observation
   attr_accessor :html
   
-  notifies_subscribers_of :observation, :notification => "activity", :include_owner => true
+  notifies_subscribers_of :observation, :notification => "activity", :include_owner => true, 
+    :queue_if => lambda {|ident| ident.taxon_change_id.blank?}
   auto_subscribes :user, :to => :observation, :if => lambda {|ident, observation| 
     ident.user_id != observation.user_id
   }
@@ -39,6 +40,7 @@ class Identification < ActiveRecord::Base
   scope :for_others, includes(:observation).where("observations.user_id != identifications.user_id")
   scope :by, lambda {|user| where("identifications.user_id = ?", user)}
   scope :of, lambda {|taxon| where("identifications.taxon_id = ?", taxon)}
+  scope :on, lambda {|date| where(Identification.conditions_for_date("identifications.created_at", date)) }
   scope :current, where(:current => true)
   scope :outdated, where(:current => false)
   

@@ -93,8 +93,7 @@ function loadingClickForLink() {
 
   var link = this
   if (!$(this).attr('data-loading-click-bound')) {
-    // this *should* bind complete but that doesn't seem to be working with the current
-    $(this).bind('ajax:success', function() {
+    $(this).bind('ajax:complete', function() {
       $(link).show()
       loading.hide()
     })
@@ -123,9 +122,11 @@ function loadingClickForButton() {
 $('input[data-loading-click][type=text], input[data-loading-click][type=submit]').live('click', function(clickEvent) {
   var button = this
   if ($(this).parents('form').length > 0) {
-    $(this).parents('form').submit(function(e) {
-      loadingClickForButton.apply(button)
-    })
+    if ($(this).attr("exception") != "true") {
+      $(this).parents('form').submit(function(e) {
+        loadingClickForButton.apply(button)
+      })
+    }
   } else {
     loadingClickForButton.apply(button)
   }
@@ -338,10 +339,12 @@ $(document).ready(function() {
   // force browsers that don't support HTML5's required attribute to recognize it
   $('form:has(input[required])').submit(checkFormForRequiredFields)
 
-  $('.item .item_content').width(function() { return $(this).parent().width() - 58 })
+  $('body.browser .item .item_content').width(function() { return $(this).parent().width() - 58 })
   $('.identification:visible .identification_body').width(function() { 
     return $(this).parent().outerWidth(true) - $(this).siblings('.identification_image').outerWidth(true) - 20
   })
+
+  $('.add_matching_link').attr('confirm', null).data('confirm', null)
 })
 
 function checkFormForRequiredFields(e) {
@@ -593,11 +596,15 @@ $.fn.centerInContainer = function(options) {
         h = $(this).naturalHeight()
     if (w > h) {
       var width = containerHeight / h * w
-      $(this).css({height: containerHeight, maxWidth: 'none'})
-      $(this).css({top: 0, left: '50%', marginLeft: '-' + (width / 2) + 'px'})
+      $(this).css({height: containerHeight, maxWidth: 'none', position:'absolute'})
+      $(this).css({
+        top: 0, 
+        left: '50%', 
+        marginLeft: '-' + (width / 2) + 'px'
+      })
     } else if (w < h) {
       var height = containerWidth / w * h
-      $(this).css({width: $(this).parents(containerSelector).width(), maxHeight: 'none'})
+      $(this).css({width: $(this).parents(containerSelector).width(), maxHeight: 'none', position: 'absolute'})
       $(this).css({left: 0, top: '50%', marginTop: '-' + (height / 2) + 'px'})
     } else if (w == 0 && h == 0) {
       var that = this
@@ -932,3 +939,54 @@ $('.project_invitation .ignorelink').live('ajax:success', function() {
   $(target).slideUp()
 })
 
+$('.add_matching_link').live('click', function(e) {
+  var link = this,
+      url = $(this).attr('href').replace(/add_matching/, 'preview_matching'),
+      projectId = url.match(/projects\/(.+?)\/preview_matching/)[1]
+  e.preventDefault()
+  e.stopImmediatePropagation()
+  $('#add_matching_link_dialog').remove()
+  var dialog = $('<div></div>').attr('id', 'add_matching_link_dialog')
+    .addClass('dialog')
+    .html('<div class="loading status">Loading...</div>')
+  $.ajax({url: url, type: 'get'})
+    .success(function(data) { dialog.html(data) })
+    .fail(function() {
+      dialog.dialog('close')
+      showJoinProjectDialog(projectId, {originalInput: link})
+    })
+  $(document.body).append(dialog)
+  dialog.dialog({modal: true, title: "Add matching observations to project", width: 400, height: 400})
+  return false  
+})
+
+function showJoinProjectDialog(projectId, options) {
+  options = options || {}
+  var url = options.url || '/projects/'+projectId+'/join?partial=join',
+      title = options.title || 'Join project',
+      originalInput = options.originalInput
+  var dialog = $('<div></div>').addClass('dialog').html('<div class="loading status">Loading...</div>')
+  dialog.load(url, function() {
+    // ajaxify join
+    var button = $('.default.button', this),
+        diag = this
+    button.click(function(e) {
+      var joinUrl = $(this).attr('href')
+      $.post(joinUrl).done(function() {
+        $(diag).dialog('close')
+        if (originalInput) {
+          $(originalInput).click()
+        }
+      }).fail(function() {
+        alert('Failed to join project')
+      })
+      return false
+    })
+  })
+  dialog.dialog({
+    modal: true,
+    title: title,
+    width: 600,
+    minHeight: 400
+  })
+}

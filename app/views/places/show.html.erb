@@ -27,7 +27,7 @@
   <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
   <script type="text/javascript" charset="utf-8">
     var PLACE = <%= @place.to_json.html_safe %>,
-        PLACE_GEOMETRY_KML_URL = <%= @place_geometry.blank? ? ''.inspect.html_safe : place_geometry_url(@place, :format => "kml").inspect.html_safe %>,
+        PLACE_GEOMETRY_KML_URL = <%=raw place_geometry_kml_url.inspect %>,
         WIKIPEDIA_DESCRIPTION_URL = <%= url_for(:action => "wikipedia", :id => @place.wikipedia_name).inspect.html_safe %>,
         FLICKR_API_KEY = <%= FLICKR_API_KEY.inspect.html_safe %>,
         NEARBY_PLACES = <%= @nearby_places.to_json.html_safe %>,
@@ -77,11 +77,12 @@
 
 <div id="maintabs">
   <div id="metalinks" class="meta right">
-    <%= link_to "embed place widget", place_widget_path(@place), :rel => "nofollow" %>
-    <% if @place.editable_by?(current_user) -%>
-      |
-      <%= link_to "edit place", edit_place_path(@place), :rel => "nofollow" %>
-    <% end -%>
+    <%-
+      pieces = []
+      pieces << link_to("embed place widget", place_widget_path(@place), :rel => "nofollow") if @place.check_list
+      pieces << link_to("edit place", edit_place_path(@place), :rel => "nofollow") if @place.editable_by?(current_user)
+    -%>
+    <%=raw pieces.join(' | ') %>
   </div>
   <ul>
     <li><a href="#guidetab"><span>Species Guide</span></a></li>
@@ -90,22 +91,30 @@
   </ul>
   
   <div id="guidetab">
-    <%- extra = capture do -%>
-      <p class="ui">
-        <%= link_to "View check list page", @place.check_list, :class => "readmore" %>
-      </p>
-      
-      <% if logged_in? -%>
-        <% if @place_geometry -%>
-          <%= render :partial => 'subscriptions/subscription', :locals => {:resource => @place } %>
-        <% else %>
-          <div class="meta">
-            Subscriptions aren't available for places without boundaries.
-          </div>
+    <% if @place.check_list -%>
+      <%- extra = capture do -%>
+        <p class="ui">
+          <%= link_to "View check list page", @place.check_list, :class => "readmore" %>
+        </p>
+        
+        <% if logged_in? -%>
+          <% if @place_geometry -%>
+            <%= render :partial => 'subscriptions/subscription', :locals => {:resource => @place } %>
+          <% else %>
+            <div class="meta">
+              Subscriptions aren't available for places without boundaries.
+            </div>
+          <% end -%>
         <% end -%>
       <% end -%>
+      <%= render :partial => 'guides/guide', :locals => {:extra => extra} %>
+    <% else %>
+      <div class="readable nocontent">
+        This place has no check list, so there is no guide<% if @place_geometry %>, but you can still
+        <%= render :partial => 'subscriptions/subscription', :locals => {:resource => @place } %>
+        <% end %>
+      </div>
     <% end -%>
-    <%= render :partial => 'guides/guide', :locals => {:extra => extra} %>
   </div><!-- end guidetab -->
   
   <div id="observationstab">

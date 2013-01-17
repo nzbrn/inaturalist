@@ -84,6 +84,15 @@ describe TaxonSwap, "commit_records" do
     obs.taxon.should eq(@output_taxon)
   end
 
+  it "should generate updates for people who DO want automation" do
+    u = User.make!(:prefers_automatic_taxonomic_changes => true)
+    u.prefers_automatic_taxonomic_changes?.should be_true
+    o = Observation.make!(:taxon => @input_taxon, :user => u)
+    lambda {
+      @swap.commit_records
+    }.should change(Update, :count).by(1)
+  end
+
   it "should generate updates for people who don't want automation" do
     u = User.make!(:prefers_automatic_taxonomic_changes => false)
     u.prefers_automatic_taxonomic_changes?.should_not be_true
@@ -164,6 +173,14 @@ describe TaxonSwap, "commit_records" do
     ident.observation.identifications.by(ident.user).of(@output_taxon).count.should eq(1)
   end
 
+  it "should not queue job to generate updates for new identifications" do
+    obs = Observation.make!(:taxon => @input_taxon)
+    Delayed::Job.delete_all
+    stamp = Time.now
+    @swap.commit_records
+    Delayed::Job.where("created_at >= ?", stamp).detect{|j| j.handler =~ /notify_subscribers_of/}.should be_blank
+  end
+
   it "should set counter caches correctly" do
     3.times { Observation.make!(:taxon => @input_taxon) }
     @input_taxon.reload
@@ -174,6 +191,19 @@ describe TaxonSwap, "commit_records" do
     @output_taxon.reload
     @input_taxon.observations_count.should eq(0)
     @output_taxon.observations_count.should eq(3)
+  end
+
+  it "should be copacetic with content with a blank user" do
+    l = CheckList.make!
+    l.update_attributes(:user => nil)
+    l.user.should be_blank
+    lt = ListedTaxon.make!(:taxon => @input_taxon, :list => l)
+    lt.update_attributes(:user => nil)
+    lt.user.should be_blank
+    @swap.commit_records
+    lt.reload
+    @output_taxon.reload
+    lt.taxon_id.should eq(@output_taxon.id)
   end
 end
 

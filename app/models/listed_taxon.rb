@@ -131,8 +131,7 @@ class ListedTaxon < ActiveRecord::Base
   end
   
   def to_s
-    "<ListedTaxon #{self.id}: taxon_id: #{self.taxon_id}, " + 
-    "list_id: #{self.list_id}>"
+    "<ListedTaxon #{self.id}: taxon_id: #{self.taxon_id} list_id: #{self.list_id} place_id: #{place_id}>"
   end
   
   def to_plain_s
@@ -189,7 +188,7 @@ class ListedTaxon < ActiveRecord::Base
 
   def list_rules_pass
     # don't bother if validates_presence_of(:taxon) has already failed
-    if !errors.include?(:taxon)
+    if !errors.include?(:taxon) && taxon
       list.rules.each do |rule|
         errors.add(:base, "#{taxon.to_plain_s} is not #{rule.terms}") unless rule.validates?(taxon)
       end
@@ -489,7 +488,7 @@ class ListedTaxon < ActiveRecord::Base
     scope.find_each do |lt|
       lt.force_update_cache_columns = true
       lt.update_attributes(:taxon => taxon)
-      yield(record) if block_given?
+      yield(lt) if block_given?
     end
   end
   

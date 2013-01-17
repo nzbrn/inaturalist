@@ -35,25 +35,25 @@ class ProjectObservation < ActiveRecord::Base
   
   def refresh_project_list
     return true if observation.blank? || observation.taxon_id.blank?
-    Project.delay.refresh_project_list(project_id, 
+    Project.delay(:priority => USER_INTEGRITY_PRIORITY).refresh_project_list(project_id, 
       :taxa => [observation.taxon_id], :add_new_taxa => id_was.nil?)
     true
   end
   
   def update_observations_counter_cache_later
     return true unless observation
-    ProjectUser.delay.update_observations_counter_cache_from_project_and_user(project_id, observation.user_id)
+    ProjectUser.delay(:priority => USER_INTEGRITY_PRIORITY).update_observations_counter_cache_from_project_and_user(project_id, observation.user_id)
     true
   end
   
   def update_taxa_counter_cache_later
     return true unless observation
-    ProjectUser.delay.update_taxa_counter_cache_from_project_and_user(project_id, observation.user_id)
+    ProjectUser.delay(:priority => USER_INTEGRITY_PRIORITY).update_taxa_counter_cache_from_project_and_user(project_id, observation.user_id)
     true
   end
   
   def update_project_observed_taxa_counter_cache_later
-    Project.delay.update_observed_taxa_count(project_id)
+    Project.delay(:priority => USER_INTEGRITY_PRIORITY).update_observed_taxa_count(project_id)
   end
 
   def destroy_project_invitations
@@ -131,13 +131,10 @@ class ProjectObservation < ActiveRecord::Base
   def self.to_csv(project_observations, options = {})
     return nil if project_observations.blank?
     project = options[:project] || project_observations.first.project
-    columns = Observation.column_names
-    columns += [:scientific_name, :common_name, :url, :image_url, :tag_list, :user_login].map{|c| c.to_s}
-    except = [:map_scale, :timeframe, :iconic_taxon_id, :delta, :user_agent, :location_is_exact, :geom].map{|e| e.to_s}
+    columns = Observation::CSV_COLUMNS
     unless project.curated_by?(options[:user])
-      except += %w(private_latitude private_longitude private_positional_accuracy)
+      columns -= %w(private_latitude private_longitude private_positional_accuracy)
     end
-    columns -= except
     headers = columns.map{|c| Observation.human_attribute_name(c)}
 
     project_columns = %w(curator_ident_taxon_id curator_ident_taxon_name curator_ident_user_id curator_ident_user_login tracking_code)

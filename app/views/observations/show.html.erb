@@ -137,7 +137,7 @@
     #forms h3{margin:0;}
     .ui-tabs .ui-tabs-nav li{border-color:transparent;background-color:white;}
     .ui-tabs .ui-tabs-nav,
-    .ui-tabs .ui-tabs-nav .ui-tabs-selected{border-color:#eee;}
+    .ui-tabs .ui-tabs-nav .ui-tabs-active{border-color:#eee;}
     .ui-tabs .ui-tabs-nav li a{padding:0.25em 0.5em;}
     #new_identification_form .species_guess{width:538px;}
     #new_identification_form label{display:block;}
@@ -421,11 +421,13 @@
             </label>
             <%= observation_field_value_for(ofv) %>
             <span class="extra small">
-              <%= link_to "Observations w/ field", observations_path("field:#{ofv.observation_field.normalized_name}" => "") %>
+              <%= link_to "Observations w/ field", observations_path("field:#{ofv.observation_field.normalized_name}" => ""),
+                :rel => "nofollow" %>
               <% if ofv.value.to_s.size < 30 -%>
                 |
                 <%= link_to "Observations w/ #{ofv.observation_field.name}=#{ofv.value}", 
-                  observations_path("field:#{ofv.observation_field.normalized_name}" => ofv.value) -%>
+                  observations_path("field:#{ofv.observation_field.normalized_name}" => ofv.value),
+                  :rel => "nofollow" -%>
               <%- end -%>
             </span>
           </div>

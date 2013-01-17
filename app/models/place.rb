@@ -5,10 +5,11 @@ class Place < ActiveRecord::Base
   has_many :check_lists, :dependent => :destroy
   has_many :listed_taxa
   has_many :taxa, :through => :listed_taxa
+  has_many :taxon_links, :dependent => :delete_all
   has_one :place_geometry, :dependent => :destroy
   
   before_save :calculate_bbox_area
-  after_create :create_default_check_list
+  after_save :check_default_check_list
   
   validates_presence_of :latitude, :longitude
   validates_length_of :name, :within => 2..500, 
@@ -19,6 +20,8 @@ class Place < ActiveRecord::Base
   has_subscribers :to => {
     :observations => {:notification => "new_observations", :include_owner => false}
   }
+
+  preference :check_lists, :boolean, :default => true
   
   has_subscribers :to => {
     :observations => {:notification => "new_observations", :include_owner => false}
@@ -323,14 +326,22 @@ class Place < ActiveRecord::Base
   end
   
   # Create a CheckList associated with this place
-  def create_default_check_list
-    self.create_check_list(:place => self)
-    save(:validate => false)
-    unless check_list.valid?
-      Rails.logger.info "[INFO] Failed to create a default check list on " + 
-        "creation of #{self}: " + 
-        check_list.errors.full_messages.join(', ')
+  def check_default_check_list
+    if place_type == PLACE_TYPE_CODES['Continent']
+      self.prefers_check_lists = false
     end
+    if prefers_check_lists && check_list.blank?
+      self.create_check_list(:place => self)
+      save(:validate => false)
+      unless check_list.valid?
+        Rails.logger.info "[INFO] Failed to create a default check list on " + 
+          "creation of #{self}: " + 
+          check_list.errors.full_messages.join(', ')
+      end
+    else
+      # TODO destroy existing check lists?
+    end
+    true
   end
   
   # Update the associated place_geometry or create a new one

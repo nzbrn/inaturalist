@@ -1734,7 +1734,7 @@ identifier,
       taxon_photo.destroy unless new_photos.detect{|p| p.id == taxon_photo.photo_id}
     end
     new_photos.each do |photo|
-      taxon_photos.create(:photo => photo) unless photos.detect{|p| p.id == photo.id}
+      taxon_photos.build(:photo => photo) unless photos.detect{|p| p.id == photo.id}
     end
   end
   
@@ -2059,7 +2059,7 @@ identifier,
         place_types(%w(Country State County)).
         intersecting_taxon(self).
         find_each(:select => "places.id, place_type, check_list_id, taxon_ranges.id AS taxon_range_id", :include => :check_list) do |place|
-      place.check_list.add_taxon(self, :taxon_range_id => place.taxon_range_id)
+      place.check_list.try(:add_taxon, self, :taxon_range_id => place.taxon_range_id)
     end
   end
   
@@ -2175,7 +2175,7 @@ identifier,
       if name = tag.match(/^taxonomy:\w+=(.*)/).try(:[], 1)
         name.downcase
       else
-        name = tag.downcase
+        name = tag.downcase.strip.gsub(/ sp\.?$/, '')
         next if PROBLEM_NAMES.include?(name)
         name
       end
@@ -2311,7 +2311,7 @@ identifier,
             :photo => {
               :methods => [:license_code, :attribution],
               :except => [:original_url, :file_processing, :file_file_size, 
-                :file_content_type, :file_file_name, :mobile]
+                :file_content_type, :file_file_name, :mobile, :metadata]
             }
           }
         }
