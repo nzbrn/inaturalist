@@ -123,7 +123,6 @@ class User < ActiveRecord::Base
   validates_uniqueness_of   :login
   validates_format_of       :login,    :with => login_regex, :message => bad_login_message
 
-  validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100, :allow_blank => true
 
   validates_format_of       :email,    :with => email_regex, :message => bad_email_message, :allow_blank => true
