@@ -6,6 +6,7 @@ tmp/
 backup/
 config/config.yml
 config/database.yml
+config/geoip.yml
 config/gmaps_api_key.yml
 config/s3.yml
 config/newrelic.yml
@@ -15,7 +16,6 @@ config/settings.yml
 config/tilestache.cfg
 log/*
 cache/
-tmp/
 db/sphinx/
 Capfile
 config/*.sphinx.conf
